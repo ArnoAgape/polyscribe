@@ -88,6 +88,7 @@ dependencies {
     implementation (libs.firebase.firestore)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.ui.storage)
+    implementation(libs.play.services.auth)
 
     //DI
     implementation(libs.hilt)

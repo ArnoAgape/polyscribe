@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "213819776571",
+    "project_id": "polyscribe-fef8d",
+    "storage_bucket": "polyscribe-fef8d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:213819776571:android:d9b64c4011a56a4ae9461e",
+        "android_client_info": {
+          "package_name": "com.arnoagape.polyscribe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJA9v5MDooluz1H__R8g8JwdH-x6STVfY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
