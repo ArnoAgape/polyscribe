@@ -5,7 +5,7 @@ import java.io.Serializable
 
 data class File(
     val id: String = "",
-    val url: String? = null,
+    val fileUrl: String? = null,
     val createdAt: Timestamp = Timestamp.now(),
     val date: String? = null,
     val time: String? = null,
