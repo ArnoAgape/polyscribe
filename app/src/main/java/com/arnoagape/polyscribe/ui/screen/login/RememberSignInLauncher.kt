@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.screen.login
+package com.arnoagape.polyscribe.ui.screen.login
 
 import android.app.Activity
 import android.content.Intent

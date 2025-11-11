@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.screen.send
+package com.arnoagape.polyscribe.ui.screen.send
 
 import com.arnoagape.polyscribe.domain.model.File
 

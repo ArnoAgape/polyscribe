@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.navigation.compose.rememberNavController
+import com.arnoagape.polyscribe.navigation.AppNavGraph
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,6 +33,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PolyscribeTheme {
+                val navController = rememberNavController()
+                AppNavGraph(navController = navController)
                 PolyscribeApp()
             }
         }
