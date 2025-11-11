@@ -70,8 +70,7 @@ L’application permet aux clients d’**envoyer leurs documents directement dep
 
 ## 👨‍💻 Auteur
 
-Arno Bouiron
-Développeur Android – passionné d’écologie, d’urbanisme et de mobilité douce 🚴‍♂️
+Arno Bouiron, développeur Android – passionné d’écologie, d’urbanisme et de mobilité douce 🚴‍♂️
 
 ---
 
