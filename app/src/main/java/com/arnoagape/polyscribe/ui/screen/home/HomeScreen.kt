@@ -1,4 +1,18 @@
 package com.arnoagape.polyscribe.ui.screen.home
 
-class HomeScreen {
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import com.arnoagape.polyscribe.domain.model.File
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onFileClick: (File) -> Unit = {},
+    onSettingsClick: () -> Unit = {},
+    onFABClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    onHomeClick: () -> Unit = {},
+) {
+
 }

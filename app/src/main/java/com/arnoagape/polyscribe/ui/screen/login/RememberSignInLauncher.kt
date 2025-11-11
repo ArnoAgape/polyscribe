@@ -7,24 +7,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.NavHostController
+import com.arnoagape.polyscribe.navigation.Home
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import com.arnoagape.polyscribe.R
-import com.arnoagape.polyscribe.screen.Screen
+import com.arnoagape.polyscribe.ui.screen.profile.ProfileViewModel
 
 /**
  * Remembers and returns a lambda function that launches the Firebase Authentication
  * sign-in flow using FirebaseUI.
- *
- *
- * @param navController The [NavHostController] used for app navigation.
- * @param showMessage A lambda used to display toast or snackbar messages to the user.
- * @param profileViewModel The [ProfileViewModel] used to sync user data post sign-in.
- *
- * @return A lambda function that launches the Firebase sign-in flow when invoked.
  */
 @Composable
 fun rememberSignInLauncher(
@@ -32,10 +27,27 @@ fun rememberSignInLauncher(
     showMessage: (String) -> Unit,
     profileViewModel: ProfileViewModel
 ): () -> Unit {
-    val firebaseAuth = FirebaseAuth.getInstance()
+
+    fun handleSignInFailure(
+        response: IdpResponse?,
+        showMessage: (String) -> Unit
+    ) {
+        if (response == null) {
+            Log.w("Auth", "Connection canceled by user.")
+            showMessage("Connection canceled.")
+        } else {
+            val errorCode = response.error?.errorCode
+            Log.w("Auth", "Connection failed. Error code: $errorCode", response.error)
+            showMessage("Connection failed. Please try again.")
+        }
+    }
+
+    val firebaseAuth = remember { FirebaseAuth.getInstance() }
+    val currentShowMessage by rememberUpdatedState(showMessage)
 
     val signInLauncher: ActivityResultLauncher<Intent> = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
+
     ) { result ->
         val response = IdpResponse.fromResultIntent(result.data)
 
@@ -44,34 +56,29 @@ fun rememberSignInLauncher(
             Log.d("Auth", "Successfully connected: ${user?.email ?: "Unknown user"}")
 
             profileViewModel.syncUserWithFirestore()
+            currentShowMessage("Connection successful")
 
-            showMessage("Connection successful")
-
-            navController.navigate(Screen.Homefeed.route) {
+            navController.navigate(Home) {
                 popUpTo(navController.graph.startDestinationId) {
                     inclusive = true
                 }
                 launchSingleTop = true
             }
         } else {
-            // Failed or canceled by the user
-            if (response == null) {
-                Log.w("Auth", "Connection canceled by user.")
-                showMessage("Connection canceled.")
-            } else {
-                // Error
-                val errorCode = response.error?.errorCode
-                Log.w("Auth", "Connection failed. Error code: $errorCode", response.error)
-                showMessage("Connection failed. Please try again.")
-            }
+            handleSignInFailure(response, showMessage)
         }
     }
 
-    val providers = remember { listOf(AuthUI.IdpConfig.EmailBuilder().build()) }
+    val providers = remember {
+        listOf(
+            AuthUI.IdpConfig.EmailBuilder().build(),
+            AuthUI.IdpConfig.GoogleBuilder().build()
+        )
+    }
+
     val signInIntent = remember(providers) {
         AuthUI.getInstance()
             .createSignInIntentBuilder()
-            .setTheme(R.style.Theme_HexagonalGames_Login)
             .setAvailableProviders(providers)
             .build()
     }

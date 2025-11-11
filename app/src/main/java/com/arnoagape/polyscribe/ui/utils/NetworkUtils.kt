@@ -21,7 +21,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class NetworkUtils @Inject constructor(
-    private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
 
     /**
