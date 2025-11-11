@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.screen.settings
+package com.arnoagape.polyscribe.screen.profile
 
 import android.Manifest
 import android.app.NotificationChannel
