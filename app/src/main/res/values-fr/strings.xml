@@ -2,4 +2,5 @@
 <resources>
     <string name="home">Accueil</string>
     <string name="profile">Profil</string>
+    <string name="loading">Chargement…</string>
 </resources>
