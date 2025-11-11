@@ -2,7 +2,7 @@
 <img src="app/src/main/res/drawable/ic_logo.jpg" alt="Polyscribe Logo" width="200" height="200"/>
 </p>
 
-# 🖨️ Polyscribe - Official App
+# 🖨️ Polyscribe - Application officielle
 
 **Polyscribe** est une application Android développée pour moderniser les services de **reprographie et d’impression** de l’entreprise **Polyscribe**, située à **Marseille 6ᵉ**.  
 Depuis près de **30 ans**, Polyscribe accompagne étudiants, particuliers et professionnels dans leurs besoins en **impression, copie et bureautique**.
