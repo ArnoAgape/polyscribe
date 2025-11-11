@@ -12,7 +12,20 @@
           "package_name": "com.arnoagape.polyscribe"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "213819776571-snpj415q8cp2jhpcdmpah5jg13oskbdo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.arnoagape.polyscribe",
+            "certificate_hash": "ca282d6129ce877e1c42c75b8e4a87054891f789"
+          }
+        },
+        {
+          "client_id": "213819776571-b7r6tc4bfv1m52f8lod79kp9i1l6ka30.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDJA9v5MDooluz1H__R8g8JwdH-x6STVfY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "213819776571-b7r6tc4bfv1m52f8lod79kp9i1l6ka30.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
