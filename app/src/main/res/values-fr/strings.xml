@@ -3,4 +3,14 @@
     <string name="home">Accueil</string>
     <string name="profile">Profil</string>
     <string name="loading">Chargement…</string>
+
+    <string name="sign_in_google">Se connecter avec Google</string>
+    <string name="sign_in">Se connecter</string>
+    <string name="sign_in_guest">Continuer en tant qu\'invité</string>
+    <string name="sign_up">S\'inscrire</string>
+    <string name="email">E-mail</string>
+    <string name="password">Mot de passe</string>
+    <string name="confirm_password">Confirmer le mot de passe</string>
+
+    <string name="or">ou</string>
 </resources>

@@ -44,7 +44,7 @@ class NotificationService : FirebaseMessagingService() {
         )
 
         val builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_logo)
+            .setSmallIcon(R.drawable.ic_polyscribe_logo)
             .setContentTitle(title ?: "New notification")
             .setContentText(body ?: "")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -52,8 +52,7 @@ class MainActivity : ComponentActivity() {
                 ) { contentPadding ->
                     Box(Modifier.padding(contentPadding)) {
                         AppNavGraph(
-                            navController = navController,
-                            showMessage = showMessage
+                            navController = navController
                         )
                     }
                 }

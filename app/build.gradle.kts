@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.material)
 
     // Firebase & Firestore
     implementation(platform(libs.firebase.bom))

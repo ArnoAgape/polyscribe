@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.NavHostController
+import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.navigation.Home
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -79,6 +80,8 @@ fun rememberSignInLauncher(
     val signInIntent = remember(providers) {
         AuthUI.getInstance()
             .createSignInIntentBuilder()
+            .setLogo(R.drawable.ic_polyscribe_logo)
+            .setTheme(R.style.Theme_Polyscribe)
             .setAvailableProviders(providers)
             .build()
     }
