@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,6 +38,7 @@ fun LoginScreen(
 @Composable
 private fun LoginContent(
     onGoogleSignInClick: () -> Unit,
+    onGuestSignInClick: () -> Unit,
     onEmailSignInClick: (String, String) -> Unit,
     showMessage: (String) -> Unit
 ) {
@@ -56,8 +58,7 @@ private fun LoginContent(
             contentAlignment = Alignment.Center
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // 🔹 Logo
                 Image(
@@ -67,6 +68,8 @@ private fun LoginContent(
                         .size(160.dp)
                         .padding(bottom = 16.dp)
                 )
+
+                Spacer(modifier = Modifier.height(30.dp))
 
                 // 🔹 Champ email
                 OutlinedTextField(
@@ -89,6 +92,8 @@ private fun LoginContent(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                Spacer(modifier = Modifier.height(24.dp))
+
                 // 🔹 Email Button
                 Button(
                     onClick = { onEmailSignInClick(email, password) },
@@ -99,8 +104,7 @@ private fun LoginContent(
                     Text(stringResource(R.string.sign_in))
                 }
 
-                // 🔹 Separator
-                Text(stringResource(R.string.or), style = MaterialTheme.typography.labelMedium)
+                Spacer(modifier = Modifier.height(50.dp))
 
                 // 🔹 Google Button
                 OutlinedButton(
@@ -112,20 +116,36 @@ private fun LoginContent(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_google_logo),
-                        contentDescription = "Google",
-                        modifier = Modifier.size(24.dp)
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Unspecified
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(stringResource(R.string.sign_in_google))
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 🔹 Separator
+                Text(stringResource(R.string.or), style = MaterialTheme.typography.labelMedium)
+
+                Spacer(modifier = Modifier.height(14.dp))
+
                 // 🔹 Option inscription
                 TextButton(
                     onClick = {
-                        showMessage("Fonctionnalité d’inscription à venir")
+                        showMessage("Fonctionnalité à venir")
                     }
                 ) {
-                    Text(stringResource(R.string.sign_up))
+                    OutlinedButton(
+                        onClick = onGuestSignInClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        border = ButtonDefaults.outlinedButtonBorder(enabled = true)
+                    ) {
+                        Text(stringResource(R.string.sign_in_guest))
+                    }
                 }
             }
         }
@@ -139,6 +159,7 @@ private fun LoginScreenPreview() {
         LoginContent(
             onEmailSignInClick = { _, _ -> },
             onGoogleSignInClick = { },
+            onGuestSignInClick = { },
             showMessage = { },
         )
     }
