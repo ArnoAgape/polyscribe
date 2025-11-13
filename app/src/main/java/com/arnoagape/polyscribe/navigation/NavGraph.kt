@@ -47,13 +47,19 @@ fun AppNavGraph(
 
         composable<Login> {
             LoginScreen(
-                viewModel = hiltViewModel<LoginViewModel>()
+                viewModel = hiltViewModel<LoginViewModel>(),
+                onEmailSignInClick = { email, password ->
+                    navController.navigate(Home)
+                },
+                onGoogleSignInClick = { navController.navigate(Home) },
+                onGuestSignInClick = { navController.navigate(Home) },
             )
         }
 
         composable<Profile> {
             ProfileScreen(
                 viewModel = hiltViewModel<ProfileViewModel>(),
+                onBackClick = { navController.navigateUp() }
             )
         }
 

@@ -4,6 +4,11 @@
     <string name="profile">Profil</string>
     <string name="loading">Chargement…</string>
 
+    <string name="error_generic">Une erreur est survenue</string>
+    <string name="error_no_account_file">Un compte est nécessaire pour ajouter un fichier</string>
+    <string name="no_network">Aucun réseau</string>
+    <string name="no_files">Pour envoyer un nouveau document, appuyez sur le bouton "+"</string>
+
     <string name="sign_in_google">Se connecter avec Google</string>
     <string name="sign_in">Se connecter</string>
     <string name="sign_in_guest">Continuer en tant qu\'invité</string>
@@ -13,4 +18,8 @@
     <string name="confirm_password">Confirmer le mot de passe</string>
 
     <string name="or">ou</string>
+    <string name="description_button_add">Ajout</string>
+
+    <string name="created_at">Créé le %1$s à %2$s</string>
+    <string name="feature_coming_soon">Fonctionnalité à venir</string>
 </resources>

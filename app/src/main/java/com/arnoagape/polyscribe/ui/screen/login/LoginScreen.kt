@@ -16,12 +16,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.ui.common.Event.ShowSnackBar
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
+    onGoogleSignInClick: () -> Unit,
+    onGuestSignInClick: () -> Unit,
+    onEmailSignInClick: (String, String) -> Unit
 ) {
 
     Scaffold { contentPadding ->
@@ -31,7 +35,13 @@ fun LoginScreen(
                 .padding(16.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {}
+        ) {
+            LoginContent(
+                onGoogleSignInClick = onGoogleSignInClick,
+                onGuestSignInClick = onGuestSignInClick,
+                onEmailSignInClick = onEmailSignInClick
+            )
+        }
     }
 }
 
@@ -39,8 +49,7 @@ fun LoginScreen(
 private fun LoginContent(
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
-    onEmailSignInClick: (String, String) -> Unit,
-    showMessage: (String) -> Unit
+    onEmailSignInClick: (String, String) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -80,6 +89,8 @@ private fun LoginContent(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // 🔹 Champ mot de passe
                 OutlinedTextField(
@@ -134,7 +145,7 @@ private fun LoginContent(
                 // 🔹 Option inscription
                 TextButton(
                     onClick = {
-                        showMessage("Fonctionnalité à venir")
+                        ShowSnackBar(R.string.feature_coming_soon)
                     }
                 ) {
                     OutlinedButton(
@@ -160,7 +171,6 @@ private fun LoginScreenPreview() {
             onEmailSignInClick = { _, _ -> },
             onGoogleSignInClick = { },
             onGuestSignInClick = { },
-            showMessage = { },
         )
     }
 }
