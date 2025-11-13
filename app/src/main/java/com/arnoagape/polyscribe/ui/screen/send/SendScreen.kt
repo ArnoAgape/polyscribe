@@ -1,8 +1,84 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
+import android.net.Uri
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDialog
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.ui.common.Event
+import com.arnoagape.polyscribe.ui.common.EventsEffect
+import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendScreen(
@@ -10,5 +86,408 @@ fun SendScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val post by viewModel.file.collectAsStateWithLifecycle()
+    val isFileValid by viewModel.isFileValid.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
+    EventsEffect(viewModel.eventsFlow) { event ->
+        when (event) {
+            is Event.ShowSnackBar -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                onSaveClick()
+            }
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.send_fragment_label)) },
+                navigationIcon = {
+                    IconButton(onClick = { onBackClick() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.contentDescription_go_back)
+                        )
+                    }
+                }
+            )
+        }
+    ) { contentPadding ->
+
+        when (uiState) {
+
+            is SendUiState.Idle, is SendUiState.Success -> {
+                val fileToDisplay =
+                    if (uiState is SendUiState.Success) (uiState as SendUiState.Success).file else post
+
+                CreateFile(
+                    modifier = Modifier.padding(contentPadding),
+                    fileUrl = fileToDisplay.fileUrl,
+                    date = fileToDisplay.date,
+                    time = fileToDisplay.time,
+                    colored = fileToDisplay.isColored,
+                    doubleSided = fileToDisplay.isDoubleSided,
+                    numberOfCopies = fileToDisplay.numberOfCopies,
+                    comments = fileToDisplay.comments,
+                    onSaveClicked = { viewModel.onSaveClicked() },
+                    isFileValid = isFileValid,
+                    isLoading = false
+                )
+            }
+
+            is SendUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator()
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(R.string.publishing),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+
+            is SendUiState.Error -> {
+                val errorState = uiState as SendUiState.Error
+                val message = when (errorState) {
+                    is SendUiState.Error.NoAccount -> (uiState as SendUiState.Error.NoAccount).message
+                    is SendUiState.Error.Generic -> (uiState as SendUiState.Error.Generic).message
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = message, color = MaterialTheme.colorScheme.error)
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun DateField(
+    modifier: Modifier,
+    value: LocalDate?,
+    onValueChange: (LocalDate?) -> Unit,
+    label: String
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val displayText = value?.format(formatter) ?: ""
+
+    OutlinedTextField(
+        label = { Text(label) },
+        value = displayText,
+        onValueChange = {},
+        readOnly = true,
+        trailingIcon = { Icon(Icons.Default.DateRange, null) },
+        modifier = modifier.clickable { showDialog = true }
+    )
+
+    if (showDialog) {
+        // ---- Material 3 DatePickerDialog ----
+        val datePickerState = rememberDatePickerState()
+
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val date = Instant.ofEpochMilli(millis)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
+
+                        onValueChange(date)
+                    }
+                    showDialog = false
+                }) { Text("OK") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun TimeField(
+    modifier: Modifier,
+    value: LocalTime?,
+    onValueChange: (LocalTime?) -> Unit,
+    label: String
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    val displayText = value?.format(formatter) ?: ""
+
+    OutlinedTextField(
+        label = { Text(label) },
+        value = displayText,
+        onValueChange = {},
+        readOnly = true,
+        trailingIcon = { Icon(Icons.Default.AccessTime, null) },
+        modifier = modifier.clickable { showDialog = true }
+    )
+
+    if (showDialog) {
+        val state = rememberTimePickerState()
+
+        TimePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val picked = LocalTime.of(state.hour, state.minute)
+                    onValueChange(picked)
+                    showDialog = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Annuler")
+                }
+            },
+            title = { Text(stringResource(R.string.select_time)) }
+        ) {
+            TimePicker(state = state)
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+private fun CreateFile(
+    modifier: Modifier = Modifier,
+    fileUrl: String?,
+    date: LocalDate?,
+    onDateChange: (LocalDate?) -> Unit = {},
+    time: LocalTime?,
+    onTimeChange: (LocalTime?) -> Unit = {},
+    colored: Boolean,
+    onColorationChange: (Boolean) -> Unit = {},
+    doubleSided: Boolean,
+    onDoubleSidedChange: (Boolean) -> Unit = {},
+    numberOfCopies: Int?,
+    onNumberOfCopiesChange: (Int?) -> Unit = {},
+    comments: String?,
+    onFileSelected: (Uri?) -> Unit = {},
+    onSaveClicked: () -> Unit,
+    isFileValid: Boolean,
+    isLoading: Boolean
+) {
+    val scrollState = rememberScrollState()
+    val selectedFileUri = fileUrl?.toUri()
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        onFileSelected(uri)
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = modifier
+                .padding(16.dp)
+                .navigationBarsPadding()
+                .imePadding()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    DateField(
+                        modifier = Modifier.weight(1f),
+                        value = date,
+                        onValueChange = onDateChange,
+                        label = stringResource(id = R.string.hint_date)
+                    )
+
+                    TimeField(
+                        modifier = Modifier.weight(1f),
+                        value = time,
+                        onValueChange = onTimeChange,
+                        label = stringResource(id = R.string.hint_time)
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                // Coloration
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(stringResource(id = R.string.hint_color))
+                    Switch(
+                        checked = colored,
+                        onCheckedChange = onColorationChange
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                // Double sided
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(stringResource(id = R.string.hint_double_sided))
+                    Switch(
+                        checked = doubleSided,
+                        onCheckedChange = onDoubleSidedChange
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                // Number of copies
+                OutlinedTextField(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth(),
+                    value = numberOfCopies.toString(),
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() }) {
+                            onNumberOfCopiesChange(newValue.toIntOrNull())
+                        }
+                    },
+                    label = { Text(stringResource(id = R.string.hint_number_of_copies)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                )
+
+
+                Spacer(Modifier.height(16.dp))
+
+                // Comments
+                if (comments != null) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .fillMaxWidth(),
+                        value = comments,
+                        onValueChange = {},
+                        label = { Text(stringResource(id = R.string.hint_comments)) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            capitalization = KeyboardCapitalization.Sentences
+                        )
+                    )
+                }
+
+
+
+                Spacer(Modifier.height(16.dp))
+
+                // 🖼️ File picker
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    if (selectedFileUri != null) {
+                        AsyncImage(
+                            model = selectedFileUri,
+                            contentDescription = stringResource(R.string.preview_file),
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .border(1.dp, Color.Gray, RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Button(
+                        onClick = { launcher.launch("image/*") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Text(
+                            text = if (selectedFileUri == null)
+                                stringResource(R.string.select_file)
+                            else
+                                stringResource(R.string.change_file),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            Button(
+                onClick = onSaveClicked,
+                enabled = isFileValid && !isLoading
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(text = stringResource(id = R.string.action_send))
+                }
+            }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@PreviewLightDark
+@Composable
+private fun CreateFilePreview() {
+    PolyscribeTheme {
+        CreateFile(
+            fileUrl = null,
+            date = null,
+            onDateChange = {},
+            time = null,
+            onTimeChange = {},
+            colored = false,
+            onColorationChange = {},
+            doubleSided = false,
+            onDoubleSidedChange = {},
+            numberOfCopies = 1,
+            onNumberOfCopiesChange = {},
+            comments = "J'adore !!",
+            onFileSelected = {},
+            onSaveClicked = {},
+            isFileValid = true,
+            isLoading = false
+        )
+    }
 }

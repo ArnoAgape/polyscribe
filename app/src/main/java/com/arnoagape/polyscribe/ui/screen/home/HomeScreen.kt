@@ -1,6 +1,8 @@
 package com.arnoagape.polyscribe.ui.screen.home
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,6 +52,8 @@ import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.google.firebase.Timestamp
+import java.time.LocalDate
+import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +101,7 @@ fun HomeScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(id = R.string.description_button_add)
+                    contentDescription = stringResource(id = R.string.contentDescription_button_add)
                 )
             }
         }
@@ -167,7 +171,7 @@ private fun HomeContent(
                     Text(
                         text = stringResource(
                             R.string.created_at,
-                            file.date ?: "", file.time ?: ""
+                            file.date, file.time
                         ),
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -196,6 +200,7 @@ private fun HomeContent(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @PreviewLightDark
 @Composable
 private fun HomeContentPreview() {
@@ -206,43 +211,55 @@ private fun HomeContentPreview() {
                     id = "1",
                     fileUrl = "https://picsum.photos/id/85/1080/",
                     createdAt = Timestamp(0, 0),
-                    date = "13/11/2025",
-                    time = "10:50",
+                    date = LocalDate.now(),
+                    time = LocalTime.now(),
                     author = User(
                         id = "1",
                         displayName = "John Doe",
                         phoneNumber = "06 01 02 03 04",
                         email = "jdoe@mail.com",
                         isProfessional = true
-                    )
+                    ),
+                    isColored = false,
+                    isDoubleSided = false,
+                    numberOfCopies = 1,
+                    comments = null
                 ),
                 File(
                     id = "2",
                     fileUrl = "https://picsum.photos/id/85/1080/",
                     createdAt = Timestamp(0, 0),
-                    date = "08/01/2025",
-                    time = "21:38",
+                    date = LocalDate.now(),
+                    time = LocalTime.now(),
                     author = User(
                         id = "2",
                         displayName = "Harry Ter",
                         phoneNumber = "06 12 23 34 45",
                         email = "hter@mail.com",
                         isProfessional = true
-                    )
+                    ),
+                    isColored = false,
+                    isDoubleSided = false,
+                    numberOfCopies = 1,
+                    comments = null
                 ),
                 File(
                     id = "3",
                     fileUrl = "https://picsum.photos/id/85/1080/",
                     createdAt = Timestamp(0, 0),
-                    date = "13/07/2025",
-                    time = "19:57",
+                    date = LocalDate.now(),
+                    time = LocalTime.now(),
                     author = User(
                         id = "3",
                         displayName = "Emma Watt",
                         phoneNumber = "06 02 03 04 05",
                         email = "ewatt@mail.com",
                         isProfessional = false
-                    )
+                    ),
+                    isColored = false,
+                    isDoubleSided = false,
+                    numberOfCopies = 1,
+                    comments = null
                 )
             ),
             onFileClick = {}

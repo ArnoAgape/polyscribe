@@ -3,6 +3,7 @@ package com.arnoagape.polyscribe.ui.screen.send
 import com.arnoagape.polyscribe.domain.model.File
 
 sealed class SendUiState {
+
     object Idle : SendUiState()
     object Loading : SendUiState()
     data class Success(val file: File) : SendUiState()

@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="home">Accueil</string>
+    <string name="cancel">Annuler</string>
+    <string name="or">ou</string>
     <string name="profile">Profil</string>
     <string name="loading">Chargement…</string>
+    <string name="publishing">Publication en cours…</string>
+    <string name="file_success">Document envoyé avec succès</string>
 
     <string name="error_generic">Une erreur est survenue</string>
     <string name="error_no_account_file">Un compte est nécessaire pour ajouter un fichier</string>
     <string name="no_network">Aucun réseau</string>
     <string name="no_files">Pour envoyer un nouveau document, appuyez sur le bouton "+"</string>
+    <string name="error_number_of_copies">Le nombre de copies ne doit pas être égale à 0</string>
+    <string name="error_no_file">Un document doit être joint à l\'envoi</string>
+
+    <string name="send_fragment_label">Envoyer un document</string>
+    <string name="action_send">Envoyer</string>
+    <string name="select_file">Joindre le document</string>
+    <string name="change_file">Choisir un autre document</string>
+    <string name="preview_file">Aperçu du document</string>
+    <string name="uploaded_file">Document envoyé</string>
+    <string name="select_time">Choisir une heure</string>
+    <string name="select_date">Choisir une date</string>
 
     <string name="sign_in_google">Se connecter avec Google</string>
     <string name="sign_in">Se connecter</string>
@@ -16,9 +31,15 @@
     <string name="email">E-mail</string>
     <string name="password">Mot de passe</string>
     <string name="confirm_password">Confirmer le mot de passe</string>
+    <string name="hint_date">Date</string>
+    <string name="hint_time">Heure</string>
+    <string name="hint_color">Couleur :</string>
+    <string name="hint_double_sided">Recto-verso :</string>
+    <string name="hint_number_of_copies">Nombre d\'exemplaires</string>
+    <string name="hint_comments">Commentaires</string>
 
-    <string name="or">ou</string>
-    <string name="description_button_add">Ajout</string>
+    <string name="contentDescription_button_add">Ajout</string>
+    <string name="contentDescription_go_back">Retour</string>
 
     <string name="created_at">Créé le %1$s à %2$s</string>
     <string name="feature_coming_soon">Fonctionnalité à venir</string>
