@@ -4,6 +4,7 @@
     <string name="cancel">Annuler</string>
     <string name="or">ou</string>
     <string name="profile">Profil</string>
+    <string name="settings">Paramètres</string>
     <string name="loading">Chargement…</string>
     <string name="publishing">Publication en cours…</string>
     <string name="file_success">Document envoyé avec succès</string>

@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -19,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -122,11 +124,24 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 when (uiState) {
-                    is HomeUiState.Success ->
+                    is HomeUiState.Idle, is HomeUiState.Success ->
                         HomeContent(
                             files = (uiState as HomeUiState.Success).files,
                             onFileClick = onFileClick
                         )
+
+                    is HomeUiState.Loading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
 
                     is HomeUiState.Error.Empty -> {
                         Column(

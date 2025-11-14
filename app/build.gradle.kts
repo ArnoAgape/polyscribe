@@ -93,12 +93,16 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.ui.storage)
     implementation(libs.play.services.auth)
+    implementation(libs.datastore.preferences)
+    implementation(libs.androidx.datastore)
 
     //DI
     implementation(libs.hilt)
     implementation(libs.material3)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.accompanist.permissions)
+    testImplementation(libs.datastore.preferences)
 
     // Images
     implementation(libs.coil.compose)

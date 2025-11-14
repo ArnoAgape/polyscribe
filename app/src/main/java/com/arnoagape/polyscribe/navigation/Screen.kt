@@ -21,3 +21,6 @@ object Profile
 
 @Serializable
 object Send
+
+@Serializable
+object Settings

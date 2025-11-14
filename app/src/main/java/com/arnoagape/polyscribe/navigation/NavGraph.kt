@@ -1,5 +1,7 @@
 package com.arnoagape.polyscribe.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -16,7 +18,10 @@ import com.arnoagape.polyscribe.ui.screen.profile.ProfileScreen
 import com.arnoagape.polyscribe.ui.screen.profile.ProfileViewModel
 import com.arnoagape.polyscribe.ui.screen.send.SendScreen
 import com.arnoagape.polyscribe.ui.screen.send.SendViewModel
+import com.arnoagape.polyscribe.ui.screen.settings.SettingsScreen
+import com.arnoagape.polyscribe.ui.screen.settings.SettingsViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     navController: NavHostController
@@ -68,6 +73,12 @@ fun AppNavGraph(
                 viewModel = hiltViewModel<SendViewModel>(),
                 onBackClick = { navController.navigateUp() },
                 onSaveClick = { navController.navigateUp() }
+            )
+        }
+
+        composable<Settings> {
+            SettingsScreen(
+                viewModel = hiltViewModel<SettingsViewModel>()
             )
         }
     }

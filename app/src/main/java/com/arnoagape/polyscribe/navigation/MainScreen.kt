@@ -1,8 +1,11 @@
 package com.arnoagape.polyscribe.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -13,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen() {
 
@@ -20,7 +24,7 @@ fun MainScreen() {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
     val isBottomBarDestination = currentRoute == Home::class.qualifiedName ||
-            currentRoute == Profile::class.qualifiedName
+            currentRoute == Profile::class.qualifiedName || currentRoute == Settings::class.qualifiedName
 
     if (isBottomBarDestination) {
         NavigationSuiteScaffold(
@@ -57,7 +61,8 @@ enum class AppDestinations(
     val route: Any
 ) {
     HOME(Icons.Default.Home, R.string.home, Home),
-    PROFILE(Icons.Default.AccountBox, R.string.profile, Profile);
+    PROFILE(Icons.Default.AccountBox, R.string.profile, Profile),
+    SETTINGS(Icons.Default.Settings, R.string.settings, Settings);
 
     @Composable
     fun label(): String = stringResource(id = labelRes)

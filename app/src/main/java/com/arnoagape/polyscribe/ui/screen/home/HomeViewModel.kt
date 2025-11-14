@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** Holds the current state of the home feed UI (loading, success, or error). */
-    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
 
     /** Publicly exposed immutable flow for observing post-related UI states. */
     val uiState: StateFlow<HomeUiState> = _uiState
