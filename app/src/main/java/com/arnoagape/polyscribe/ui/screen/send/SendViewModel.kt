@@ -165,41 +165,4 @@ class SendViewModel @Inject constructor(
             addFile()
         }
     }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun toggleColoration() {
-        _file.update { file ->
-            file.copy(isColored = !file.isColored)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun toggleDoubleSided() {
-        _file.update { file ->
-            file.copy(isDoubleSided = !file.isDoubleSided)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun changeNumberOfCopies(delta: Int) {
-        _file.update { file ->
-            val current = file.numberOfCopies
-            val newValue = (current + delta).coerceAtLeast(1)
-            file.copy(numberOfCopies = newValue)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun updateDate() {
-        _file.update { file ->
-            file.copy(date = file.date)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun updateTime() {
-        _file.update { file ->
-            file.copy(time = file.time)
-        }
-    }
 }

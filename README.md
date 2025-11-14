@@ -1,5 +1,5 @@
 <p align="center">
-<img src="app/src/main/res/drawable/ic_logo.jpg" alt="Polyscribe Logo" width="200" height="200"/>
+<img src="app/src/main/res/drawable/ic_polyscribe_logo.jpg" alt="Polyscribe Logo" width="200" height="200"/>
 </p>
 
 # 🖨️ Polyscribe - Application officielle
