@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.time.LocalDate
@@ -52,7 +53,7 @@ class SendViewModel @Inject constructor(
             isColored = false,
             isDoubleSided = false,
             numberOfCopies = 1,
-            comments = null,
+            comments = "",
         )
     )
 
@@ -128,6 +129,29 @@ class SendViewModel @Inject constructor(
             else -> {
                 addFile()
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun toggleColoration() {
+        _file.update { file ->
+            file.copy(isColored = !file.isColored)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun toggleDoubleSided() {
+        _file.update { file ->
+            file.copy(isDoubleSided = !file.isDoubleSided)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun changeNumberOfCopies(delta: Int) {
+        _file.update { file ->
+            val current = file.numberOfCopies
+            val newValue = (current + delta).coerceAtLeast(1)
+            file.copy(numberOfCopies = newValue)
         }
     }
 }

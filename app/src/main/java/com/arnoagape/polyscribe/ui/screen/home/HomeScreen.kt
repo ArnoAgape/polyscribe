@@ -238,7 +238,7 @@ private fun HomeContentPreview() {
                     isColored = false,
                     isDoubleSided = false,
                     numberOfCopies = 1,
-                    comments = null
+                    comments = ""
                 ),
                 File(
                     id = "2",
@@ -256,7 +256,7 @@ private fun HomeContentPreview() {
                     isColored = false,
                     isDoubleSided = false,
                     numberOfCopies = 1,
-                    comments = null
+                    comments = "null"
                 ),
                 File(
                     id = "3",
@@ -274,7 +274,7 @@ private fun HomeContentPreview() {
                     isColored = false,
                     isDoubleSided = false,
                     numberOfCopies = 1,
-                    comments = null
+                    comments = "null"
                 )
             ),
             onFileClick = {}

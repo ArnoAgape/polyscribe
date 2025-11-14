@@ -15,5 +15,5 @@ data class File(
     val isColored: Boolean,
     val isDoubleSided: Boolean,
     val numberOfCopies: Int,
-    val comments: String?
+    val comments: String
 ) : Serializable

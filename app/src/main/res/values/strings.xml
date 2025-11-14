@@ -18,7 +18,7 @@
 
     <string name="send_fragment_label">Send a document</string>
     <string name="action_send">Send</string>
-    <string name="select_file">Select the file</string>
+    <string name="select_file">Select file</string>
     <string name="change_file">Pick another file</string>
     <string name="preview_file">File preview</string>
     <string name="uploaded_file">File uploaded</string>
@@ -36,7 +36,7 @@
     <string name="hint_time">Time</string>
     <string name="hint_color">Color:</string>
     <string name="hint_double_sided">Double sided:</string>
-    <string name="hint_number_of_copies">Number of copies</string>
+    <string name="hint_number_of_copies">Number of copies:</string>
     <string name="hint_comments">Comments</string>
 
     <string name="contentDescription_button_add">Add</string>

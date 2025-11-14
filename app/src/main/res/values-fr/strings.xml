@@ -36,7 +36,7 @@
     <string name="hint_time">Heure</string>
     <string name="hint_color">Couleur :</string>
     <string name="hint_double_sided">Recto-verso :</string>
-    <string name="hint_number_of_copies">Nombre d\'exemplaires</string>
+    <string name="hint_number_of_copies">Nombre d\'exemplaires :</string>
     <string name="hint_comments">Commentaires</string>
 
     <string name="contentDescription_button_add">Ajout</string>

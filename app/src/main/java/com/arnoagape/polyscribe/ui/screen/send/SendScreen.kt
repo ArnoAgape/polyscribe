@@ -12,11 +12,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -123,13 +125,16 @@ fun SendScreen(
                     if (uiState is SendUiState.Success) (uiState as SendUiState.Success).file else post
 
                 CreateFile(
-                    modifier = Modifier.padding(contentPadding),
+                    contentPadding = contentPadding,
                     fileUrl = fileToDisplay.fileUrl,
                     date = fileToDisplay.date,
                     time = fileToDisplay.time,
                     colored = fileToDisplay.isColored,
+                    onColorationChange = { viewModel.toggleColoration() },
                     doubleSided = fileToDisplay.isDoubleSided,
+                    onDoubleSidedChange = { viewModel.toggleDoubleSided() },
                     numberOfCopies = fileToDisplay.numberOfCopies,
+                    onNumberOfCopiesChange = { delta -> viewModel.changeNumberOfCopies(delta) },
                     comments = fileToDisplay.comments,
                     onSaveClicked = { viewModel.onSaveClicked() },
                     isFileValid = isFileValid,
@@ -192,7 +197,10 @@ fun DateField(
         onValueChange = {},
         readOnly = true,
         trailingIcon = { Icon(Icons.Default.DateRange, null) },
-        modifier = modifier.clickable { showDialog = true }
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clickable { showDialog = true }
     )
 
     if (showDialog) {
@@ -239,7 +247,10 @@ fun TimeField(
         onValueChange = {},
         readOnly = true,
         trailingIcon = { Icon(Icons.Default.AccessTime, null) },
-        modifier = modifier.clickable { showDialog = true }
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clickable { showDialog = true }
     )
 
     if (showDialog) {
@@ -271,19 +282,19 @@ fun TimeField(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun CreateFile(
-    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     fileUrl: String?,
     date: LocalDate?,
     onDateChange: (LocalDate?) -> Unit = {},
     time: LocalTime?,
     onTimeChange: (LocalTime?) -> Unit = {},
     colored: Boolean,
-    onColorationChange: (Boolean) -> Unit = {},
+    onColorationChange: (Boolean) -> Unit,
     doubleSided: Boolean,
-    onDoubleSidedChange: (Boolean) -> Unit = {},
-    numberOfCopies: Int?,
-    onNumberOfCopiesChange: (Int?) -> Unit = {},
-    comments: String?,
+    onDoubleSidedChange: (Boolean) -> Unit,
+    numberOfCopies: Int,
+    onNumberOfCopiesChange: (Int) -> Unit,
+    comments: String,
     onFileSelected: (Uri?) -> Unit = {},
     onSaveClicked: () -> Unit,
     isFileValid: Boolean,
@@ -303,19 +314,19 @@ private fun CreateFile(
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(16.dp)
                 .navigationBarsPadding()
                 .imePadding()
                 .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
+                    .padding(contentPadding)
                     .verticalScroll(scrollState)
-            ) {
+            )
+            {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -341,7 +352,13 @@ private fun CreateFile(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 8.dp)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -358,7 +375,12 @@ private fun CreateFile(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -372,42 +394,50 @@ private fun CreateFile(
                 Spacer(Modifier.height(16.dp))
 
                 // Number of copies
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(5.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(stringResource(id = R.string.hint_number_of_copies))
+                    IconButton(
+                        onClick = { onNumberOfCopiesChange(-1) },
+                        enabled = numberOfCopies > 1
+                    ) {
+                        Text("-", style = MaterialTheme.typography.headlineSmall)
+                    }
+
+                    Text(
+                        text = numberOfCopies.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
+
+                    IconButton(onClick = { onNumberOfCopiesChange(+1) }) {
+                        Text("+", style = MaterialTheme.typography.headlineSmall)
+                    }
+                }
+
+                // Comments
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
-                    value = numberOfCopies.toString(),
-                    onValueChange = { newValue ->
-                        if (newValue.all { it.isDigit() }) {
-                            onNumberOfCopiesChange(newValue.toIntOrNull())
-                        }
-                    },
-                    label = { Text(stringResource(id = R.string.hint_number_of_copies)) },
+                    value = comments,
+                    onValueChange = {},
+                    label = { Text(stringResource(id = R.string.hint_comments)) },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
-                )
-
-
-                Spacer(Modifier.height(16.dp))
-
-                // Comments
-                if (comments != null) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .fillMaxWidth(),
-                        value = comments,
-                        onValueChange = {},
-                        label = { Text(stringResource(id = R.string.hint_comments)) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            capitalization = KeyboardCapitalization.Sentences
-                        )
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences
                     )
-                }
-
-
+                )
 
                 Spacer(Modifier.height(16.dp))
 
