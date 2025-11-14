@@ -88,16 +88,15 @@ fun HomeScreen(
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    if (isSignedIn) {
+                onClick = { onFABClick() },
+                    /*if (isSignedIn) {
                         onFABClick()
                     } else {
                         Toast.makeText(
                             context, context.getString(R.string.error_no_account_file),
                             Toast.LENGTH_SHORT
                         ).show()
-                    }
-                },
+                    }*/
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {

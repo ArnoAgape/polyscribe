@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -73,6 +71,7 @@ import coil.compose.AsyncImage
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
+import com.arnoagape.polyscribe.ui.components.PickerField
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import java.time.Instant
 import java.time.LocalDate
@@ -187,47 +186,50 @@ fun SendScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateField(
-    modifier: Modifier,
-    value: LocalDate?,
-    onValueChange: (LocalDate?) -> Unit,
-    label: String
+    value: LocalDate,
+    onValueChange: (LocalDate) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
-
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    val displayText = value?.format(formatter) ?: ""
 
-    OutlinedTextField(
-        label = { Text(label) },
-        value = displayText,
-        onValueChange = {},
-        readOnly = true,
-        trailingIcon = { Icon(Icons.Default.DateRange, null) },
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .clickable { showDialog = true }
+    PickerField(
+        modifier = modifier,
+        label = label,
+        value = value.format(formatter),
+        icon = Icons.Default.DateRange,
+        onClick = { showDialog = true }
     )
 
     if (showDialog) {
-        val datePickerState = rememberDatePickerState()
+        val state = rememberDatePickerState(
+            initialSelectedDateMillis = value
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant().toEpochMilli()
+        )
 
         DatePickerDialog(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        val date = Instant.ofEpochMilli(millis)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-
-                        onValueChange(date)
+                    state.selectedDateMillis?.let { millis ->
+                        onValueChange(
+                            Instant.ofEpochMilli(millis)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                        )
                     }
                     showDialog = false
                 }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                }) { Text(stringResource(R.string.cancel)) }
             }
         ) {
-            DatePicker(state = datePickerState)
+            DatePicker(state = state)
         }
     }
 }
@@ -237,25 +239,20 @@ fun DateField(
 @Composable
 fun TimeField(
     modifier: Modifier,
-    value: LocalTime?,
-    onValueChange: (LocalTime?) -> Unit,
+    value: LocalTime,
+    onValueChange: (LocalTime) -> Unit,
     label: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
     val formatter = DateTimeFormatter.ofPattern("HH:mm")
-    val displayText = value?.format(formatter) ?: ""
 
-    OutlinedTextField(
-        label = { Text(label) },
-        value = displayText,
-        onValueChange = {},
-        readOnly = true,
-        trailingIcon = { Icon(Icons.Default.AccessTime, null) },
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp)
-            .clickable { showDialog = true }
+    PickerField(
+        modifier = modifier,
+        label = label,
+        value = value.format(formatter),
+        icon = Icons.Default.AccessTime,
+        onClick = { showDialog = true }
     )
 
     if (showDialog) {
@@ -267,12 +264,11 @@ fun TimeField(
                 TextButton(onClick = {
                     val picked = LocalTime.of(state.hour, state.minute)
                     onValueChange(picked)
-                    showDialog = false
                 }) { Text("OK") }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("Annuler")
+                    Text(stringResource(R.string.cancel))
                 }
             },
             title = { Text(stringResource(R.string.select_time)) }
@@ -281,7 +277,6 @@ fun TimeField(
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -292,9 +287,9 @@ private fun CreateFile(
     onFileSelected: (Uri?) -> Unit,
     photoUrl: String?,
     onPhotoSelected: (Uri?) -> Unit,
-    date: LocalDate?,
+    date: LocalDate,
     onDateChange: (LocalDate) -> Unit,
-    time: LocalTime?,
+    time: LocalTime,
     onTimeChange: (LocalTime) -> Unit,
     colored: Boolean,
     onColorationChange: (Boolean) -> Unit,
@@ -309,11 +304,17 @@ private fun CreateFile(
     isLoading: Boolean
 ) {
     val scrollState = rememberScrollState()
+
     val selectedFileUri = fileUrl?.toUri()
     val selectedPhotoUri = photoUrl?.toUri()
 
-    val launcher = rememberLauncherForActivityResult(
+    val pictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        onPhotoSelected(uri)
+    }
+    val fileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
         onFileSelected(uri)
     }
@@ -334,8 +335,7 @@ private fun CreateFile(
                 modifier = Modifier
                     .padding(contentPadding)
                     .verticalScroll(scrollState)
-            )
-            {
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -343,14 +343,14 @@ private fun CreateFile(
                     DateField(
                         modifier = Modifier.weight(1f),
                         value = date,
-                        onValueChange = { onDateChange },
+                        onValueChange = onDateChange,
                         label = stringResource(id = R.string.hint_date)
                     )
 
                     TimeField(
                         modifier = Modifier.weight(1f),
                         value = time,
-                        onValueChange = { onTimeChange },
+                        onValueChange = onTimeChange,
                         label = stringResource(id = R.string.hint_time)
                     )
                 }
@@ -470,7 +470,8 @@ private fun CreateFile(
                     }
 
                     Button(
-                        onClick = { launcher.launch("image/*") },
+                        onClick = { fileLauncher.launch(
+                            arrayOf("application/pdf", "application/msword", "text/plain")) },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
@@ -498,7 +499,7 @@ private fun CreateFile(
                     }
 
                     Button(
-                        onClick = { launcher.launch("image/*") },
+                        onClick = { pictureLauncher.launch("image/*") },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
@@ -542,9 +543,9 @@ private fun CreateFilePreview() {
             onFileSelected = {},
             photoUrl = null,
             onPhotoSelected = {},
-            date = null,
+            date = LocalDate.now(),
             onDateChange = {},
-            time = null,
+            time = LocalTime.now(),
             onTimeChange = {},
             colored = false,
             onColorationChange = {},
