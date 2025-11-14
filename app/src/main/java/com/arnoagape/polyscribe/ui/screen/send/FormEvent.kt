@@ -1,38 +1,21 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
+import java.time.LocalDate
+import java.time.LocalTime
 
 /**
  * A sealed class representing different events that can occur on a form.
  */
 sealed class FormEvent {
-  
-  /**
-   * Event triggered when the title of the form is changed.
-   *
-   * @property title The new title of the form.
-   */
-  data class TitleChanged(val title: String) : FormEvent()
-  
-  /**
-   * Event triggered when the description of the form is changed.
-   *
-   * @property description The new description of the form.
-   */
-  data class DescriptionChanged(val description: String) : FormEvent()
 
-  /**
-   * Event triggered when the file of the form is changed.
-   *
-   * @property fileUrl The url of the file of the form.
-   */
+  data class DateChanged(val date: LocalDate) : FormEvent()
+  data class TimeChanged(val time: LocalTime) : FormEvent()
+  data class ColorChanged(val isColored: Boolean) : FormEvent()
+  data class DoubleSidedChanged(val isDoubleSided: Boolean) : FormEvent()
+  data class NumberOfCopiesChanged(val delta: Int) : FormEvent()
+  data class PhotoChanged(val photoUrl: Uri?) : FormEvent()
   data class FileChanged(val fileUrl: Uri?) : FormEvent()
-
-  /**
-   * Event triggered when the comment of the form is changed.
-   *
-   * @property comment The new comment of the form.
-   */
   data class CommentChanged(val comment: String) : FormEvent()
   
 }

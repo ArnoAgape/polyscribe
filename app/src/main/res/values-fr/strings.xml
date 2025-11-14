@@ -18,9 +18,12 @@
 
     <string name="send_fragment_label">Envoyer un document</string>
     <string name="action_send">Envoyer</string>
-    <string name="select_file">Joindre le document</string>
+    <string name="select_file">Joindre un document</string>
     <string name="change_file">Choisir un autre document</string>
+    <string name="select_image">Joindre une image</string>
+    <string name="change_image">Choisir une autre image</string>
     <string name="preview_file">Aperçu du document</string>
+    <string name="preview_image">Aperçu de l\'image</string>
     <string name="uploaded_file">Document envoyé</string>
     <string name="select_time">Choisir une heure</string>
     <string name="select_date">Choisir une date</string>

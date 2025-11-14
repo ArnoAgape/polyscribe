@@ -224,7 +224,8 @@ private fun HomeContentPreview() {
             files = listOf(
                 File(
                     id = "1",
-                    fileUrl = "https://picsum.photos/id/85/1080/",
+                    photoUrl= "https://picsum.photos/id/85/1080/",
+                    fileUrl = null,
                     createdAt = Timestamp(0, 0),
                     date = LocalDate.now(),
                     time = LocalTime.now(),
@@ -238,11 +239,12 @@ private fun HomeContentPreview() {
                     isColored = false,
                     isDoubleSided = false,
                     numberOfCopies = 1,
-                    comments = ""
+                    comment = ""
                 ),
                 File(
                     id = "2",
-                    fileUrl = "https://picsum.photos/id/85/1080/",
+                    photoUrl= "https://picsum.photos/id/85/1080/",
+                    fileUrl = null,
                     createdAt = Timestamp(0, 0),
                     date = LocalDate.now(),
                     time = LocalTime.now(),
@@ -256,11 +258,12 @@ private fun HomeContentPreview() {
                     isColored = false,
                     isDoubleSided = false,
                     numberOfCopies = 1,
-                    comments = "null"
+                    comment = "null"
                 ),
                 File(
                     id = "3",
-                    fileUrl = "https://picsum.photos/id/85/1080/",
+                    photoUrl= "https://picsum.photos/id/85/1080/",
+                    fileUrl = null,
                     createdAt = Timestamp(0, 0),
                     date = LocalDate.now(),
                     time = LocalTime.now(),
@@ -274,7 +277,7 @@ private fun HomeContentPreview() {
                     isColored = false,
                     isDoubleSided = false,
                     numberOfCopies = 1,
-                    comments = "null"
+                    comment = "null"
                 )
             ),
             onFileClick = {}

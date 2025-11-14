@@ -8,6 +8,7 @@ import java.time.LocalTime
 data class File(
     val id: String,
     val fileUrl: String?,
+    val photoUrl: String?,
     val createdAt: Timestamp,
     val date: LocalDate,
     val time: LocalTime,
@@ -15,5 +16,5 @@ data class File(
     val isColored: Boolean,
     val isDoubleSided: Boolean,
     val numberOfCopies: Int,
-    val comments: String
+    val comment: String
 ) : Serializable

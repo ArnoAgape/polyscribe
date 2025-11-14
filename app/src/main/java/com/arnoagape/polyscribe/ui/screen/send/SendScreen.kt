@@ -127,15 +127,21 @@ fun SendScreen(
                 CreateFile(
                     contentPadding = contentPadding,
                     fileUrl = fileToDisplay.fileUrl,
+                    onFileSelected = { viewModel.onAction(FormEvent.FileChanged(it)) },
+                    photoUrl = fileToDisplay.photoUrl,
+                    onPhotoSelected = { viewModel.onAction(FormEvent.PhotoChanged(it)) },
                     date = fileToDisplay.date,
+                    onDateChange = { viewModel.onAction(FormEvent.DateChanged(it)) },
                     time = fileToDisplay.time,
+                    onTimeChange = { viewModel.onAction(FormEvent.TimeChanged(it)) },
                     colored = fileToDisplay.isColored,
-                    onColorationChange = { viewModel.toggleColoration() },
+                    onColorationChange = { viewModel.onAction(FormEvent.ColorChanged(it)) },
                     doubleSided = fileToDisplay.isDoubleSided,
-                    onDoubleSidedChange = { viewModel.toggleDoubleSided() },
+                    onDoubleSidedChange = { viewModel.onAction(FormEvent.DoubleSidedChanged(it)) },
                     numberOfCopies = fileToDisplay.numberOfCopies,
-                    onNumberOfCopiesChange = { delta -> viewModel.changeNumberOfCopies(delta) },
-                    comments = fileToDisplay.comments,
+                    onNumberOfCopiesChange = { delta -> viewModel.onAction(FormEvent.NumberOfCopiesChanged(delta)) },
+                    comments = fileToDisplay.comment,
+                    onCommentsChanged = { viewModel.onAction(FormEvent.CommentChanged(it)) },
                     onSaveClicked = { viewModel.onSaveClicked() },
                     isFileValid = isFileValid,
                     isLoading = false
@@ -204,7 +210,6 @@ fun DateField(
     )
 
     if (showDialog) {
-        // ---- Material 3 DatePickerDialog ----
         val datePickerState = rememberDatePickerState()
 
         DatePickerDialog(
@@ -284,10 +289,13 @@ fun TimeField(
 private fun CreateFile(
     contentPadding: PaddingValues = PaddingValues(),
     fileUrl: String?,
+    onFileSelected: (Uri?) -> Unit,
+    photoUrl: String?,
+    onPhotoSelected: (Uri?) -> Unit,
     date: LocalDate?,
-    onDateChange: (LocalDate?) -> Unit = {},
+    onDateChange: (LocalDate) -> Unit,
     time: LocalTime?,
-    onTimeChange: (LocalTime?) -> Unit = {},
+    onTimeChange: (LocalTime) -> Unit,
     colored: Boolean,
     onColorationChange: (Boolean) -> Unit,
     doubleSided: Boolean,
@@ -295,13 +303,14 @@ private fun CreateFile(
     numberOfCopies: Int,
     onNumberOfCopiesChange: (Int) -> Unit,
     comments: String,
-    onFileSelected: (Uri?) -> Unit = {},
+    onCommentsChanged: (String) -> Unit,
     onSaveClicked: () -> Unit,
     isFileValid: Boolean,
     isLoading: Boolean
 ) {
     val scrollState = rememberScrollState()
     val selectedFileUri = fileUrl?.toUri()
+    val selectedPhotoUri = photoUrl?.toUri()
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -334,14 +343,14 @@ private fun CreateFile(
                     DateField(
                         modifier = Modifier.weight(1f),
                         value = date,
-                        onValueChange = onDateChange,
+                        onValueChange = { onDateChange },
                         label = stringResource(id = R.string.hint_date)
                     )
 
                     TimeField(
                         modifier = Modifier.weight(1f),
                         value = time,
-                        onValueChange = onTimeChange,
+                        onValueChange = { onTimeChange },
                         label = stringResource(id = R.string.hint_time)
                     )
                 }
@@ -431,7 +440,7 @@ private fun CreateFile(
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
                     value = comments,
-                    onValueChange = {},
+                    onValueChange = { onCommentsChanged(it) },
                     label = { Text(stringResource(id = R.string.hint_comments)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -441,14 +450,13 @@ private fun CreateFile(
 
                 Spacer(Modifier.height(16.dp))
 
-                // 🖼️ File picker
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                // 🖼️ Photo & File picker
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
+                    // File picker
                     if (selectedFileUri != null) {
                         AsyncImage(
                             model = selectedFileUri,
@@ -472,6 +480,34 @@ private fun CreateFile(
                                 stringResource(R.string.select_file)
                             else
                                 stringResource(R.string.change_file),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    
+                    // Photo picker
+                    if (selectedPhotoUri != null) {
+                        AsyncImage(
+                            model = selectedPhotoUri,
+                            contentDescription = stringResource(R.string.preview_image),
+                            modifier = Modifier
+                                .size(200.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .border(1.dp, Color.Gray, RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Button(
+                        onClick = { launcher.launch("image/*") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Text(
+                            text = if (selectedPhotoUri == null)
+                                stringResource(R.string.select_image)
+                            else
+                                stringResource(R.string.change_image),
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -503,6 +539,9 @@ private fun CreateFilePreview() {
     PolyscribeTheme {
         CreateFile(
             fileUrl = null,
+            onFileSelected = {},
+            photoUrl = null,
+            onPhotoSelected = {},
             date = null,
             onDateChange = {},
             time = null,
@@ -513,8 +552,8 @@ private fun CreateFilePreview() {
             onDoubleSidedChange = {},
             numberOfCopies = 1,
             onNumberOfCopiesChange = {},
-            comments = "J'adore !!",
-            onFileSelected = {},
+            comments = "I love Polyscribe!",
+            onCommentsChanged = {},
             onSaveClicked = {},
             isFileValid = true,
             isLoading = false

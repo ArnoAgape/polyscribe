@@ -46,6 +46,7 @@ class SendViewModel @Inject constructor(
         File(
             id = UUID.randomUUID().toString(),
             fileUrl = null,
+            photoUrl = null,
             createdAt = Timestamp.now(),
             date = LocalDate.now(),
             time = LocalTime.now(),
@@ -53,7 +54,7 @@ class SendViewModel @Inject constructor(
             isColored = false,
             isDoubleSided = false,
             numberOfCopies = 1,
-            comments = "",
+            comment = "",
         )
     )
 
@@ -69,12 +70,53 @@ class SendViewModel @Inject constructor(
      */
     @RequiresApi(Build.VERSION_CODES.O)
     val isFileValid = file.map { currentFile ->
-        currentFile.numberOfCopies != 0 && currentFile.fileUrl.isNullOrBlank()
+        currentFile.photoUrl != null && currentFile.fileUrl != null
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = false,
     )
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun onAction(formEvent: FormEvent) {
+        when (formEvent) {
+            is FormEvent.DateChanged -> {
+                _file.update { it.copy(date = formEvent.date) }
+            }
+
+            is FormEvent.TimeChanged -> {
+                _file.update { it.copy(time = formEvent.time) }
+            }
+
+            is FormEvent.ColorChanged -> {
+                _file.update { it.copy(isColored = formEvent.isColored) }
+            }
+
+            is FormEvent.DoubleSidedChanged -> {
+                _file.update { it.copy(isDoubleSided = formEvent.isDoubleSided) }
+            }
+
+            is FormEvent.NumberOfCopiesChanged -> {
+                _file.update { file ->
+                    file.copy(
+                        numberOfCopies = (file.numberOfCopies + formEvent.delta).coerceAtLeast(1)
+                    )
+                }
+            }
+
+            is FormEvent.PhotoChanged -> {
+                _file.update { it.copy(photoUrl = formEvent.photoUrl.toString()) }
+            }
+
+            is FormEvent.FileChanged -> {
+                _file.update { it.copy(fileUrl = formEvent.fileUrl.toString()) }
+            }
+
+            is FormEvent.CommentChanged -> {
+                _file.update { it.copy(comment = formEvent.comment) }
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun addFile() {
@@ -117,18 +159,10 @@ class SendViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun onSaveClicked() {
         val file = _file.value
-        when {
-            file.numberOfCopies == 0 -> {
-                _events.trySend(Event.ShowSnackBar(R.string.error_number_of_copies))
-            }
-
-            file.fileUrl.isNullOrBlank() -> {
-                _events.trySend(Event.ShowSnackBar(R.string.error_no_file))
-            }
-
-            else -> {
-                addFile()
-            }
+        if (file.fileUrl == null || file.photoUrl == null) {
+            _events.trySend(Event.ShowSnackBar(R.string.error_no_file))
+        } else {
+            addFile()
         }
     }
 
@@ -152,6 +186,20 @@ class SendViewModel @Inject constructor(
             val current = file.numberOfCopies
             val newValue = (current + delta).coerceAtLeast(1)
             file.copy(numberOfCopies = newValue)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateDate() {
+        _file.update { file ->
+            file.copy(date = file.date)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateTime() {
+        _file.update { file ->
+            file.copy(time = file.time)
         }
     }
 }
