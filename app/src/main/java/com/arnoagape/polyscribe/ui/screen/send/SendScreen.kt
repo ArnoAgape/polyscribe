@@ -204,9 +204,7 @@ fun DateField(
 
     if (showDialog) {
         val state = rememberDatePickerState(
-            initialSelectedDateMillis = value
-                .atStartOfDay(ZoneId.systemDefault())
-                .toInstant().toEpochMilli()
+            initialSelectedDateMillis = value.toEpochDay() * 24 * 60 * 60 * 1000
         )
 
         DatePickerDialog(
@@ -244,8 +242,11 @@ fun TimeField(
     label: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
-
     val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    val state = rememberTimePickerState(
+        initialHour = value.hour,
+        initialMinute = value.minute
+    )
 
     PickerField(
         modifier = modifier,
@@ -256,14 +257,13 @@ fun TimeField(
     )
 
     if (showDialog) {
-        val state = rememberTimePickerState()
-
         TimePickerDialog(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
                     val picked = LocalTime.of(state.hour, state.minute)
                     onValueChange(picked)
+                    showDialog = false
                 }) { Text("OK") }
             },
             dismissButton = {
@@ -271,7 +271,7 @@ fun TimeField(
                     Text(stringResource(R.string.cancel))
                 }
             },
-            title = { Text(stringResource(R.string.select_time)) }
+            title = { }
         ) {
             TimePicker(state = state)
         }
