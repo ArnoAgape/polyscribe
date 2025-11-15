@@ -2,6 +2,10 @@
     <string name="app_name" translatable="false">Polyscribe</string>
     <string name="cancel">Cancel</string>
     <string name="or">or</string>
+    <string name="add">Add</string>
+    <string name="add_file">Add file</string>
+    <string name="add_picture">Add picture</string>
+    <string name="delete">Delete</string>
     <string name="home">Home</string>
     <string name="profile">Profile</string>
     <string name="settings">Settings</string>

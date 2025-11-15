@@ -45,8 +45,8 @@ class SendViewModel @Inject constructor(
     private val _file = MutableStateFlow(
         File(
             id = UUID.randomUUID().toString(),
-            fileUrl = null,
-            photoUrl = null,
+            fileUrl = emptyList(),
+            pictureUrl = emptyList(),
             createdAt = Timestamp.now(),
             date = LocalDate.now(),
             time = LocalTime.now(),
@@ -69,8 +69,9 @@ class SendViewModel @Inject constructor(
      * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    val isFileValid = file.map { currentFile ->
-        currentFile.photoUrl != null && currentFile.fileUrl != null
+    val isFileValid = file
+        .map { currentFile ->
+        currentFile.fileUrl.isNotEmpty() || currentFile.pictureUrl.isNotEmpty()
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
@@ -104,13 +105,33 @@ class SendViewModel @Inject constructor(
                 }
             }
 
-            is FormEvent.PhotoChanged -> {
-                _file.update { it.copy(photoUrl = formEvent.photoUrl.toString()) }
-            }
+            is FormEvent.AddFile ->
+                _file.update { file ->
+                    file.copy(
+                        fileUrl = file.fileUrl.plus(formEvent.uri.toString())
+                    )
+                }
 
-            is FormEvent.FileChanged -> {
-                _file.update { it.copy(fileUrl = formEvent.fileUrl.toString()) }
-            }
+            is FormEvent.RemoveFile ->
+                _file.update { file ->
+                    file.copy(
+                        fileUrl = file.fileUrl.minus(formEvent.uri.toString())
+                    )
+                }
+
+            is FormEvent.AddPicture ->
+                _file.update { file ->
+                    file.copy(
+                        pictureUrl = file.pictureUrl.plus(formEvent.uri.toString())
+                    )
+                }
+
+            is FormEvent.RemovePicture ->
+                _file.update { file ->
+                    file.copy(
+                        pictureUrl = file.pictureUrl.minus(formEvent.uri.toString())
+                    )
+                }
 
             is FormEvent.CommentChanged -> {
                 _file.update { it.copy(comment = formEvent.comment) }
@@ -119,7 +140,7 @@ class SendViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun addFile() {
+    fun sendFile() {
         viewModelScope.launch {
             if (!networkUtils.isNetworkAvailable()) {
                 _events.trySend(Event.ShowSnackBar(R.string.no_network))
@@ -159,10 +180,11 @@ class SendViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun onSaveClicked() {
         val file = _file.value
-        if (file.fileUrl == null || file.photoUrl == null) {
+        if (file.fileUrl.isNotEmpty() || file.pictureUrl.isNotEmpty()) {
             _events.trySend(Event.ShowSnackBar(R.string.error_no_file))
         } else {
-            addFile()
+            sendFile()
         }
     }
+
 }

@@ -21,14 +21,16 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,9 +46,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -55,11 +54,12 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
+import com.arnoagape.polyscribe.ui.components.FileRowItem
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
+import com.arnoagape.polyscribe.ui.utils.getFileName
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -108,10 +108,12 @@ fun SendScreen(
 
                 CreateFile(
                     contentPadding = contentPadding,
-                    fileUrl = fileToDisplay.fileUrl,
-                    onFileSelected = { viewModel.onAction(FormEvent.FileChanged(it)) },
-                    photoUrl = fileToDisplay.photoUrl,
-                    onPhotoSelected = { viewModel.onAction(FormEvent.PhotoChanged(it)) },
+                    fileUrls = fileToDisplay.fileUrl,
+                    onAddFile = { viewModel.onAction(FormEvent.AddFile(it)) },
+                    onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
+                    pictureUrls = fileToDisplay.pictureUrl,
+                    onAddPicture = { viewModel.onAction(FormEvent.AddPicture(it)) },
+                    onRemovePicture = { viewModel.onAction(FormEvent.RemovePicture(it)) },
                     date = fileToDisplay.date,
                     onDateChange = { viewModel.onAction(FormEvent.DateChanged(it)) },
                     time = fileToDisplay.time,
@@ -121,7 +123,13 @@ fun SendScreen(
                     doubleSided = fileToDisplay.isDoubleSided,
                     onDoubleSidedChange = { viewModel.onAction(FormEvent.DoubleSidedChanged(it)) },
                     numberOfCopies = fileToDisplay.numberOfCopies,
-                    onNumberOfCopiesChange = { delta -> viewModel.onAction(FormEvent.NumberOfCopiesChanged(delta)) },
+                    onNumberOfCopiesChange = { delta ->
+                        viewModel.onAction(
+                            FormEvent.NumberOfCopiesChanged(
+                                delta
+                            )
+                        )
+                    },
                     comments = fileToDisplay.comment,
                     onCommentsChanged = { viewModel.onAction(FormEvent.CommentChanged(it)) },
                     onSaveClicked = { viewModel.onSaveClicked() },
@@ -170,10 +178,12 @@ fun SendScreen(
 @Composable
 private fun CreateFile(
     contentPadding: PaddingValues = PaddingValues(),
-    fileUrl: String?,
-    onFileSelected: (Uri?) -> Unit,
-    photoUrl: String?,
-    onPhotoSelected: (Uri?) -> Unit,
+    fileUrls: List<String>,
+    onAddFile: (Uri) -> Unit,
+    onRemoveFile: (Uri) -> Unit,
+    pictureUrls: List<String>,
+    onAddPicture: (Uri) -> Unit,
+    onRemovePicture: (Uri) -> Unit,
     date: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     time: LocalTime,
@@ -190,20 +200,22 @@ private fun CreateFile(
     isFileValid: Boolean,
     isLoading: Boolean
 ) {
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    val selectedFileUri = fileUrl?.toUri()
-    val selectedPhotoUri = photoUrl?.toUri()
+    val selectedFileUris = fileUrls.map { it.toUri() }
+    val selectedPhotoUris = pictureUrls.map { it.toUri() }
 
     val pictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        onPhotoSelected(uri)
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        uris.forEach { onAddPicture(it) }
     }
+
     val fileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri: Uri? ->
-        onFileSelected(uri)
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        uris.forEach { onAddFile(it) }
     }
 
     Surface(
@@ -218,11 +230,16 @@ private fun CreateFile(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            /** ---------- SCROLLABLE FORM CONTENT ---------- **/
             Column(
                 modifier = Modifier
-                    .padding(contentPadding)
+                    .weight(1f)
                     .verticalScroll(scrollState)
+                    .padding(contentPadding)
             ) {
+
+                /** ---------- DATE & TIME ---------- **/
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -233,7 +250,6 @@ private fun CreateFile(
                         onValueChange = onDateChange,
                         label = stringResource(id = R.string.hint_date)
                     )
-
                     TimeField(
                         modifier = Modifier.weight(1f),
                         value = time,
@@ -244,17 +260,13 @@ private fun CreateFile(
 
                 Spacer(Modifier.height(16.dp))
 
-                // Coloration
+                /** ---------- COLORATION ---------- **/
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(5.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
+                        .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -267,16 +279,12 @@ private fun CreateFile(
 
                 Spacer(Modifier.height(16.dp))
 
-                // Double sided
+                /** ---------- DOUBLE SIDED ---------- **/
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(5.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
+                        .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -289,20 +297,17 @@ private fun CreateFile(
 
                 Spacer(Modifier.height(16.dp))
 
-                // Number of copies
+                /** ---------- NUMBER OF COPIES ---------- **/
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(5.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
+                        .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(stringResource(id = R.string.hint_number_of_copies))
+
                     IconButton(
                         onClick = { onNumberOfCopiesChange(-1) },
                         enabled = numberOfCopies > 1
@@ -311,9 +316,8 @@ private fun CreateFile(
                     }
 
                     Text(
-                        text = numberOfCopies.toString(),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(horizontal = 12.dp)
+                        numberOfCopies.toString(),
+                        style = MaterialTheme.typography.titleMedium
                     )
 
                     IconButton(onClick = { onNumberOfCopiesChange(+1) }) {
@@ -321,13 +325,13 @@ private fun CreateFile(
                     }
                 }
 
-                // Comments
+                /** ---------- COMMENTS ---------- **/
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
                     value = comments,
-                    onValueChange = { onCommentsChanged(it) },
+                    onValueChange = onCommentsChanged,
                     label = { Text(stringResource(id = R.string.hint_comments)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -335,74 +339,78 @@ private fun CreateFile(
                     )
                 )
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
+            }
 
-                // 🖼️ Photo & File picker
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+            /** ---------- ADD BUTTONS ONLY (STAY SIDE-BY-SIDE) ---------- **/
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        fileLauncher.launch(
+                            arrayOf(
+                                "application/pdf",
+                                "application/msword",
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                "application/vnd.oasis.opendocument.text",
+                                "text/plain"
+                            )
+                        )
+                    }
                 ) {
-                    // File picker
-                    if (selectedFileUri != null) {
-                        AsyncImage(
-                            model = selectedFileUri,
-                            contentDescription = stringResource(R.string.preview_file),
-                            modifier = Modifier
-                                .size(200.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .border(1.dp, Color.Gray, RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+                    Icon(Icons.Default.AttachFile, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.add_file),
+                        maxLines = 1)
+                }
 
-                    Button(
-                        onClick = { fileLauncher.launch(
-                            arrayOf("application/pdf", "application/msword", "text/plain")) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Text(
-                            text = if (selectedFileUri == null)
-                                stringResource(R.string.select_file)
-                            else
-                                stringResource(R.string.change_file),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    
-                    // Photo picker
-                    if (selectedPhotoUri != null) {
-                        AsyncImage(
-                            model = selectedPhotoUri,
-                            contentDescription = stringResource(R.string.preview_image),
-                            modifier = Modifier
-                                .size(200.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .border(1.dp, Color.Gray, RoundedCornerShape(16.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    Button(
-                        onClick = { pictureLauncher.launch("image/*") },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Text(
-                            text = if (selectedPhotoUri == null)
-                                stringResource(R.string.select_image)
-                            else
-                                stringResource(R.string.change_image),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = { pictureLauncher.launch("image/*") }
+                ) {
+                    Icon(Icons.Default.Photo, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.add_picture),
+                        maxLines = 1)
                 }
             }
 
+            Spacer(Modifier.height(16.dp))
+
+            /** ---------- FILES LISTED ONE AFTER ANOTHER ---------- **/
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                selectedFileUris.forEach { uri ->
+                    FileRowItem(
+                        fileName = context.getFileName(uri),
+                        icon = Icons.Default.AttachFile,
+                        onRemove = { onRemoveFile(uri) }
+                    )
+                }
+
+                selectedPhotoUris.forEach { uri ->
+                    FileRowItem(
+                        fileName = context.getFileName(uri),
+                        icon = Icons.Default.Photo,
+                        onRemove = { onRemovePicture(uri) }
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+
+            /** ---------- SEND BUTTON ---------- **/
             Button(
+                modifier = Modifier.fillMaxWidth(),
                 onClick = onSaveClicked,
                 enabled = isFileValid && !isLoading
             ) {
@@ -426,10 +434,14 @@ private fun CreateFile(
 private fun CreateFilePreview() {
     PolyscribeTheme {
         CreateFile(
-            fileUrl = null,
-            onFileSelected = {},
-            photoUrl = null,
-            onPhotoSelected = {},
+            fileUrls = listOf("content://com.example.provider/document/resume.pdf"),
+            onAddFile = {},
+            onRemoveFile = {},
+            pictureUrls = listOf(
+                "content://com.example.provider/images/photo1.jpg"
+            ),
+            onAddPicture = {},
+            onRemovePicture = {},
             date = LocalDate.now(),
             onDateChange = {},
             time = LocalTime.now(),

@@ -7,8 +7,8 @@ import java.time.LocalTime
 
 data class File(
     val id: String,
-    val fileUrl: String?,
-    val photoUrl: String?,
+    val fileUrl: List<String>,
+    val pictureUrl: List<String>,
     val createdAt: Timestamp,
     val date: LocalDate,
     val time: LocalTime,

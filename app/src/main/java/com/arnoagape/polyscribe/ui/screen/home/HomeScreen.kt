@@ -89,14 +89,14 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onFABClick() },
-                    /*if (isSignedIn) {
-                        onFABClick()
-                    } else {
-                        Toast.makeText(
-                            context, context.getString(R.string.error_no_account_file),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }*/
+                /*if (isSignedIn) {
+                    onFABClick()
+                } else {
+                    Toast.makeText(
+                        context, context.getString(R.string.error_no_account_file),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }*/
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
@@ -192,22 +192,20 @@ private fun HomeContent(
 
                     Spacer(Modifier.height(8.dp))
 
-                    if (file.fileUrl != null) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .fillMaxWidth()
-                                .heightIn(max = 200.dp)
-                                .aspectRatio(ratio = 16 / 9f),
-                            model = file.fileUrl,
-                            imageLoader = LocalContext.current.imageLoader.newBuilder()
-                                .logger(DebugLogger())
-                                .build(),
-                            placeholder = ColorPainter(Color.DarkGray),
-                            contentDescription = "image",
-                            contentScale = ContentScale.Crop,
-                        )
-                    }
+                    AsyncImage(
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp)
+                            .aspectRatio(ratio = 16 / 9f),
+                        model = file.fileUrl,
+                        imageLoader = LocalContext.current.imageLoader.newBuilder()
+                            .logger(DebugLogger())
+                            .build(),
+                        placeholder = ColorPainter(Color.DarkGray),
+                        contentDescription = "image",
+                        contentScale = ContentScale.Crop,
+                    )
                 }
             }
         }
@@ -223,8 +221,8 @@ private fun HomeContentPreview() {
             files = listOf(
                 File(
                     id = "1",
-                    photoUrl= "https://picsum.photos/id/85/1080/",
-                    fileUrl = null,
+                    pictureUrl = emptyList(),
+                    fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
                     date = LocalDate.now(),
                     time = LocalTime.now(),
@@ -242,8 +240,8 @@ private fun HomeContentPreview() {
                 ),
                 File(
                     id = "2",
-                    photoUrl= "https://picsum.photos/id/85/1080/",
-                    fileUrl = null,
+                    pictureUrl = emptyList(),
+                    fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
                     date = LocalDate.now(),
                     time = LocalTime.now(),
@@ -261,8 +259,8 @@ private fun HomeContentPreview() {
                 ),
                 File(
                     id = "3",
-                    photoUrl= "https://picsum.photos/id/85/1080/",
-                    fileUrl = null,
+                    pictureUrl = emptyList(),
+                    fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
                     date = LocalDate.now(),
                     time = LocalTime.now(),

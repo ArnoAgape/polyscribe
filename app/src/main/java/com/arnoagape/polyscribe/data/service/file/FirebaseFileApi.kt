@@ -41,17 +41,23 @@ class FirebaseFileApi @Inject constructor(
             throw IOException("No internet connection")
         }
         try {
-            var updatedFile = file
-            file.fileUrl?.let { uriString ->
+            val uploadedFiles = file.fileUrl.mapNotNull { uriString ->
                 val uri = uriString.toUri()
-                if (uri.scheme == "content") {
-                    val downloadUrl = uploadDocumentToFirebase(uri)
-                    if (downloadUrl != null) {
-                        updatedFile = file.copy(fileUrl = downloadUrl)
-                    }
-                }
+                uploadDocumentToFirebase(uri)
             }
-            filesCollection.document(updatedFile.id).set(updatedFile).await()
+
+            val uploadedPhotos = file.pictureUrl.mapNotNull { uriString ->
+                val uri = uriString.toUri()
+                uploadDocumentToFirebase(uri)
+            }
+
+            val updated = file.copy(
+                fileUrl = uploadedFiles,
+                pictureUrl = uploadedPhotos
+            )
+
+            filesCollection.document(updated.id).set(updated).await()
+
         } catch (e: Exception) {
             Log.e("FirebaseFileApi", "Error while adding document", e)
             throw e
