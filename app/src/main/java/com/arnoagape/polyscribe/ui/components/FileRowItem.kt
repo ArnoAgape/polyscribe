@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
@@ -53,7 +53,7 @@ fun FileRowItem(
     }
 }
 
-@PreviewLightDark
+@Preview
 @Composable
 fun FileRowItemPreview() {
     PolyscribeTheme {

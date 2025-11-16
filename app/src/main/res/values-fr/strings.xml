@@ -4,8 +4,8 @@
     <string name="cancel">Annuler</string>
     <string name="or">ou</string>
     <string name="add">Ajouter</string>
-    <string name="add_file">Ajouter image</string>
-    <string name="add_picture">Ajouter fichier</string>
+    <string name="add_file">Fichier</string>
+    <string name="add_picture">Image</string>
     <string name="delete">Supprimer</string>
     <string name="profile">Profil</string>
     <string name="settings">Paramètres</string>
