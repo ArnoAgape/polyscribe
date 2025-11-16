@@ -11,9 +11,11 @@
     <string name="settings">Settings</string>
     <string name="loading">Loading…</string>
     <string name="publishing">Publishing…</string>
-    <string name="file_success">File sent successfully</string>
+    <string name="success_file">File sent successfully</string>
+    <string name="success_sign_up">Account created successfully</string>
 
     <string name="error_generic">An issue occurred</string>
+    <string name="error_sign_up">Sign up canceled or failed</string>
     <string name="error_no_account_file">An account is mandatory in order to add a file</string>
     <string name="no_network">No network</string>
     <string name="no_files">To send a new file, please press the button "+"</string>

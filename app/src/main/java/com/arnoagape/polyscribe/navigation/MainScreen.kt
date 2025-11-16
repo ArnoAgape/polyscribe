@@ -1,6 +1,7 @@
 package com.arnoagape.polyscribe.navigation
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -20,6 +22,10 @@ import com.arnoagape.polyscribe.R
 @Composable
 fun MainScreen() {
 
+    val context = LocalContext.current
+    val showMessage: (String) -> Unit = { msg ->
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    }
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
@@ -48,10 +54,10 @@ fun MainScreen() {
             }
         )
         {
-            AppNavGraph(navController = navController)
+            AppNavGraph(navController = navController, showMessage = showMessage)
         }
     } else {
-        AppNavGraph(navController = navController)
+        AppNavGraph(navController = navController, showMessage = showMessage)
     }
 }
 

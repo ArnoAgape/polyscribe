@@ -153,7 +153,7 @@ class SendViewModel @Inject constructor(
                 fileRepository.sendFile(fileToSave)
 
                 _uiState.value = SendUiState.Success(fileToSave)
-                _events.trySend(Event.ShowSnackBar(R.string.file_success))
+                _events.trySend(Event.ShowSnackBar(R.string.success_file))
 
             } catch (e: Exception) {
                 when (e) {

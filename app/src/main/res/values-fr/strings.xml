@@ -11,9 +11,11 @@
     <string name="settings">Paramètres</string>
     <string name="loading">Chargement…</string>
     <string name="publishing">Publication en cours…</string>
-    <string name="file_success">Document envoyé avec succès</string>
+    <string name="success_file">Document envoyé avec succès</string>
+    <string name="success_sign_up">Compte créé avec succès</string>
 
     <string name="error_generic">Une erreur est survenue</string>
+    <string name="error_sign_up">Inscription annulée ou échouée</string>
     <string name="error_no_account_file">Un compte est nécessaire pour ajouter un fichier</string>
     <string name="no_network">Aucun réseau</string>
     <string name="no_files">Pour envoyer un nouveau document, appuyez sur le bouton "+"</string>

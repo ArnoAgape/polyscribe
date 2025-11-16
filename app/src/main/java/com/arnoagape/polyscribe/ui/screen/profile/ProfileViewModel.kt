@@ -8,7 +8,6 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -26,14 +25,4 @@ class ProfileViewModel @Inject constructor(
                 started = SharingStarted.Eagerly,
                 initialValue = false
             )
-
-    /**
-     * Ensures the authenticated user is present in Firestore.
-     * This can be used to synchronize user data after login or profile updates.
-     */
-    fun syncUserWithFirestore() {
-        viewModelScope.launch {
-            userRepository.ensureUserInFirestore()
-        }
-    }
 }

@@ -1,8 +1,10 @@
 package com.arnoagape.polyscribe.navigation
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,6 +16,9 @@ import com.arnoagape.polyscribe.ui.screen.home.HomeScreen
 import com.arnoagape.polyscribe.ui.screen.home.HomeViewModel
 import com.arnoagape.polyscribe.ui.screen.login.LoginScreen
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
+import com.arnoagape.polyscribe.ui.screen.login.rememberEmailSignUpLauncher
+import com.arnoagape.polyscribe.ui.screen.login.rememberGoogleSignUpLauncher
+import com.arnoagape.polyscribe.ui.screen.login.rememberSignInLauncher
 import com.arnoagape.polyscribe.ui.screen.profile.ProfileScreen
 import com.arnoagape.polyscribe.ui.screen.profile.ProfileViewModel
 import com.arnoagape.polyscribe.ui.screen.send.SendScreen
@@ -24,8 +29,18 @@ import com.arnoagape.polyscribe.ui.screen.settings.SettingsViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    showMessage: (String) -> Unit
 ) {
+
+    val loginViewModel: LoginViewModel = hiltViewModel()
+    val context = LocalContext.current
+    val showMessage: (String) -> Unit = { msg ->
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    }
+    val getString: (Int) -> String = { resId ->
+        context.getString(resId)
+    }
 
     NavHost(
         navController = navController,
@@ -51,13 +66,31 @@ fun AppNavGraph(
         }
 
         composable<Login> {
+            val signInLauncher = rememberSignInLauncher(
+                navController = navController,
+                showMessage = showMessage,
+                loginViewModel = loginViewModel
+            )
+            val emailSignUpLauncher = rememberEmailSignUpLauncher(
+                navController = navController,
+                showMessage = showMessage,
+                loginViewModel = loginViewModel,
+                getString = getString
+            )
+            val googleSignUpLauncher = rememberGoogleSignUpLauncher(
+                navController = navController,
+                showMessage = showMessage,
+                loginViewModel = loginViewModel,
+                getString = getString
+            )
             LoginScreen(
                 viewModel = hiltViewModel<LoginViewModel>(),
                 onEmailSignInClick = { email, password ->
                     navController.navigate(Home)
                 },
-                onGoogleSignInClick = { navController.navigate(Home) },
+                onGoogleSignInClick = { googleSignUpLauncher() },
                 onGuestSignInClick = { navController.navigate(Home) },
+                onSignUpClick = { emailSignUpLauncher() }
             )
         }
 
