@@ -58,6 +58,9 @@ import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.components.FileRowItem
+import com.arnoagape.polyscribe.ui.screen.send.fields.DateField
+import com.arnoagape.polyscribe.ui.screen.send.fields.NumberOfCopiesField
+import com.arnoagape.polyscribe.ui.screen.send.fields.TimeField
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.getFileName
 import java.time.LocalDate
@@ -123,12 +126,8 @@ fun SendScreen(
                     doubleSided = fileToDisplay.isDoubleSided,
                     onDoubleSidedChange = { viewModel.onAction(FormEvent.DoubleSidedChanged(it)) },
                     numberOfCopies = fileToDisplay.numberOfCopies,
-                    onNumberOfCopiesChange = { delta ->
-                        viewModel.onAction(
-                            FormEvent.NumberOfCopiesChanged(
-                                delta
-                            )
-                        )
+                    onNumberOfCopiesChange = { newValue ->
+                        viewModel.onAction(FormEvent.NumberOfCopiesSet(newValue))
                     },
                     comments = fileToDisplay.comment,
                     onCommentsChanged = { viewModel.onAction(FormEvent.CommentChanged(it)) },
@@ -298,32 +297,11 @@ private fun CreateFile(
                 Spacer(Modifier.height(16.dp))
 
                 /** ---------- NUMBER OF COPIES ---------- **/
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(stringResource(id = R.string.hint_number_of_copies))
 
-                    IconButton(
-                        onClick = { onNumberOfCopiesChange(-1) },
-                        enabled = numberOfCopies > 1
-                    ) {
-                        Text("-", style = MaterialTheme.typography.headlineSmall)
-                    }
-
-                    Text(
-                        numberOfCopies.toString(),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    IconButton(onClick = { onNumberOfCopiesChange(+1) }) {
-                        Text("+", style = MaterialTheme.typography.headlineSmall)
-                    }
-                }
+                NumberOfCopiesField(
+                    numberOfCopies,
+                    onNumberOfCopiesChange
+                )
 
                 /** ---------- COMMENTS ---------- **/
                 OutlinedTextField(
@@ -366,8 +344,10 @@ private fun CreateFile(
                 ) {
                     Icon(Icons.Default.AttachFile, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.add_file),
-                        maxLines = 1)
+                    Text(
+                        stringResource(R.string.add_file),
+                        maxLines = 1
+                    )
                 }
 
                 Button(
@@ -376,8 +356,10 @@ private fun CreateFile(
                 ) {
                     Icon(Icons.Default.Photo, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text(stringResource(R.string.add_picture),
-                        maxLines = 1)
+                    Text(
+                        stringResource(R.string.add_picture),
+                        maxLines = 1
+                    )
                 }
             }
 

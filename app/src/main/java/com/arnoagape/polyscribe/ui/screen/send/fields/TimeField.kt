@@ -1,17 +1,17 @@
-package com.arnoagape.polyscribe.ui.screen.send
+package com.arnoagape.polyscribe.ui.screen.send.fields
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDialog
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,48 +21,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.components.PickerField
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DateField(
-    value: LocalDate,
-    onValueChange: (LocalDate) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier
+fun TimeField(
+    modifier: Modifier,
+    value: LocalTime,
+    onValueChange: (LocalTime) -> Unit,
+    label: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    val state = rememberTimePickerState(
+        initialHour = value.hour,
+        initialMinute = value.minute
+    )
 
     PickerField(
         modifier = modifier,
         label = label,
         value = value.format(formatter),
-        icon = Icons.Default.DateRange,
+        icon = Icons.Default.AccessTime,
         onClick = { showDialog = true }
     )
 
     if (showDialog) {
-        val state = rememberDatePickerState(
-            initialSelectedDateMillis = value.toEpochDay() * 24 * 60 * 60 * 1000
-        )
-
-        DatePickerDialog(
+        TimePickerDialog(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        state.selectedDateMillis?.let { millis ->
-                            onValueChange(
-                                Instant.ofEpochMilli(millis)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-                            )
-                        }
+                        val picked = LocalTime.of(state.hour, state.minute)
+                        onValueChange(picked)
                         showDialog = false
                     },
                     colors = ButtonDefaults.textButtonColors(
@@ -71,16 +64,18 @@ fun DateField(
                 ) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                },
+                TextButton(
+                    onClick = { showDialog = false },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                ) { Text(stringResource(R.string.cancel)) }
-            }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            title = { }
         ) {
-            DatePicker(state = state)
+            TimePicker(state = state)
         }
     }
 }

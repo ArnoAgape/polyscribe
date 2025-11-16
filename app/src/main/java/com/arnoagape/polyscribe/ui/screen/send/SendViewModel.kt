@@ -71,12 +71,12 @@ class SendViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     val isFileValid = file
         .map { currentFile ->
-        currentFile.fileUrl.isNotEmpty() || currentFile.pictureUrl.isNotEmpty()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = false,
-    )
+            currentFile.fileUrl.isNotEmpty() || currentFile.pictureUrl.isNotEmpty()
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false,
+        )
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onAction(formEvent: FormEvent) {
@@ -97,11 +97,9 @@ class SendViewModel @Inject constructor(
                 _file.update { it.copy(isDoubleSided = formEvent.isDoubleSided) }
             }
 
-            is FormEvent.NumberOfCopiesChanged -> {
+            is FormEvent.NumberOfCopiesSet -> {
                 _file.update { file ->
-                    file.copy(
-                        numberOfCopies = (file.numberOfCopies + formEvent.delta).coerceAtLeast(1)
-                    )
+                    file.copy(numberOfCopies = formEvent.value.coerceAtLeast(1))
                 }
             }
 
