@@ -11,6 +11,9 @@ import kotlinx.serialization.Serializable
 data class Detail(val fileId: String)
 
 @Serializable
+object AuthCheck
+
+@Serializable
 object Home
 
 @Serializable

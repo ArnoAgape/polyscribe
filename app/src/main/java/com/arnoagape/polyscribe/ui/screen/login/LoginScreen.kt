@@ -175,13 +175,12 @@ private fun LoginContent(
                     Text(stringResource(R.string.sign_in_guest))
                 }
 
-
                 Spacer(modifier = Modifier.height(14.dp))
 
                 // 🔹 Separator
                 Text(stringResource(R.string.or), style = MaterialTheme.typography.labelMedium)
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // 🔹 Sign up
                 TextButton(

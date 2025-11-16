@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.ui.screen.login
+package com.arnoagape.polyscribe.ui.screen.login.launchers
 
 import android.app.Activity
 import android.util.Log
@@ -11,6 +11,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.NavHostController
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.navigation.Home
+import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth

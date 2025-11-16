@@ -48,7 +48,7 @@ class FirebaseFileApi @Inject constructor(
 
             val uploadedPhotos = file.pictureUrl.mapNotNull { uriString ->
                 val uri = uriString.toUri()
-                uploadDocumentToFirebase(uri)
+                uploadImageToFirebase(uri)
             }
 
             val updated = file.copy(
@@ -125,6 +125,28 @@ class FirebaseFileApi @Inject constructor(
                 null
             } finally {
                 pfd?.close()
+            }
+        }
+    }
+
+    /**
+     * Uploads an image to Firebase Storage and returns its download URL.
+     *
+     * @param uri The [Uri] of the image to upload.
+     * @return The download URL as a [String], or `null` if the upload fails.
+     */
+    override suspend fun uploadImageToFirebase(uri: Uri): String? {
+        return withContext(Dispatchers.IO + SupervisorJob()) {
+            try {
+                val fileRef = FirebaseStorage.getInstance()
+                    .reference
+                    .child("images/${System.currentTimeMillis()}.jpg")
+
+                fileRef.putFile(uri).await()
+                fileRef.downloadUrl.await().toString()
+            } catch (e: Exception) {
+                Log.e("FirebaseUpload", "Error while uploading the picture", e)
+                null
             }
         }
     }

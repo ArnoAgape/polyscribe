@@ -13,4 +13,6 @@ interface FileApi {
     fun getFileById(fileId: String): Flow<File?>
 
     suspend fun uploadDocumentToFirebase(uri: Uri): String?
+
+    suspend fun uploadImageToFirebase(uri: Uri): String?
 }

@@ -19,7 +19,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -192,20 +194,33 @@ private fun HomeContent(
 
                     Spacer(Modifier.height(8.dp))
 
-                    AsyncImage(
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .fillMaxWidth()
-                            .heightIn(max = 200.dp)
-                            .aspectRatio(ratio = 16 / 9f),
-                        model = file.fileUrl,
-                        imageLoader = LocalContext.current.imageLoader.newBuilder()
-                            .logger(DebugLogger())
-                            .build(),
-                        placeholder = ColorPainter(Color.DarkGray),
-                        contentDescription = "image",
-                        contentScale = ContentScale.Crop,
-                    )
+                    val previewUrl = file.pictureUrl.firstOrNull()
+                    val documentUrl = file.fileUrl.firstOrNull()
+
+                    when {
+                        previewUrl != null -> {
+                            AsyncImage(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .fillMaxWidth()
+                                    .heightIn(max = 200.dp)
+                                    .aspectRatio(ratio = 16 / 9f),
+                                model = file.pictureUrl.firstOrNull(),
+                                imageLoader = LocalContext.current.imageLoader.newBuilder()
+                                    .logger(DebugLogger())
+                                    .build(),
+                                placeholder = ColorPainter(Color.DarkGray),
+                                contentDescription = "image",
+                                contentScale = ContentScale.Crop,
+                            )
+                        }
+                        documentUrl?.endsWith(".pdf") == true -> {
+                            Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF")
+                        }
+                        else -> {
+                            Icon(Icons.AutoMirrored.Filled.InsertDriveFile, contentDescription = "Document")
+                        }
+                    }
                 }
             }
         }
