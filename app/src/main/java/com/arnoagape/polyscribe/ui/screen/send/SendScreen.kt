@@ -131,7 +131,7 @@ fun SendScreen(
                     },
                     comments = fileToDisplay.comment,
                     onCommentsChanged = { viewModel.onAction(FormEvent.CommentChanged(it)) },
-                    onSaveClicked = { viewModel.onSaveClicked() },
+                    onSaveClicked = { viewModel.sendFile() },
                     isFileValid = isFileValid,
                     isLoading = false
                 )
@@ -420,7 +420,7 @@ private fun CreateFilePreview() {
             onAddFile = {},
             onRemoveFile = {},
             pictureUrls = listOf(
-                "content://com.example.provider/images/photo1.jpg"
+                "content://com.example.provider/images/photo.jpg"
             ),
             onAddPicture = {},
             onRemovePicture = {},

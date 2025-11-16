@@ -174,15 +174,4 @@ class SendViewModel @Inject constructor(
             }
         }
     }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun onSaveClicked() {
-        val file = _file.value
-        if (file.fileUrl.isNotEmpty() || file.pictureUrl.isNotEmpty()) {
-            _events.trySend(Event.ShowSnackBar(R.string.error_no_file))
-        } else {
-            sendFile()
-        }
-    }
-
 }
