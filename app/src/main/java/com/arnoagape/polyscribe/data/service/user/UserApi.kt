@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserApi {
 
+    suspend fun getCurrentUser(): User?
+
     fun observeUser(): Flow<User?>
 
     suspend fun updateUser(user: User): Result<Unit>

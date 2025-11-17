@@ -30,25 +30,32 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateField(
-    value: LocalDate,
-    onValueChange: (LocalDate) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val currentLocalDate: LocalDate = remember(value) {
+        try {
+            LocalDate.parse(value)
+        } catch (_: Exception) {
+            LocalDate.now()
+        }
+    }
 
     PickerField(
         modifier = modifier,
         label = label,
-        value = value.format(formatter),
+        value = currentLocalDate.format(formatter),
         icon = Icons.Default.DateRange,
         onClick = { showDialog = true }
     )
 
     if (showDialog) {
         val state = rememberDatePickerState(
-            initialSelectedDateMillis = value.toEpochDay() * 24 * 60 * 60 * 1000
+            initialSelectedDateMillis = currentLocalDate.toEpochDay() * 24 * 60 * 60 * 1000
         )
 
         DatePickerDialog(
@@ -60,7 +67,7 @@ fun DateField(
                             onValueChange(
                                 Instant.ofEpochMilli(millis)
                                     .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
+                                    .toLocalDate().format(formatter)
                             )
                         }
                         showDialog = false

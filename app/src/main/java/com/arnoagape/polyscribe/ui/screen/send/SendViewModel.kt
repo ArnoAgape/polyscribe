@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.data.repository.FileRepository
+import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
@@ -31,6 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SendViewModel @Inject constructor(
     private val fileRepository: FileRepository,
+    private val userRepository: UserRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
@@ -46,10 +48,9 @@ class SendViewModel @Inject constructor(
         File(
             id = UUID.randomUUID().toString(),
             fileUrl = emptyList(),
-            pictureUrl = emptyList(),
             createdAt = Timestamp.now(),
-            date = LocalDate.now(),
-            time = LocalTime.now(),
+            date = LocalDate.now().toString(),
+            time = LocalTime.now().toString(),
             author = null,
             isColored = false,
             isDoubleSided = false,
@@ -71,12 +72,18 @@ class SendViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     val isFileValid = file
         .map { currentFile ->
-            currentFile.fileUrl.isNotEmpty() || currentFile.pictureUrl.isNotEmpty()
+            currentFile.fileUrl.isNotEmpty()
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = false,
         )
+
+    init {
+        viewModelScope.launch {
+            _user.value = userRepository.getCurrentUser()
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onAction(formEvent: FormEvent) {
@@ -117,20 +124,6 @@ class SendViewModel @Inject constructor(
                     )
                 }
 
-            is FormEvent.AddPicture ->
-                _file.update { file ->
-                    file.copy(
-                        pictureUrl = file.pictureUrl.plus(formEvent.uri.toString())
-                    )
-                }
-
-            is FormEvent.RemovePicture ->
-                _file.update { file ->
-                    file.copy(
-                        pictureUrl = file.pictureUrl.minus(formEvent.uri.toString())
-                    )
-                }
-
             is FormEvent.CommentChanged -> {
                 _file.update { it.copy(comment = formEvent.comment) }
             }
@@ -140,37 +133,43 @@ class SendViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     fun sendFile() {
         viewModelScope.launch {
+
+            // 🔹 1. Vérification réseau
             if (!networkUtils.isNetworkAvailable()) {
                 _events.trySend(Event.ShowSnackBar(R.string.no_network))
+                return@launch
+            }
+
+            // 🔹 2. Vérification utilisateur connecté
+            val currentUser = _user.value
+            if (currentUser == null) {
+                _uiState.value = SendUiState.Error.NoAccount()
+                _events.trySend(Event.ShowSnackBar(R.string.error_no_account_file))
                 return@launch
             }
 
             _uiState.value = SendUiState.Loading
 
             try {
-                val fileToSave = _file.value.copy(author = _user.value)
+                // 🔹 3. Création d’un file complet avec l’auteur
+                val fileToSave = _file.value.copy(author = currentUser)
 
+                // 🔹 4. Upload Storage + Firestore
                 fileRepository.sendFile(fileToSave)
 
+                // 🔹 5. Succès UI
                 _uiState.value = SendUiState.Success(fileToSave)
                 _events.trySend(Event.ShowSnackBar(R.string.success_file))
 
+            } catch (e: IOException) {
+                // 🔹 6. Erreur réseau (upload impossible)
+                _uiState.value = SendUiState.Error.Generic("Network error: ${e.message}")
+                _events.trySend(Event.ShowSnackBar(R.string.no_network))
+
             } catch (e: Exception) {
-                when (e) {
-                    is IllegalStateException -> {
-                        _uiState.value = SendUiState.Error.NoAccount()
-                    }
-
-                    is IOException -> {
-                        _uiState.value = SendUiState.Error.Generic("Network error: ${e.message}")
-                        _events.trySend(Event.ShowSnackBar(R.string.no_network))
-                    }
-
-                    else -> {
-                        _uiState.value = SendUiState.Error.Generic()
-                        _events.trySend(Event.ShowSnackBar(R.string.error_generic))
-                    }
-                }
+                // 🔹 7. Erreur générique (Firebase Storage, Firestore, etc.)
+                _uiState.value = SendUiState.Error.Generic()
+                _events.trySend(Event.ShowSnackBar(R.string.error_generic))
             }
         }
     }

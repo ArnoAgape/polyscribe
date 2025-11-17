@@ -8,6 +8,7 @@ import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
@@ -32,7 +33,7 @@ class FirebaseFileApi @Inject constructor(
 
     override fun getFilesOrderByCreationDateDesc(): Flow<List<File>> {
         return filesCollection
-            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .dataObjects()
     }
 
@@ -46,14 +47,11 @@ class FirebaseFileApi @Inject constructor(
                 uploadDocumentToFirebase(uri)
             }
 
-            val uploadedPhotos = file.pictureUrl.mapNotNull { uriString ->
-                val uri = uriString.toUri()
-                uploadImageToFirebase(uri)
-            }
-
             val updated = file.copy(
                 fileUrl = uploadedFiles,
-                pictureUrl = uploadedPhotos
+                createdAt = Timestamp.now(),
+                date = file.date,
+                time = file.time
             )
 
             filesCollection.document(updated.id).set(updated).await()
@@ -109,7 +107,7 @@ class FirebaseFileApi @Inject constructor(
                 // --- 4️⃣ Infers the file extension ---
                 val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
                 val fileName = "${System.currentTimeMillis()}.$extension"
-                val fileRef = storage.child("uploads/$fileName")
+                val fileRef = storage.child("files/$fileName")
 
                 // --- 5️⃣ File upload ---
                 fileRef.putFile(uri).await()
@@ -125,28 +123,6 @@ class FirebaseFileApi @Inject constructor(
                 null
             } finally {
                 pfd?.close()
-            }
-        }
-    }
-
-    /**
-     * Uploads an image to Firebase Storage and returns its download URL.
-     *
-     * @param uri The [Uri] of the image to upload.
-     * @return The download URL as a [String], or `null` if the upload fails.
-     */
-    override suspend fun uploadImageToFirebase(uri: Uri): String? {
-        return withContext(Dispatchers.IO + SupervisorJob()) {
-            try {
-                val fileRef = FirebaseStorage.getInstance()
-                    .reference
-                    .child("images/${System.currentTimeMillis()}.jpg")
-
-                fileRef.putFile(uri).await()
-                fileRef.downloadUrl.await().toString()
-            } catch (e: Exception) {
-                Log.e("FirebaseUpload", "Error while uploading the picture", e)
-                null
             }
         }
     }

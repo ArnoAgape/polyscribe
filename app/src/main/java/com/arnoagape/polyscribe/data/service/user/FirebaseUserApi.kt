@@ -26,6 +26,8 @@ class FirebaseUserApi : UserApi {
         isProfessional = false
     )
 
+    override suspend fun getCurrentUser(): User? = auth.currentUser?.toDomain()
+
     override fun observeUser(): Flow<User?> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser?.toDomain())

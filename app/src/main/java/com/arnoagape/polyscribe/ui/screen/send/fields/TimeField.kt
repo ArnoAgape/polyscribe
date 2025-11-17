@@ -29,21 +29,28 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun TimeField(
     modifier: Modifier,
-    value: LocalTime,
-    onValueChange: (LocalTime) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     label: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    val currentLocalTime: LocalTime = remember(value) {
+        try {
+            LocalTime.parse(value)
+        } catch (_: Exception) {
+            LocalTime.now()
+        }
+    }
     val state = rememberTimePickerState(
-        initialHour = value.hour,
-        initialMinute = value.minute
+        initialHour = currentLocalTime.hour,
+        initialMinute = currentLocalTime.minute
     )
 
     PickerField(
         modifier = modifier,
         label = label,
-        value = value.format(formatter),
+        value = currentLocalTime.format(formatter),
         icon = Icons.Default.AccessTime,
         onClick = { showDialog = true }
     )
@@ -55,7 +62,7 @@ fun TimeField(
                 TextButton(
                     onClick = {
                         val picked = LocalTime.of(state.hour, state.minute)
-                        onValueChange(picked)
+                        onValueChange(picked.format(formatter))
                         showDialog = false
                     },
                     colors = ButtonDefaults.textButtonColors(

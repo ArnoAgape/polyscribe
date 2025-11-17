@@ -47,8 +47,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import coil.imageLoader
-import coil.util.DebugLogger
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
@@ -56,8 +54,6 @@ import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.google.firebase.Timestamp
-import java.time.LocalDate
-import java.time.LocalTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,41 +180,64 @@ private fun HomeContent(
                 Column(
                     modifier = Modifier.padding(8.dp),
                 ) {
+
+                    // ---- TITRE DATE/HEURE ----
                     Text(
                         text = stringResource(
                             R.string.created_at,
-                            file.date, file.time
+                            file.date,
+                            file.time
                         ),
                         style = MaterialTheme.typography.titleLarge
                     )
 
                     Spacer(Modifier.height(8.dp))
 
-                    val previewUrl = file.pictureUrl.firstOrNull()
+                    // ---- VIGNETTE DU DOCUMENT ----
                     val documentUrl = file.fileUrl.firstOrNull()
 
-                    when {
-                        previewUrl != null -> {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .fillMaxWidth()
-                                    .heightIn(max = 200.dp)
-                                    .aspectRatio(ratio = 16 / 9f),
-                                model = file.pictureUrl.firstOrNull(),
-                                imageLoader = LocalContext.current.imageLoader.newBuilder()
-                                    .logger(DebugLogger())
-                                    .build(),
-                                placeholder = ColorPainter(Color.DarkGray),
-                                contentDescription = "image",
-                                contentScale = ContentScale.Crop,
-                            )
-                        }
-                        documentUrl?.endsWith(".pdf") == true -> {
-                            Icon(Icons.Default.PictureAsPdf, contentDescription = "PDF")
-                        }
-                        else -> {
-                            Icon(Icons.AutoMirrored.Filled.InsertDriveFile, contentDescription = "Document")
+                    if (documentUrl != null) {
+
+                        val isImage = documentUrl.endsWith(".jpg", true) ||
+                                documentUrl.endsWith(".jpeg", true) ||
+                                documentUrl.endsWith(".png", true)
+
+                        when {
+                            isImage -> {
+                                AsyncImage(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp)
+                                        .fillMaxWidth()
+                                        .heightIn(max = 200.dp)
+                                        .aspectRatio(16 / 9f),
+                                    model = documentUrl,
+                                    placeholder = ColorPainter(Color.DarkGray),
+                                    contentDescription = "Image preview",
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+                            documentUrl.endsWith(".pdf", true) -> {
+                                Icon(
+                                    imageVector = Icons.Default.PictureAsPdf,
+                                    contentDescription = "PDF",
+                                    modifier = Modifier
+                                        .padding(32.dp)
+                                        .fillMaxWidth()
+                                        .height(120.dp)
+                                )
+                            }
+
+                            else -> {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
+                                    contentDescription = "Document",
+                                    modifier = Modifier
+                                        .padding(32.dp)
+                                        .fillMaxWidth()
+                                        .height(120.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -236,11 +255,10 @@ private fun HomeContentPreview() {
             files = listOf(
                 File(
                     id = "1",
-                    pictureUrl = emptyList(),
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = LocalDate.now(),
-                    time = LocalTime.now(),
+                    date = "10/11/2025",
+                    time = "11:04",
                     author = User(
                         id = "1",
                         displayName = "John Doe",
@@ -255,11 +273,10 @@ private fun HomeContentPreview() {
                 ),
                 File(
                     id = "2",
-                    pictureUrl = emptyList(),
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = LocalDate.now(),
-                    time = LocalTime.now(),
+                    date = "23/04/1993",
+                    time = "22:44",
                     author = User(
                         id = "2",
                         displayName = "Harry Ter",
@@ -274,11 +291,10 @@ private fun HomeContentPreview() {
                 ),
                 File(
                     id = "3",
-                    pictureUrl = emptyList(),
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = LocalDate.now(),
-                    time = LocalTime.now(),
+                    date = "01/05/1968",
+                    time = "14:00",
                     author = User(
                         id = "3",
                         displayName = "Emma Watt",

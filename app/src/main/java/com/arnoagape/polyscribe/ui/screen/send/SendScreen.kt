@@ -63,8 +63,6 @@ import com.arnoagape.polyscribe.ui.screen.send.fields.NumberOfCopiesField
 import com.arnoagape.polyscribe.ui.screen.send.fields.TimeField
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.getFileName
-import java.time.LocalDate
-import java.time.LocalTime
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,7 +73,7 @@ fun SendScreen(
     onSaveClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val post by viewModel.file.collectAsStateWithLifecycle()
+    val file by viewModel.file.collectAsStateWithLifecycle()
     val isFileValid by viewModel.isFileValid.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -107,16 +105,16 @@ fun SendScreen(
         when (uiState) {
             is SendUiState.Idle, is SendUiState.Success -> {
                 val fileToDisplay =
-                    if (uiState is SendUiState.Success) (uiState as SendUiState.Success).file else post
+                    if (uiState is SendUiState.Success) (uiState as SendUiState.Success).file else file
 
                 CreateFile(
                     contentPadding = contentPadding,
                     fileUrls = fileToDisplay.fileUrl,
                     onAddFile = { viewModel.onAction(FormEvent.AddFile(it)) },
                     onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
-                    pictureUrls = fileToDisplay.pictureUrl,
-                    onAddPicture = { viewModel.onAction(FormEvent.AddPicture(it)) },
-                    onRemovePicture = { viewModel.onAction(FormEvent.RemovePicture(it)) },
+                    pictureUrls = emptyList(),
+                    onAddPicture = { viewModel.onAction(FormEvent.AddFile(it)) },
+                    onRemovePicture = {},
                     date = fileToDisplay.date,
                     onDateChange = { viewModel.onAction(FormEvent.DateChanged(it)) },
                     time = fileToDisplay.time,
@@ -183,10 +181,10 @@ private fun CreateFile(
     pictureUrls: List<String>,
     onAddPicture: (Uri) -> Unit,
     onRemovePicture: (Uri) -> Unit,
-    date: LocalDate,
-    onDateChange: (LocalDate) -> Unit,
-    time: LocalTime,
-    onTimeChange: (LocalTime) -> Unit,
+    date: String,
+    onDateChange: (String) -> Unit,
+    time: String,
+    onTimeChange: (String) -> Unit,
     colored: Boolean,
     onColorationChange: (Boolean) -> Unit,
     doubleSided: Boolean,
@@ -203,12 +201,11 @@ private fun CreateFile(
     val scrollState = rememberScrollState()
 
     val selectedFileUris = fileUrls.map { it.toUri() }
-    val selectedPhotoUris = pictureUrls.map { it.toUri() }
 
     val pictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris ->
-        uris.forEach { onAddPicture(it) }
+        uris.forEach { onAddFile(it) }
     }
 
     val fileLauncher = rememberLauncherForActivityResult(
@@ -320,7 +317,7 @@ private fun CreateFile(
                 Spacer(Modifier.height(24.dp))
             }
 
-            /** ---------- ADD BUTTONS ONLY (STAY SIDE-BY-SIDE) ---------- **/
+            /** ---------- ADD BUTTONS FILE ---------- **/
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -377,14 +374,6 @@ private fun CreateFile(
                         onRemove = { onRemoveFile(uri) }
                     )
                 }
-
-                selectedPhotoUris.forEach { uri ->
-                    FileRowItem(
-                        fileName = context.getFileName(uri),
-                        icon = Icons.Default.Photo,
-                        onRemove = { onRemovePicture(uri) }
-                    )
-                }
             }
 
             Spacer(Modifier.height(16.dp))
@@ -424,9 +413,9 @@ private fun CreateFilePreview() {
             ),
             onAddPicture = {},
             onRemovePicture = {},
-            date = LocalDate.now(),
+            date = "11/11/2025",
             onDateChange = {},
-            time = LocalTime.now(),
+            time = "13:04",
             onTimeChange = {},
             colored = false,
             onColorationChange = {},

@@ -2,19 +2,16 @@ package com.arnoagape.polyscribe.domain.model
 
 import com.google.firebase.Timestamp
 import java.io.Serializable
-import java.time.LocalDate
-import java.time.LocalTime
 
 data class File(
-    val id: String,
-    val fileUrl: List<String>,
-    val pictureUrl: List<String>,
-    val createdAt: Timestamp,
-    val date: LocalDate,
-    val time: LocalTime,
-    val author: User?,
-    val isColored: Boolean,
-    val isDoubleSided: Boolean,
-    val numberOfCopies: Int,
-    val comment: String
+    val id: String = "",
+    val fileUrl: List<String> = emptyList(),
+    val createdAt: Timestamp = Timestamp.now(),
+    val date: String = "",
+    val time: String = "",
+    val author: User? = null,
+    val isColored: Boolean = false,
+    val isDoubleSided: Boolean = false,
+    val numberOfCopies: Int = 1,
+    val comment: String = ""
 ) : Serializable
