@@ -41,7 +41,7 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
-    onBackClick: () -> Unit
+    onLoginScreen: () -> Unit
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
 
@@ -72,7 +72,7 @@ fun ProfileScreen(
                         onDescriptionChanged = { },
                         onSignOutClick = {
                             viewModel.signOut()
-                            onBackClick()
+                            onLoginScreen()
                         },
                         onDeleteAccountClick = { viewModel.deleteAccount() }
                     )

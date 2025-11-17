@@ -102,7 +102,7 @@ fun AppNavGraph(
         composable<Profile> {
             ProfileScreen(
                 viewModel = hiltViewModel<ProfileViewModel>(),
-                onBackClick = { navController.navigateUp() }
+                onLoginScreen = { navController.navigate(Login) }
             )
         }
 
