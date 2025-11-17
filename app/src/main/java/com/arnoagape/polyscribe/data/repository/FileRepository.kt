@@ -19,8 +19,7 @@ class FileRepository @Inject constructor(
     /**
      * Observes the list of all files ordered by descending creation date.
      */
-    fun getFilesOrderByCreationDateDesc(): Flow<List<File>> =
-        fileApi.getFilesOrderByCreationDateDesc()
+    val files: Flow<List<File>> = fileApi.getFilesOrderByCreationDateDesc()
 
     /**
      * Uploads a new file to Firebase (Storage + Firestore).

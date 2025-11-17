@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** Holds the current state of the home feed UI (loading, success, or error). */
-    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Idle)
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
 
     /** Publicly exposed immutable flow for observing post-related UI states. */
     val uiState: StateFlow<HomeUiState> = _uiState
@@ -49,16 +49,16 @@ class HomeViewModel @Inject constructor(
 
     private fun getAllFiles() {
         viewModelScope.launch {
-            fileRepository.getFilesOrderByCreationDateDesc()
+            fileRepository.files
                 .onStart { _uiState.value = HomeUiState.Loading }
                 .catch { e ->
                     _uiState.value = HomeUiState.Error.Generic(e.message ?: "Unknown error")
                 }
-                .collect { posts ->
-                    _uiState.value = if (posts.isEmpty()) {
+                .collect { files ->
+                    _uiState.value = if (files.isEmpty()) {
                         HomeUiState.Error.Empty()
                     } else {
-                        HomeUiState.Success(posts)
+                        HomeUiState.Success(files)
                     }
                 }
         }

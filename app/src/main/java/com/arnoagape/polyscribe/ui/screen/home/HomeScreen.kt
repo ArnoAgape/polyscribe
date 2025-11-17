@@ -224,7 +224,7 @@ private fun HomeContent(
                                     modifier = Modifier
                                         .padding(32.dp)
                                         .fillMaxWidth()
-                                        .height(120.dp)
+                                        .height(60.dp)
                                 )
                             }
 
@@ -235,7 +235,7 @@ private fun HomeContent(
                                     modifier = Modifier
                                         .padding(32.dp)
                                         .fillMaxWidth()
-                                        .height(120.dp)
+                                        .height(60.dp)
                                 )
                             }
                         }
