@@ -1,11 +1,9 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
-import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -63,8 +61,8 @@ import com.arnoagape.polyscribe.ui.screen.send.fields.NumberOfCopiesField
 import com.arnoagape.polyscribe.ui.screen.send.fields.TimeField
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.getFileName
+import java.time.Instant
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendScreen(
@@ -72,9 +70,7 @@ fun SendScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val file by viewModel.file.collectAsStateWithLifecycle()
-    val isFileValid by viewModel.isFileValid.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     EventsEffect(viewModel.eventsFlow) { event ->
@@ -102,10 +98,11 @@ fun SendScreen(
         }
     ) { contentPadding ->
 
-        when (uiState) {
+        when (state.uiState) {
             is SendUiState.Idle, is SendUiState.Success -> {
                 val fileToDisplay =
-                    if (uiState is SendUiState.Success) (uiState as SendUiState.Success).file else file
+                    if (state.uiState is SendUiState.Success) (state.uiState as SendUiState.Success).file
+                    else state.file
 
                 CreateFile(
                     contentPadding = contentPadding,
@@ -130,7 +127,7 @@ fun SendScreen(
                     comments = fileToDisplay.comment,
                     onCommentsChanged = { viewModel.onAction(FormEvent.CommentChanged(it)) },
                     onSaveClicked = { viewModel.sendFile() },
-                    isFileValid = isFileValid,
+                    isFileValid = state.isValid,
                     isLoading = false
                 )
             }
@@ -154,10 +151,10 @@ fun SendScreen(
             }
 
             is SendUiState.Error -> {
-                val errorState = uiState as SendUiState.Error
+                val errorState = state.uiState as SendUiState.Error
                 val message = when (errorState) {
-                    is SendUiState.Error.NoAccount -> (uiState as SendUiState.Error.NoAccount).message
-                    is SendUiState.Error.Generic -> (uiState as SendUiState.Error.Generic).message
+                    is SendUiState.Error.NoAccount -> (state.uiState as SendUiState.Error.NoAccount).message
+                    is SendUiState.Error.Generic -> (state.uiState as SendUiState.Error.Generic).message
                 }
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -171,7 +168,6 @@ fun SendScreen(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun CreateFile(
     contentPadding: PaddingValues = PaddingValues(),
@@ -181,10 +177,10 @@ private fun CreateFile(
     pictureUrls: List<String>,
     onAddPicture: (Uri) -> Unit,
     onRemovePicture: (Uri) -> Unit,
-    date: String,
-    onDateChange: (String) -> Unit,
-    time: String,
-    onTimeChange: (String) -> Unit,
+    date: Instant,
+    onDateChange: (Instant) -> Unit,
+    time: Instant,
+    onTimeChange: (Instant) -> Unit,
     colored: Boolean,
     onColorationChange: (Boolean) -> Unit,
     doubleSided: Boolean,
@@ -399,7 +395,6 @@ private fun CreateFile(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @PreviewLightDark
 @Composable
 private fun CreateFilePreview() {
@@ -413,9 +408,9 @@ private fun CreateFilePreview() {
             ),
             onAddPicture = {},
             onRemovePicture = {},
-            date = "11/11/2025",
+            date = Instant.now(),
             onDateChange = {},
-            time = "13:04",
+            time = Instant.now(),
             onTimeChange = {},
             colored = false,
             onColorationChange = {},

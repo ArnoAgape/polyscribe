@@ -1,7 +1,5 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
@@ -18,14 +16,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.time.LocalDate
-import java.time.LocalTime
+import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
@@ -43,14 +41,13 @@ class SendViewModel @Inject constructor(
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private val _file = MutableStateFlow(
         File(
             id = UUID.randomUUID().toString(),
             fileUrl = emptyList(),
             createdAt = Timestamp.now(),
-            date = LocalDate.now().toString(),
-            time = LocalTime.now().toString(),
+            date = Instant.now(),
+            time = Instant.now(),
             author = null,
             isColored = false,
             isDoubleSided = false,
@@ -63,13 +60,11 @@ class SendViewModel @Inject constructor(
      * Public state flow representing the current post being edited.
      * This is immutable for consumers.
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     val file: StateFlow<File> = _file.asStateFlow()
 
     /**
      * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
      */
-    @RequiresApi(Build.VERSION_CODES.O)
     val isFileValid = file
         .map { currentFile ->
             currentFile.fileUrl.isNotEmpty()
@@ -79,13 +74,30 @@ class SendViewModel @Inject constructor(
             initialValue = false,
         )
 
+    val state: StateFlow<SendScreenState> =
+        combine(
+            uiState,
+            file,
+            isFileValid
+        ) { ui, f, valid ->
+            SendScreenState(
+                uiState = ui,
+                file = f,
+                isValid = valid
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = SendScreenState()
+        )
+
+
     init {
         viewModelScope.launch {
             _user.value = userRepository.getCurrentUser()
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun onAction(formEvent: FormEvent) {
         when (formEvent) {
             is FormEvent.DateChanged -> {
@@ -130,17 +142,16 @@ class SendViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun sendFile() {
         viewModelScope.launch {
 
-            // 🔹 1. Vérification réseau
+            // 1. Network checking
             if (!networkUtils.isNetworkAvailable()) {
                 _events.trySend(Event.ShowSnackBar(R.string.no_network))
                 return@launch
             }
 
-            // 🔹 2. Vérification utilisateur connecté
+            // 2. If user logged in checking
             val currentUser = _user.value
             if (currentUser == null) {
                 _uiState.value = SendUiState.Error.NoAccount()
@@ -151,26 +162,31 @@ class SendViewModel @Inject constructor(
             _uiState.value = SendUiState.Loading
 
             try {
-                // 🔹 3. Création d’un file complet avec l’auteur
+                // 3. Creation of file with user
                 val fileToSave = _file.value.copy(author = currentUser)
 
-                // 🔹 4. Upload Storage + Firestore
+                // 4. Upload Storage + Firestore
                 fileRepository.sendFile(fileToSave)
 
-                // 🔹 5. Succès UI
+                // 5. Success UI
                 _uiState.value = SendUiState.Success(fileToSave)
                 _events.trySend(Event.ShowSnackBar(R.string.success_file))
 
             } catch (e: IOException) {
-                // 🔹 6. Erreur réseau (upload impossible)
+                // 6. Network error (impossible upload)
                 _uiState.value = SendUiState.Error.Generic("Network error: ${e.message}")
                 _events.trySend(Event.ShowSnackBar(R.string.no_network))
 
-            } catch (e: Exception) {
-                // 🔹 7. Erreur générique (Firebase Storage, Firestore, etc.)
+            } catch (_: Exception) {
+                // 7. Generic error (Firebase Storage, Firestore, etc.)
                 _uiState.value = SendUiState.Error.Generic()
                 _events.trySend(Event.ShowSnackBar(R.string.error_generic))
             }
         }
     }
 }
+data class SendScreenState(
+    val uiState: SendUiState = SendUiState.Idle,
+    val file: File = File(),
+    val isValid: Boolean = false
+)

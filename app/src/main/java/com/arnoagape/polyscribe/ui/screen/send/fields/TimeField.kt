@@ -1,7 +1,5 @@
 package com.arnoagape.polyscribe.ui.screen.send.fields
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.ButtonDefaults
@@ -21,27 +19,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.components.PickerField
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TimeField(
     modifier: Modifier,
-    value: String,
-    onValueChange: (String) -> Unit,
+    value: Instant,
+    onValueChange: (Instant) -> Unit,
     label: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val formatter = DateTimeFormatter.ofPattern("HH:mm")
     val currentLocalTime: LocalTime = remember(value) {
-        try {
-            LocalTime.parse(value)
-        } catch (_: Exception) {
-            LocalTime.now()
-        }
+        value.atZone(ZoneId.systemDefault()).toLocalTime()
     }
+
     val state = rememberTimePickerState(
         initialHour = currentLocalTime.hour,
         initialMinute = currentLocalTime.minute
@@ -62,7 +59,12 @@ fun TimeField(
                 TextButton(
                     onClick = {
                         val picked = LocalTime.of(state.hour, state.minute)
-                        onValueChange(picked.format(formatter))
+                        val pickedInstant = picked
+                            .atDate(LocalDate.now())
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant()
+
+                        onValueChange(pickedInstant)
                         showDialog = false
                     },
                     colors = ButtonDefaults.textButtonColors(

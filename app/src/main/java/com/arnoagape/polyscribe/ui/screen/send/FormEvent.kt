@@ -1,14 +1,15 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
+import java.time.Instant
 
 /**
  * A sealed class representing different events that can occur on a form.
  */
 sealed class FormEvent {
 
-    data class DateChanged(val date: String) : FormEvent()
-    data class TimeChanged(val time: String) : FormEvent()
+    data class DateChanged(val date: Instant) : FormEvent()
+    data class TimeChanged(val time: Instant) : FormEvent()
     data class ColorChanged(val isColored: Boolean) : FormEvent()
     data class DoubleSidedChanged(val isDoubleSided: Boolean) : FormEvent()
     data class NumberOfCopiesSet(val value: Int) : FormEvent()

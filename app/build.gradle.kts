@@ -1,5 +1,4 @@
 import com.android.build.gradle.BaseExtension
-import org.gradle.kotlin.dsl.getByType
 
 plugins {
     alias(libs.plugins.android.application)
@@ -23,6 +22,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,6 +40,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlin {
         jvmToolchain(17)
@@ -84,6 +85,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.material)
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     // Firebase & Firestore
     implementation(platform(libs.firebase.bom))

@@ -1,8 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.home
 
-import android.os.Build
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +52,7 @@ import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.google.firebase.Timestamp
+import java.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -181,7 +180,17 @@ private fun HomeContent(
                     modifier = Modifier.padding(8.dp),
                 ) {
 
-                    // ---- TITRE DATE/HEURE ----
+                    // ---- DATE/TIME ----
+                    Text(
+                        text = stringResource(
+                            R.string.created_at,
+                            file.date,
+                            file.time
+                        ),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
+                    // ---- NAME ----
                     Text(
                         text = stringResource(
                             R.string.created_at,
@@ -193,7 +202,7 @@ private fun HomeContent(
 
                     Spacer(Modifier.height(8.dp))
 
-                    // ---- VIGNETTE DU DOCUMENT ----
+                    // ---- FILE PREVIEW ----
                     val documentUrl = file.fileUrl.firstOrNull()
 
                     if (documentUrl != null) {
@@ -246,7 +255,6 @@ private fun HomeContent(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @PreviewLightDark
 @Composable
 private fun HomeContentPreview() {
@@ -257,8 +265,8 @@ private fun HomeContentPreview() {
                     id = "1",
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = "10/11/2025",
-                    time = "11:04",
+                    date = Instant.now(),
+                    time = Instant.now(),
                     author = User(
                         id = "1",
                         displayName = "John Doe",
@@ -275,8 +283,8 @@ private fun HomeContentPreview() {
                     id = "2",
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = "23/04/1993",
-                    time = "22:44",
+                    date = Instant.now(),
+                    time = Instant.now(),
                     author = User(
                         id = "2",
                         displayName = "Harry Ter",
@@ -293,8 +301,8 @@ private fun HomeContentPreview() {
                     id = "3",
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = "01/05/1968",
-                    time = "14:00",
+                    date = Instant.now(),
+                    time = Instant.now(),
                     author = User(
                         id = "3",
                         displayName = "Emma Watt",

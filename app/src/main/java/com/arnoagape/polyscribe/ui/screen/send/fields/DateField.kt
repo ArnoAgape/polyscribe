@@ -1,7 +1,5 @@
 package com.arnoagape.polyscribe.ui.screen.send.fields
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.ButtonDefaults
@@ -22,27 +20,22 @@ import androidx.compose.ui.res.stringResource
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.components.PickerField
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DateField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier,
+    value: Instant,
+    onValueChange: (Instant) -> Unit,
+    label: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
+
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-    val currentLocalDate: LocalDate = remember(value) {
-        try {
-            LocalDate.parse(value)
-        } catch (_: Exception) {
-            LocalDate.now()
-        }
+    val currentLocalDate = remember(value) {
+        value.atZone(ZoneId.systemDefault()).toLocalDate()
     }
 
     PickerField(
@@ -54,8 +47,12 @@ fun DateField(
     )
 
     if (showDialog) {
+        val initialMillis = remember(currentLocalDate) {
+            currentLocalDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+        }
+
         val state = rememberDatePickerState(
-            initialSelectedDateMillis = currentLocalDate.toEpochDay() * 24 * 60 * 60 * 1000
+            initialSelectedDateMillis = initialMillis
         )
 
         DatePickerDialog(
@@ -64,11 +61,18 @@ fun DateField(
                 TextButton(
                     onClick = {
                         state.selectedDateMillis?.let { millis ->
-                            onValueChange(
-                                Instant.ofEpochMilli(millis)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate().format(formatter)
-                            )
+
+                            // Convert millis -> LocalDate
+                            val pickedLocalDate = Instant.ofEpochMilli(millis)
+                                .atZone(ZoneId.of("UTC"))
+                                .toLocalDate()
+
+                            // Convert LocalDate -> Instant (00:00)
+                            val pickedInstant = pickedLocalDate
+                                .atStartOfDay(ZoneId.systemDefault())
+                                .toInstant()
+
+                            onValueChange(pickedInstant)
                         }
                         showDialog = false
                     },
@@ -78,9 +82,10 @@ fun DateField(
                 ) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                },
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                    },
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
