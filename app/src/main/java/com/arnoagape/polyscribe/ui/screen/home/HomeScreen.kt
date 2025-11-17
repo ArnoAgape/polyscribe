@@ -184,8 +184,7 @@ private fun HomeContent(
                     Text(
                         text = stringResource(
                             R.string.created_at,
-                            file.date,
-                            file.time
+                            file.dateTime
                         ),
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -194,8 +193,7 @@ private fun HomeContent(
                     Text(
                         text = stringResource(
                             R.string.created_at,
-                            file.date,
-                            file.time
+                            file.dateTime
                         ),
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -265,8 +263,7 @@ private fun HomeContentPreview() {
                     id = "1",
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = Instant.now(),
-                    time = Instant.now(),
+                    dateTime = Instant.now(),
                     author = User(
                         id = "1",
                         displayName = "John Doe",
@@ -283,8 +280,7 @@ private fun HomeContentPreview() {
                     id = "2",
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = Instant.now(),
-                    time = Instant.now(),
+                    dateTime = Instant.now(),
                     author = User(
                         id = "2",
                         displayName = "Harry Ter",
@@ -301,8 +297,7 @@ private fun HomeContentPreview() {
                     id = "3",
                     fileUrl = emptyList(),
                     createdAt = Timestamp(0, 0),
-                    date = Instant.now(),
-                    time = Instant.now(),
+                    dateTime = Instant.now(),
                     author = User(
                         id = "3",
                         displayName = "Emma Watt",

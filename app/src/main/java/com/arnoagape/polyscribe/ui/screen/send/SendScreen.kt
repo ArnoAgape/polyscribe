@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
+import DateTimeField
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,9 +57,7 @@ import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.components.FileRowItem
-import com.arnoagape.polyscribe.ui.screen.send.fields.DateField
 import com.arnoagape.polyscribe.ui.screen.send.fields.NumberOfCopiesField
-import com.arnoagape.polyscribe.ui.screen.send.fields.TimeField
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.getFileName
 import java.time.Instant
@@ -112,10 +111,8 @@ fun SendScreen(
                     pictureUrls = emptyList(),
                     onAddPicture = { viewModel.onAction(FormEvent.AddFile(it)) },
                     onRemovePicture = {},
-                    date = fileToDisplay.date,
-                    onDateChange = { viewModel.onAction(FormEvent.DateChanged(it)) },
-                    time = fileToDisplay.time,
-                    onTimeChange = { viewModel.onAction(FormEvent.TimeChanged(it)) },
+                    dateTime = fileToDisplay.dateTime,
+                    onDateTimeChange = { viewModel.onAction(FormEvent.DateTimeChanged(it)) },
                     colored = fileToDisplay.isColored,
                     onColorationChange = { viewModel.onAction(FormEvent.ColorChanged(it)) },
                     doubleSided = fileToDisplay.isDoubleSided,
@@ -177,10 +174,8 @@ private fun CreateFile(
     pictureUrls: List<String>,
     onAddPicture: (Uri) -> Unit,
     onRemovePicture: (Uri) -> Unit,
-    date: Instant,
-    onDateChange: (Instant) -> Unit,
-    time: Instant,
-    onTimeChange: (Instant) -> Unit,
+    dateTime: Instant,
+    onDateTimeChange: (Instant) -> Unit,
     colored: Boolean,
     onColorationChange: (Boolean) -> Unit,
     doubleSided: Boolean,
@@ -236,17 +231,11 @@ private fun CreateFile(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    DateField(
-                        modifier = Modifier.weight(1f),
-                        value = date,
-                        onValueChange = onDateChange,
-                        label = stringResource(id = R.string.hint_date)
-                    )
-                    TimeField(
-                        modifier = Modifier.weight(1f),
-                        value = time,
-                        onValueChange = onTimeChange,
-                        label = stringResource(id = R.string.hint_time)
+                    DateTimeField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = dateTime,
+                        onValueChange = onDateTimeChange,
+                        label = stringResource(R.string.hint_datetime)
                     )
                 }
 
@@ -408,10 +397,8 @@ private fun CreateFilePreview() {
             ),
             onAddPicture = {},
             onRemovePicture = {},
-            date = Instant.now(),
-            onDateChange = {},
-            time = Instant.now(),
-            onTimeChange = {},
+            dateTime = Instant.now(),
+            onDateTimeChange = {},
             colored = false,
             onColorationChange = {},
             doubleSided = false,

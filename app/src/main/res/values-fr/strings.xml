@@ -53,10 +53,11 @@
     <string name="hint_double_sided">Recto-verso :</string>
     <string name="hint_number_of_copies">Nombre d\'exemplaires :</string>
     <string name="hint_comments">Commentaires</string>
+    <string name="hint_datetime">Date de collecte</string>
 
     <string name="contentDescription_button_add">Ajout</string>
     <string name="contentDescription_go_back">Retour</string>
 
-    <string name="created_at">Créé le %1$s à %2$s</string>
+    <string name="created_at">Créé le %1$s</string>
     <string name="feature_coming_soon">Fonctionnalité à venir</string>
 </resources>

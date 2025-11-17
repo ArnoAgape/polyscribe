@@ -46,8 +46,7 @@ class SendViewModel @Inject constructor(
             id = UUID.randomUUID().toString(),
             fileUrl = emptyList(),
             createdAt = Timestamp.now(),
-            date = Instant.now(),
-            time = Instant.now(),
+            dateTime = Instant.now(),
             author = null,
             isColored = false,
             isDoubleSided = false,
@@ -100,12 +99,8 @@ class SendViewModel @Inject constructor(
 
     fun onAction(formEvent: FormEvent) {
         when (formEvent) {
-            is FormEvent.DateChanged -> {
-                _file.update { it.copy(date = formEvent.date) }
-            }
-
-            is FormEvent.TimeChanged -> {
-                _file.update { it.copy(time = formEvent.time) }
+            is FormEvent.DateTimeChanged -> {
+                _file.update { it.copy(dateTime = formEvent.dateTime) }
             }
 
             is FormEvent.ColorChanged -> {

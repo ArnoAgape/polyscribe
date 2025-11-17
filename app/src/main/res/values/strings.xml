@@ -53,10 +53,11 @@
     <string name="hint_double_sided">Double sided:</string>
     <string name="hint_number_of_copies">Number of copies:</string>
     <string name="hint_comments">Comments</string>
+    <string name="hint_datetime">Collect date</string>
 
     <string name="contentDescription_button_add">Add</string>
     <string name="contentDescription_go_back">Go back</string>
 
-    <string name="created_at">Created on %1$s at %2$s</string>
+    <string name="created_at">Created on %1$s</string>
     <string name="feature_coming_soon">Feature coming soon</string>
 </resources>

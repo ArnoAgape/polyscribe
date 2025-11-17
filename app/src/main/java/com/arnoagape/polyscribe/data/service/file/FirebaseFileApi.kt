@@ -50,11 +50,10 @@ class FirebaseFileApi @Inject constructor(
             val updated = file.copy(
                 fileUrl = uploadedFiles,
                 createdAt = Timestamp.now(),
-                date = file.date,
-                time = file.time
+                dateTime = file.dateTime
             )
 
-            filesCollection.document(updated.id).set(updated).await()
+            filesCollection.document(updated.id).set(updated.toDto()).await()
 
         } catch (e: Exception) {
             Log.e("FirebaseFileApi", "Error while adding document", e)
