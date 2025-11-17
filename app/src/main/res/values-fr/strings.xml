@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="profile_picture">Votre photo de profil</string>
+    <string name="user_name">Nom</string>
+    <string name="user_email">E-mail</string>
+    <string name="user_picture">Avatar</string>
+    <string name="action_sign_out">Déconnexion</string>
+    <string name="action_delete_account">Suppression du compte</string>
     <string name="home">Accueil</string>
     <string name="cancel">Annuler</string>
     <string name="or">ou</string>

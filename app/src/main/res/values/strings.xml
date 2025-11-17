@@ -1,4 +1,10 @@
 <resources>
+    <string name="profile_picture">Your profile picture</string>
+    <string name="user_name">Name</string>
+    <string name="user_email">Email address</string>
+    <string name="user_picture">Profile picture</string>
+    <string name="action_sign_out">Sign out</string>
+    <string name="action_delete_account">Delete account</string>
     <string name="app_name" translatable="false">Polyscribe</string>
     <string name="cancel">Cancel</string>
     <string name="or">or</string>
