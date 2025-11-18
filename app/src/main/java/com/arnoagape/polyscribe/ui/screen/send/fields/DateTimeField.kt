@@ -20,7 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.arnoagape.polyscribe.R
-import com.arnoagape.polyscribe.ui.components.PickerField
+import com.arnoagape.polyscribe.ui.common.components.PickerField
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime

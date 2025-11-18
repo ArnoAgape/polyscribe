@@ -2,7 +2,6 @@
 agp = "8.13.1"
 datastore = "1.1.7"
 desugar_jdk_libs = "2.1.5"
-googleidCompose = "1.1.0"
 kotlin = "2.2.21"
 kotlinxSerializationJson = "1.9.0"
 ksp = "2.2.20-2.0.3"
@@ -34,7 +33,6 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
-googleid-compose = { module = "com.google.android.libraries.identity.googleid:googleid-compose", version.ref = "googleidCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

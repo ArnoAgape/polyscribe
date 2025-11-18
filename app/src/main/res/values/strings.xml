@@ -42,7 +42,7 @@
 
     <string name="sign_in_google">Sign in with Google</string>
     <string name="sign_in_email">Sign in with email</string>
-    <string name="sign_in_title">Sign up or log in to use Polyscribe</string>
+    <string name="sign_in_title">Sign up, log in or continue as guest to use Polyscribe</string>
     <string name="sign_in_guest">Continue as guest</string>
     <string name="sign_up">Sign up</string>
     <string name="email">Email</string>
@@ -58,6 +58,7 @@
 
     <string name="contentDescription_button_add">Add</string>
     <string name="contentDescription_go_back">Go back</string>
+    <string name="contentDescription_remove_file">Remove file</string>
 
     <string name="created_at">Created on %1$s</string>
     <string name="feature_coming_soon">Feature coming soon</string>

@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.ui.components
+package com.arnoagape.polyscribe.ui.common.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

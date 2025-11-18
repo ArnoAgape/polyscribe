@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -56,7 +54,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
-import com.arnoagape.polyscribe.ui.components.FileRowItem
+import com.arnoagape.polyscribe.ui.common.components.FileRowItem
+import com.arnoagape.polyscribe.ui.common.components.TextRowItem
 import com.arnoagape.polyscribe.ui.screen.send.fields.NumberOfCopiesField
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.getFileName
@@ -242,47 +241,36 @@ private fun CreateFile(
                 Spacer(Modifier.height(16.dp))
 
                 /** ---------- COLORATION ---------- **/
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(stringResource(id = R.string.hint_color))
-                    Switch(
-                        checked = colored,
-                        onCheckedChange = onColorationChange
-                    )
-                }
+                TextRowItem(
+                    textRes = R.string.hint_color,
+                    trailingContent = {
+                        Switch(
+                            checked = colored,
+                            onCheckedChange = onColorationChange
+                        )
+                    }
+                )
 
                 Spacer(Modifier.height(16.dp))
 
                 /** ---------- DOUBLE SIDED ---------- **/
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(stringResource(id = R.string.hint_double_sided))
-                    Switch(
-                        checked = doubleSided,
-                        onCheckedChange = onDoubleSidedChange
-                    )
-                }
+                TextRowItem(
+                    textRes = R.string.hint_double_sided,
+                    trailingContent = {
+                        Switch(
+                            checked = doubleSided,
+                            onCheckedChange = onDoubleSidedChange
+                        )
+                    }
+                )
 
                 Spacer(Modifier.height(16.dp))
 
                 /** ---------- NUMBER OF COPIES ---------- **/
 
                 NumberOfCopiesField(
-                    numberOfCopies,
-                    onNumberOfCopiesChange
+                    numberOfCopies = numberOfCopies,
+                    onNumberOfCopiesChange = onNumberOfCopiesChange
                 )
 
                 /** ---------- COMMENTS ---------- **/
