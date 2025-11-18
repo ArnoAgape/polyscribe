@@ -86,6 +86,10 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.material)
 
+    // Google Sign In Button
+    implementation(libs.googleid.compose)
+
+    // Allows API < 26
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     // Firebase & Firestore
