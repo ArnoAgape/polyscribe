@@ -1,6 +1,7 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,23 +20,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.R
@@ -48,8 +41,7 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
-    onSignUpClick: () -> Unit,
-    onEmailSignInClick: (String, String) -> Unit
+    onEmailSignInClick: () -> Unit
 ) {
 
     Scaffold { contentPadding ->
@@ -63,8 +55,7 @@ fun LoginScreen(
             LoginContent(
                 onGoogleSignInClick = onGoogleSignInClick,
                 onGuestSignInClick = onGuestSignInClick,
-                onEmailSignInClick = onEmailSignInClick,
-                onSignUpClick = onSignUpClick
+                onEmailSignInClick = onEmailSignInClick
             )
         }
     }
@@ -74,13 +65,9 @@ fun LoginScreen(
 private fun LoginContent(
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
-    onSignUpClick: () -> Unit,
-    onEmailSignInClick: (String, String) -> Unit
+    onEmailSignInClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -89,11 +76,12 @@ private fun LoginContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp),
+                .padding(horizontal = 12.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
-                modifier = Modifier.verticalScroll(scrollState),
+                modifier = Modifier
+                    .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // 🔹 Logo
@@ -105,44 +93,27 @@ private fun LoginContent(
                         .padding(bottom = 16.dp)
                 )
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // 🔹 Champ email
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(stringResource(R.string.email)) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // 🔹 Champ mot de passe
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text(stringResource(R.string.password)) },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    stringResource(R.string.sign_in_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // 🔹 Email Button
                 Button(
-                    onClick = { onEmailSignInClick(email, password) },
+                    onClick = { onEmailSignInClick() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    Text(stringResource(R.string.sign_in))
+                    Text(stringResource(R.string.sign_in_email))
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // 🔹 Google Button
                 OutlinedButton(
@@ -162,7 +133,12 @@ private fun LoginContent(
                     Text(stringResource(R.string.sign_in_google))
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // 🔹 Separator
+                OrSeparator()
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // 🔹 Continue as guest
                 OutlinedButton(
@@ -174,20 +150,6 @@ private fun LoginContent(
                 ) {
                     Text(stringResource(R.string.sign_in_guest))
                 }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // 🔹 Separator
-                Text(stringResource(R.string.or), style = MaterialTheme.typography.labelMedium)
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // 🔹 Sign up
-                TextButton(
-                    onClick = onSignUpClick
-                ) {
-                    Text(stringResource(R.string.sign_up))
-                }
             }
         }
     }
@@ -198,10 +160,9 @@ private fun LoginContent(
 private fun LoginScreenPreview() {
     PolyscribeTheme {
         LoginContent(
-            onEmailSignInClick = { _, _ -> },
+            onEmailSignInClick = { },
             onGoogleSignInClick = { },
-            onGuestSignInClick = { },
-            onSignUpClick = { },
+            onGuestSignInClick = { }
         )
     }
 }

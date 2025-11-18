@@ -19,7 +19,6 @@ import com.arnoagape.polyscribe.ui.screen.login.LoginScreen
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.arnoagape.polyscribe.ui.screen.login.launchers.rememberEmailSignUpLauncher
 import com.arnoagape.polyscribe.ui.screen.login.launchers.rememberGoogleSignUpLauncher
-import com.arnoagape.polyscribe.ui.screen.login.launchers.rememberSignInLauncher
 import com.arnoagape.polyscribe.ui.screen.profile.ProfileScreen
 import com.arnoagape.polyscribe.ui.screen.profile.ProfileViewModel
 import com.arnoagape.polyscribe.ui.screen.send.SendScreen
@@ -71,11 +70,6 @@ fun AppNavGraph(
         }
 
         composable<Login> {
-            val signInLauncher = rememberSignInLauncher(
-                navController = navController,
-                showMessage = showMessage,
-                loginViewModel = loginViewModel
-            )
             val emailSignUpLauncher = rememberEmailSignUpLauncher(
                 navController = navController,
                 showMessage = showMessage,
@@ -90,12 +84,9 @@ fun AppNavGraph(
             )
             LoginScreen(
                 viewModel = hiltViewModel<LoginViewModel>(),
-                onEmailSignInClick = { email, password ->
-                    navController.navigate(Home)
-                },
+                onEmailSignInClick = { emailSignUpLauncher() },
                 onGoogleSignInClick = { googleSignUpLauncher() },
-                onGuestSignInClick = { navController.navigate(Home) },
-                onSignUpClick = { emailSignUpLauncher() }
+                onGuestSignInClick = { navController.navigate(Home) }
             )
         }
 

@@ -40,8 +40,9 @@
     <string name="select_time">Choisir une heure</string>
     <string name="select_date">Choisir une date</string>
 
-    <string name="sign_in_google">Se connecter avec Google</string>
-    <string name="sign_in">Se connecter</string>
+    <string name="sign_in_google">Continuer avec Google</string>
+    <string name="sign_in_email">Continuer avec un email</string>
+    <string name="sign_in_title">Inscrivez-vous ou connectez-vous pour utiliser Polyscribe</string>
     <string name="sign_in_guest">Continuer en tant qu\'invité</string>
     <string name="sign_up">S\'inscrire</string>
     <string name="email">E-mail</string>

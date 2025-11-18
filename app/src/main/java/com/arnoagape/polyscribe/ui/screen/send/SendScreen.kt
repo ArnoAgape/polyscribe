@@ -397,7 +397,7 @@ private fun CreateFilePreview() {
             ),
             onAddPicture = {},
             onRemovePicture = {},
-            dateTime = Instant.now(),
+            dateTime = Instant.EPOCH,
             onDateTimeChange = {},
             colored = false,
             onColorationChange = {},
