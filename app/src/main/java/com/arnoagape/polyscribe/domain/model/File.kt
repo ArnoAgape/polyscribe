@@ -21,12 +21,28 @@ data class File(
             id = id,
             fileUrl = fileUrl,
             createdAt = createdAt,
-            dateTime = dateTime.toString(),
+            dateTime = Timestamp(dateTime.epochSecond, dateTime.nano),
             author = author,
             isColored = isColored,
             isDoubleSided = isDoubleSided,
             numberOfCopies = numberOfCopies,
             comment = comment
         )
+    }
+
+    companion object {
+        fun fromDto(dto: FileDto): File {
+            return File(
+                id = dto.id,
+                fileUrl = dto.fileUrl,
+                createdAt = dto.createdAt,
+                dateTime = dto.dateTime.toDate().toInstant(),
+                author = dto.author,
+                isColored = dto.isColored,
+                isDoubleSided = dto.isDoubleSided,
+                numberOfCopies = dto.numberOfCopies,
+                comment = dto.comment
+            )
+        }
     }
 }

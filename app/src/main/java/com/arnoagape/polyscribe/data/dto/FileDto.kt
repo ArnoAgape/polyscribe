@@ -8,7 +8,7 @@ data class FileDto(
     val id: String = "",
     val fileUrl: List<String> = emptyList(),
     val createdAt: Timestamp = Timestamp.now(),
-    val dateTime: String = "",
+    val dateTime: Timestamp = Timestamp.now(),
     val author: User? = null,
     val isColored: Boolean = false,
     val isDoubleSided: Boolean = false,

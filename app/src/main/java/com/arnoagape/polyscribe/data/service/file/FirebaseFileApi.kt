@@ -6,6 +6,7 @@ import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.core.net.toUri
+import com.arnoagape.polyscribe.data.dto.FileDto
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import com.google.firebase.Timestamp
@@ -34,7 +35,8 @@ class FirebaseFileApi @Inject constructor(
     override fun getFilesOrderByCreationDateDesc(): Flow<List<File>> {
         return filesCollection
             .orderBy("createdAt", Query.Direction.DESCENDING)
-            .dataObjects()
+            .dataObjects<FileDto>()
+            .map { list -> list.map { File.fromDto(it) } }
     }
 
     override suspend fun sendFile(file: File) {
@@ -48,9 +50,7 @@ class FirebaseFileApi @Inject constructor(
             }
 
             val updated = file.copy(
-                fileUrl = uploadedFiles,
-                createdAt = Timestamp.now(),
-                dateTime = file.dateTime
+                fileUrl = uploadedFiles
             )
 
             filesCollection.document(updated.id).set(updated.toDto()).await()

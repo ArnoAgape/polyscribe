@@ -51,6 +51,7 @@ import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
+import com.arnoagape.polyscribe.ui.utils.Format
 import com.google.firebase.Timestamp
 import java.time.Instant
 
@@ -67,7 +68,6 @@ fun HomeScreen(
 
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isSignedIn by viewModel.isUserSignedIn.collectAsStateWithLifecycle()
     val refreshState = rememberPullToRefreshState()
 
     EventsEffect(viewModel.eventsFlow) { event ->
@@ -181,21 +181,19 @@ private fun HomeContent(
                 ) {
 
                     // ---- DATE/TIME ----
-                    Text(
-                        text = stringResource(
-                            R.string.created_at,
-                            file.dateTime
-                        ),
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    val (date, time) = Format.getLocalizedDateParts(file.createdAt)
+
+                    Text(stringResource(R.string.sent_at, date, time))
+
+                    Spacer(Modifier.height(8.dp))
 
                     // ---- NAME ----
                     Text(
                         text = stringResource(
-                            R.string.created_at,
-                            file.dateTime
+                            R.string.by,
+                            file.author?.displayName.toString()
                         ),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleSmall
                     )
 
                     Spacer(Modifier.height(8.dp))
@@ -262,7 +260,7 @@ private fun HomeContentPreview() {
                 File(
                     id = "1",
                     fileUrl = emptyList(),
-                    createdAt = Timestamp(0, 0),
+                    createdAt = Timestamp(1233356000, 212120),
                     dateTime = Instant.now(),
                     author = User(
                         id = "1",
@@ -279,7 +277,7 @@ private fun HomeContentPreview() {
                 File(
                     id = "2",
                     fileUrl = emptyList(),
-                    createdAt = Timestamp(0, 0),
+                    createdAt = Timestamp(1233396000, 0),
                     dateTime = Instant.now(),
                     author = User(
                         id = "2",
@@ -296,7 +294,7 @@ private fun HomeContentPreview() {
                 File(
                     id = "3",
                     fileUrl = emptyList(),
-                    createdAt = Timestamp(0, 0),
+                    createdAt = Timestamp(1363356000, 0),
                     dateTime = Instant.now(),
                     author = User(
                         id = "3",

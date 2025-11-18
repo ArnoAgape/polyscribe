@@ -60,6 +60,7 @@
     <string name="contentDescription_go_back">Retour</string>
     <string name="contentDescription_remove_file">Supprimer le fichier</string>
 
-    <string name="created_at">Créé le %1$s</string>
+    <string name="sent_at">Envoyé le %1$s à %2$s</string>
+    <string name="by">Par %1$s</string>
     <string name="feature_coming_soon">Fonctionnalité à venir</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
@@ -52,6 +53,7 @@ class HomeViewModel @Inject constructor(
             fileRepository.files
                 .onStart { _uiState.value = HomeUiState.Loading }
                 .catch { e ->
+                    Log.e("HomeViewModel", "Error loading files", e)
                     _uiState.value = HomeUiState.Error.Generic(e.message ?: "Unknown error")
                 }
                 .collect { files ->

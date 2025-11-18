@@ -67,9 +67,9 @@ fun ProfileScreen(
                     ProfileContent(
                         modifier = Modifier.fillMaxWidth(),
                         userName = user?.displayName ?: "",
-                        onTitleChanged = { },
+                        onNameChanged = { },
                         emailAddress = user?.email ?: "",
-                        onDescriptionChanged = { },
+                        onEmailChanged = { },
                         onSignOutClick = {
                             viewModel.signOut()
                             onLoginScreen()
@@ -86,9 +86,9 @@ fun ProfileScreen(
 private fun ProfileContent(
     modifier: Modifier = Modifier,
     userName: String,
-    onTitleChanged: (String) -> Unit,
+    onNameChanged: (String) -> Unit,
     emailAddress: String,
-    onDescriptionChanged: (String) -> Unit,
+    onEmailChanged: (String) -> Unit,
     onSignOutClick: () -> Unit,
     onDeleteAccountClick: () -> Unit
 ) {
@@ -122,7 +122,7 @@ private fun ProfileContent(
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
                     value = userName,
-                    onValueChange = { onTitleChanged(it) },
+                    onValueChange = { onNameChanged(it) },
                     label = { Text(stringResource(id = R.string.user_name)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true
@@ -132,7 +132,7 @@ private fun ProfileContent(
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
                     value = emailAddress,
-                    onValueChange = { onDescriptionChanged(it) },
+                    onValueChange = { onEmailChanged(it) },
                     label = { Text(stringResource(id = R.string.user_email)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true
@@ -169,9 +169,9 @@ private fun ProfileScreenPreview() {
     PolyscribeTheme {
         ProfileContent(
             userName = "Aretha Franklin",
-            onTitleChanged = { },
+            onNameChanged = { },
             emailAddress = "aretha.franklin@mail.com",
-            onDescriptionChanged = { },
+            onEmailChanged = { },
             onSignOutClick = { },
             onDeleteAccountClick = { }
         )
