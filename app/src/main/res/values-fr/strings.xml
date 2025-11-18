@@ -18,7 +18,7 @@
     <string name="loading">Chargement…</string>
     <string name="publishing">Publication en cours…</string>
     <string name="success_file">Document envoyé avec succès</string>
-    <string name="success_sign_up">Compte créé avec succès</string>
+    <string name="success_sign_up">Identifié avec succès</string>
 
     <string name="error_generic">Une erreur est survenue</string>
     <string name="error_sign_up">Inscription annulée ou échouée</string>

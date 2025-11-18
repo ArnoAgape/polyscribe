@@ -18,7 +18,7 @@
     <string name="loading">Loading…</string>
     <string name="publishing">Publishing…</string>
     <string name="success_file">File sent successfully</string>
-    <string name="success_sign_up">Account created successfully</string>
+    <string name="success_sign_up">Successfully logged in</string>
 
     <string name="error_generic">An issue occurred</string>
     <string name="error_sign_up">Sign up canceled or failed</string>
