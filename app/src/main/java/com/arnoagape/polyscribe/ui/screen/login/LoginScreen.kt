@@ -109,7 +109,8 @@ private fun LoginContent(
                     onClick = { onEmailSignInClick() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Email,

@@ -7,6 +7,7 @@ import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
+import com.arnoagape.polyscribe.ui.utils.AndroidEmailValidator
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -25,7 +27,8 @@ import java.io.IOException
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val networkUtils: NetworkUtils
+    private val networkUtils: NetworkUtils,
+    private val emailValidator: AndroidEmailValidator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Idle)
@@ -42,11 +45,26 @@ class ProfileViewModel @Inject constructor(
 
     val isUserFieldsValid = user
         .map { currentUser ->
-            currentUser?.displayName?.isNotBlank() == true && (currentUser.email?.isNotBlank() == true)
+            val displayName = currentUser?.displayName.orEmpty()
+            displayName.isNotBlank() && emailValidator.validate(currentUser?.email)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val state: StateFlow<ProfileScreenState> =
+        combine(
+            uiState,
+            user,
+            isUserFieldsValid
+        ) { ui, u, valid ->
+            ProfileScreenState(
+                uiState = ui,
+                user = u,
+                isValid = valid
+            )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = false,
+            initialValue = ProfileScreenState()
         )
 
     /**
@@ -71,18 +89,6 @@ class ProfileViewModel @Inject constructor(
             userRepository.ensureUserInFirestore()
         }
     }
-
-    /**
-     * Observes whether a user is currently signed in.
-     * Exposed as a [StateFlow] for reactive UI updates.
-     */
-    val isSignedIn =
-        userRepository.isUserSignedIn()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = false
-            )
 
     fun onAction(formEvent: FormEvent) {
         when (formEvent) {
@@ -172,3 +178,9 @@ class ProfileViewModel @Inject constructor(
         }
     }
 }
+
+data class ProfileScreenState(
+    val uiState: ProfileUiState = ProfileUiState.Idle,
+    val user: User? = User(),
+    val isValid: Boolean = false
+)

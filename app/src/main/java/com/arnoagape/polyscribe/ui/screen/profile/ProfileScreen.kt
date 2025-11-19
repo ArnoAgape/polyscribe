@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -30,6 +32,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,6 +41,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.ui.common.Event
+import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.FormEvent
 import com.arnoagape.polyscribe.ui.common.components.ConfirmDialogButton
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
@@ -45,9 +51,20 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
+    onSaveClick: () -> Unit,
     onLoginScreen: () -> Unit
 ) {
-    val user by viewModel.user.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    EventsEffect(viewModel.eventsFlow) { event ->
+        when (event) {
+            is Event.ShowSnackBar -> {
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                onSaveClick()
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -62,32 +79,34 @@ fun ProfileScreen(
         }
     ) { contentPadding ->
 
-            when (user) {
-                null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-
-                else -> {
-                    ProfileContent(
-                        contentPadding = contentPadding,
-                        userName = user?.displayName ?: "",
-                        onNameChanged = { viewModel.onAction(FormEvent.DisplayNameChanged(it)) },
-                        emailAddress = user?.email ?: "",
-                        onEmailChanged = { viewModel.onAction(FormEvent.EmailChanged(it)) },
-                        onSaveClick = { viewModel.saveUser() },
-                        onSignOutClick = {
-                            viewModel.signOut()
-                            onLoginScreen()
-                        },
-                        onDeleteAccountClick = { viewModel.deleteAccount() }
-                    )
+        when (state.user) {
+            null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
+
+            else -> {
+                ProfileContent(
+                    contentPadding = contentPadding,
+                    userName = state.user?.displayName ?: "",
+                    onNameChanged = { viewModel.onAction(FormEvent.DisplayNameChanged(it)) },
+                    emailAddress = state.user?.email ?: "",
+                    onEmailChanged = { viewModel.onAction(FormEvent.EmailChanged(it)) },
+                    onSaveClick = { viewModel.saveUser() },
+                    onSignOutClick = {
+                        viewModel.signOut()
+                        onLoginScreen()
+                    },
+                    onDeleteAccountClick = { viewModel.deleteAccount() },
+                    isUserFieldsValid = state.isValid,
+                    isLoading = false
+                )
+            }
+        }
     }
 }
 
@@ -100,9 +119,12 @@ private fun ProfileContent(
     onEmailChanged: (String) -> Unit,
     onSignOutClick: () -> Unit,
     onSaveClick: () -> Unit,
-    onDeleteAccountClick: () -> Unit
+    onDeleteAccountClick: () -> Unit,
+    isUserFieldsValid: Boolean,
+    isLoading: Boolean
 ) {
     val scrollState = rememberScrollState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -120,6 +142,7 @@ private fun ProfileContent(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(scrollState)
+                    .imePadding()
                     .padding(contentPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -153,19 +176,30 @@ private fun ProfileContent(
                     onValueChange = onEmailChanged,
                     label = { Text(stringResource(id = R.string.user_email)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    singleLine = true
+                    singleLine = true,
+                    enabled = false
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 /** ---------- SAVE BUTTON ---------- **/
                 Button(
-                    onClick = onSaveClick
+                    onClick = {
+                        keyboardController?.hide()
+                        onSaveClick()
+                    },
+                    enabled = isUserFieldsValid && !isLoading,
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Text(
-                        modifier = Modifier.padding(8.dp),
-                        text = stringResource(R.string.action_save)
-                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text(text = stringResource(id = R.string.action_save))
+                    }
                 }
             }
 
@@ -204,7 +238,9 @@ private fun ProfileScreenPreview() {
             onEmailChanged = { },
             onSaveClick = { },
             onSignOutClick = { },
-            onDeleteAccountClick = { }
+            onDeleteAccountClick = { },
+            isUserFieldsValid = true,
+            isLoading = false
         )
     }
 }

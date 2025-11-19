@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue,
+    primary = LightBlue,
     onPrimary = Color.White,
     primaryContainer = Blue,
     onPrimaryContainer = Color.White,
