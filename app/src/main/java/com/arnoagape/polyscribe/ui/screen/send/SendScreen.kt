@@ -223,13 +223,13 @@ private fun CreateFile(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(scrollState)
-                    .padding(contentPadding)
+                    .padding(contentPadding),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
                 /** ---------- DATE & TIME ---------- **/
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     DateTimeField(
                         modifier = Modifier.fillMaxWidth(),
@@ -238,8 +238,6 @@ private fun CreateFile(
                         label = stringResource(R.string.hint_datetime)
                     )
                 }
-
-                Spacer(Modifier.height(16.dp))
 
                 /** ---------- COLORATION ---------- **/
                 TextRowItem(
@@ -252,8 +250,6 @@ private fun CreateFile(
                     }
                 )
 
-                Spacer(Modifier.height(16.dp))
-
                 /** ---------- DOUBLE SIDED ---------- **/
                 TextRowItem(
                     textRes = R.string.hint_double_sided,
@@ -265,8 +261,6 @@ private fun CreateFile(
                     }
                 )
 
-                Spacer(Modifier.height(16.dp))
-
                 /** ---------- NUMBER OF COPIES ---------- **/
 
                 NumberOfCopiesField(
@@ -277,7 +271,6 @@ private fun CreateFile(
                 /** ---------- COMMENTS ---------- **/
                 OutlinedTextField(
                     modifier = Modifier
-                        .padding(top = 16.dp)
                         .fillMaxWidth(),
                     value = comments,
                     onValueChange = onCommentsChanged,
@@ -287,8 +280,6 @@ private fun CreateFile(
                         capitalization = KeyboardCapitalization.Sentences
                     )
                 )
-
-                Spacer(Modifier.height(24.dp))
             }
 
             /** ---------- ADD BUTTONS FILE ---------- **/

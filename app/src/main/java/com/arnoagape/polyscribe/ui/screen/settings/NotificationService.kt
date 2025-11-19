@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.ui.screen.profile
+package com.arnoagape.polyscribe.ui.screen.settings
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -9,11 +9,10 @@ import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.arnoagape.polyscribe.MainActivity
+import com.arnoagape.polyscribe.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.arnoagape.polyscribe.R
-import com.arnoagape.polyscribe.MainActivity
-import kotlin.jvm.java
 
 class NotificationService : FirebaseMessagingService() {
 

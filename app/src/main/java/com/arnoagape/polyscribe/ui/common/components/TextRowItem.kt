@@ -23,7 +23,6 @@ fun TextRowItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
