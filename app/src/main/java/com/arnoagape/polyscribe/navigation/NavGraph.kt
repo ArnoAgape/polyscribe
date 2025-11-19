@@ -80,6 +80,7 @@ fun AppNavGraph(
         composable<Home> {
             HomeScreen(
                 viewModel = homeViewModel,
+                loginViewModel = loginViewModel,
                 onFABClick = { navController.navigate(Send) },
                 onFileClick = { navController.navigate(Detail) }
             )

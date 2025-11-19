@@ -1,9 +1,10 @@
 package com.arnoagape.polyscribe.ui.screen.profile
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,6 +37,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.ui.common.FormEvent
 import com.arnoagape.polyscribe.ui.common.components.ConfirmDialogButton
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
@@ -45,14 +49,19 @@ fun ProfileScreen(
 ) {
     val user by viewModel.user.collectAsStateWithLifecycle()
 
-    Scaffold { contentPadding ->
-        Column(
-            modifier = Modifier
-                .padding(contentPadding)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(stringResource(id = R.string.profile))
+                }
+            )
+        }
+    ) { contentPadding ->
+
             when (user) {
                 null -> {
                     Box(
@@ -65,11 +74,12 @@ fun ProfileScreen(
 
                 else -> {
                     ProfileContent(
-                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = contentPadding,
                         userName = user?.displayName ?: "",
-                        onNameChanged = { },
+                        onNameChanged = { viewModel.onAction(FormEvent.DisplayNameChanged(it)) },
                         emailAddress = user?.email ?: "",
-                        onEmailChanged = { },
+                        onEmailChanged = { viewModel.onAction(FormEvent.EmailChanged(it)) },
+                        onSaveClick = { viewModel.saveUser() },
                         onSignOutClick = {
                             viewModel.signOut()
                             onLoginScreen()
@@ -78,18 +88,18 @@ fun ProfileScreen(
                     )
                 }
             }
-        }
     }
 }
 
 @Composable
 private fun ProfileContent(
-    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     userName: String,
     onNameChanged: (String) -> Unit,
     emailAddress: String,
     onEmailChanged: (String) -> Unit,
     onSignOutClick: () -> Unit,
+    onSaveClick: () -> Unit,
     onDeleteAccountClick: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -99,66 +109,84 @@ private fun ProfileContent(
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(16.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(R.drawable.img_profile_default),
-                contentDescription = stringResource(R.string.profile_picture),
-                modifier = Modifier
-                    .size(250.dp)
-                    .clip(CircleShape)
-            )
+
+            /** ---------- SCROLLABLE FORM CONTENT ---------- **/
             Column(
-                modifier = modifier
-                    .fillMaxSize()
+                modifier = Modifier
                     .weight(1f)
                     .verticalScroll(scrollState)
+                    .padding(contentPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                /** ---------- PROFILE IMAGE ---------- **/
+                Image(
+                    painter = painterResource(R.drawable.img_profile_default),
+                    contentDescription = stringResource(R.string.profile_picture),
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                )
+
+                /** ---------- NAME FIELD ---------- **/
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
                     value = userName,
-                    onValueChange = { onNameChanged(it) },
+                    onValueChange = onNameChanged,
                     label = { Text(stringResource(id = R.string.user_name)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true
                 )
+
+                /** ---------- EMAIL FIELD ---------- **/
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(top = 16.dp)
                         .fillMaxWidth(),
                     value = emailAddress,
-                    onValueChange = { onEmailChanged(it) },
+                    onValueChange = onEmailChanged,
                     label = { Text(stringResource(id = R.string.user_email)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     singleLine = true
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                /** ---------- SAVE BUTTON ---------- **/
+                Button(
+                    onClick = onSaveClick
+                ) {
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = stringResource(R.string.action_save)
+                    )
+                }
             }
 
             /** ---------- SIGN OUT BUTTON ---------- **/
             ConfirmDialogButton(
-                buttonColor = ButtonDefaults.buttonColors(),
+                buttonColor = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
                 onConfirmButton = onSignOutClick,
                 actionButton = R.string.action_sign_out,
                 confirmButtonTitle = R.string.action_sign_out,
-                confirmButtonMessage = R.string.action_sign_out,
-                okButtonMessage = R.string.action_continue
+                confirmButtonMessage = R.string.confirm_sign_out_message
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             /** ---------- DELETE ACCOUNT BUTTON ---------- **/
             ConfirmDialogButton(
-                buttonColor = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                buttonColor = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
                 onConfirmButton = onDeleteAccountClick,
                 actionButton = R.string.action_delete_account,
                 confirmButtonTitle = R.string.action_delete_account,
-                confirmButtonMessage = R.string.action_delete_account,
-                okButtonMessage = R.string.action_continue
+                confirmButtonMessage = R.string.confirm_delete_account_message
             )
         }
     }
@@ -174,6 +202,7 @@ private fun ProfileScreenPreview() {
             onNameChanged = { },
             emailAddress = "aretha.franklin@mail.com",
             onEmailChanged = { },
+            onSaveClick = { },
             onSignOutClick = { },
             onDeleteAccountClick = { }
         )

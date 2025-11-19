@@ -8,6 +8,7 @@ import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
+import com.arnoagape.polyscribe.ui.common.FormEvent
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -134,6 +135,7 @@ class SendViewModel @Inject constructor(
             is FormEvent.CommentChanged -> {
                 _file.update { it.copy(comment = formEvent.comment) }
             }
+            else -> Unit
         }
     }
 

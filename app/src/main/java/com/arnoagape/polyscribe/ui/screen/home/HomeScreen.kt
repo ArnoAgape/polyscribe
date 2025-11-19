@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -50,6 +51,7 @@ import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
+import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.Format
 import com.google.firebase.Timestamp
@@ -59,12 +61,14 @@ import java.time.Instant
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    loginViewModel: LoginViewModel,
     onFileClick: (File) -> Unit,
     onFABClick: () -> Unit
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refreshState = rememberPullToRefreshState()
+    val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
 
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
@@ -78,18 +82,26 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(stringResource(id = R.string.home))
+                }
+            )
+        },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onFABClick() },
-                /*if (isSignedIn) {
-                    onFABClick()
-                } else {
-                    Toast.makeText(
-                        context, context.getString(R.string.error_no_account_file),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }*/
+                onClick = {
+                    if (isSignedIn) {
+                        onFABClick()
+                    } else {
+                        Toast.makeText(
+                            context, context.getString(R.string.error_no_account_file),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
@@ -108,51 +120,43 @@ fun HomeScreen(
             isRefreshing = uiState is HomeUiState.Loading,
             onRefresh = { viewModel.refreshPosts() }
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(contentPadding)
-                    .padding(16.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                when (uiState) {
-                    is HomeUiState.Idle, is HomeUiState.Success ->
-                        HomeContent(
-                            files = (uiState as HomeUiState.Success).files,
-                            onFileClick = onFileClick
-                        )
+            when (uiState) {
+                is HomeUiState.Idle, is HomeUiState.Success ->
+                    HomeContent(
+                        files = (uiState as HomeUiState.Success).files,
+                        onFileClick = onFileClick
+                    )
 
-                    is HomeUiState.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                CircularProgressIndicator()
-                            }
+                is HomeUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
                         }
                     }
-
-                    is HomeUiState.Error.Empty -> {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState()),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = stringResource(R.string.no_files),
-                                modifier = Modifier.fillMaxSize(),
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
-
-                    else -> {}
                 }
+
+                is HomeUiState.Error.Empty -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_files),
+                            modifier = Modifier.fillMaxSize(),
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+
+                else -> {}
             }
         }
     }
@@ -160,10 +164,12 @@ fun HomeScreen(
 
 @Composable
 private fun HomeContent(
+    modifier: Modifier = Modifier,
     files: List<File>,
     onFileClick: (File) -> Unit
 ) {
     LazyColumn(
+        modifier = modifier.padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(files) { file ->
