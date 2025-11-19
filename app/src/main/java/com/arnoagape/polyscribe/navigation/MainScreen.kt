@@ -17,7 +17,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
-import com.arnoagape.polyscribe.ui.screen.login.launchers.rememberEmailSignUpLauncher
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -29,14 +28,6 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     val loginViewModel: LoginViewModel = hiltViewModel()
-
-    // Email Launcher
-    val emailSignUpLauncher = rememberEmailSignUpLauncher(
-        navController = navController,
-        showMessage = {},
-        getString = { resId -> navController.context.getString(resId) },
-        loginViewModel = loginViewModel
-    )
 
     // BottomBar screens
     val isBottomBarDestination =
@@ -59,7 +50,7 @@ fun MainScreen() {
                                 if (loginViewModel.isSignedIn.value) {
                                     navController.navigate(Profile)
                                 } else {
-                                    emailSignUpLauncher()
+                                    navController.navigate(AuthCheck)
                                 }
                             } else {
                                 navController.navigate(destination.route) {

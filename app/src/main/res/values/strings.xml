@@ -4,7 +4,9 @@
     <string name="user_email">Email address</string>
     <string name="user_picture">Profile picture</string>
     <string name="action_sign_out">Sign out</string>
+    <string name="confirm_sign_out_message">Are you sure you want to sign out?</string>
     <string name="action_delete_account">Delete account</string>
+    <string name="confirm_delete_account_message">You are about to delete your account. This can\'t be undone. Continue?</string>
     <string name="app_name" translatable="false">Polyscribe</string>
     <string name="cancel">Cancel</string>
     <string name="or">or</string>
@@ -59,6 +61,7 @@
     <string name="contentDescription_button_add">Add</string>
     <string name="contentDescription_go_back">Go back</string>
     <string name="contentDescription_remove_file">Remove file</string>
+    <string name="action_continue">Continue</string>
 
     <string name="sent_at">Sent on %1$s at %2$s</string>
     <string name="by">By %1$s</string>

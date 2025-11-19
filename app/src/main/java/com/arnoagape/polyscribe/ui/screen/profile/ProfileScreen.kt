@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +34,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.ui.common.components.ConfirmDialogButton
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,26 +138,28 @@ private fun ProfileContent(
                     singleLine = true
                 )
             }
-            Button(
-                onClick = onSignOutClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = stringResource(id = R.string.action_sign_out)
-                )
-            }
+
+            /** ---------- SIGN OUT BUTTON ---------- **/
+            ConfirmDialogButton(
+                buttonColor = ButtonDefaults.buttonColors(),
+                onConfirmButton = onSignOutClick,
+                actionButton = R.string.action_sign_out,
+                confirmButtonTitle = R.string.action_sign_out,
+                confirmButtonMessage = R.string.action_sign_out,
+                okButtonMessage = R.string.action_continue
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onDeleteAccountClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-            ) {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = stringResource(id = R.string.action_delete_account)
-                )
-            }
+
+            /** ---------- DELETE ACCOUNT BUTTON ---------- **/
+            ConfirmDialogButton(
+                buttonColor = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                onConfirmButton = onDeleteAccountClick,
+                actionButton = R.string.action_delete_account,
+                confirmButtonTitle = R.string.action_delete_account,
+                confirmButtonMessage = R.string.action_delete_account,
+                okButtonMessage = R.string.action_continue
+            )
         }
     }
 }

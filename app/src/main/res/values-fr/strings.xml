@@ -5,7 +5,9 @@
     <string name="user_email">E-mail</string>
     <string name="user_picture">Avatar</string>
     <string name="action_sign_out">Déconnexion</string>
+    <string name="confirm_sign_out_message">Êtes-vous sûr(e) de vouloir vous déconnecter ?</string>
     <string name="action_delete_account">Suppression du compte</string>
+    <string name="confirm_delete_account_message">Vous êtes sur le point de supprimer votre compte. Cette action est irréversible. Continuer ?</string>
     <string name="home">Accueil</string>
     <string name="cancel">Annuler</string>
     <string name="or">ou</string>
@@ -59,6 +61,7 @@
     <string name="contentDescription_button_add">Ajout</string>
     <string name="contentDescription_go_back">Retour</string>
     <string name="contentDescription_remove_file">Supprimer le fichier</string>
+    <string name="action_continue">Continuer</string>
 
     <string name="sent_at">Envoyé le %1$s à %2$s</string>
     <string name="by">Par %1$s</string>
