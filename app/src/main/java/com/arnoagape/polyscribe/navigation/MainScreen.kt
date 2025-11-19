@@ -12,19 +12,37 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
+import com.arnoagape.polyscribe.ui.screen.login.launchers.rememberEmailSignUpLauncher
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen() {
 
+    // Navigation
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
-    val isBottomBarDestination = currentRoute == Home::class.qualifiedName ||
-            currentRoute == Profile::class.qualifiedName || currentRoute == Settings::class.qualifiedName
+
+    val loginViewModel: LoginViewModel = hiltViewModel()
+
+    // Email Launcher
+    val emailSignUpLauncher = rememberEmailSignUpLauncher(
+        navController = navController,
+        showMessage = {},
+        getString = { resId -> navController.context.getString(resId) },
+        loginViewModel = loginViewModel
+    )
+
+    // BottomBar screens
+    val isBottomBarDestination =
+        currentRoute == Home::class.qualifiedName ||
+                currentRoute == Profile::class.qualifiedName ||
+                currentRoute == Settings::class.qualifiedName
 
     if (isBottomBarDestination) {
         NavigationSuiteScaffold(
@@ -37,10 +55,18 @@ fun MainScreen() {
                         label = { Text(destination.label()) },
                         selected = currentRoute == destination.route,
                         onClick = {
-                            navController.navigate(destination.route) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
+                            if (destination == AppDestinations.PROFILE) {
+                                if (loginViewModel.isSignedIn.value) {
+                                    navController.navigate(Profile)
+                                } else {
+                                    emailSignUpLauncher()
+                                }
+                            } else {
+                                navController.navigate(destination.route) {
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         }
                     )

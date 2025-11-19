@@ -1,6 +1,5 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
-import DateTimeField
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,6 +55,7 @@ import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.components.FileRowItem
 import com.arnoagape.polyscribe.ui.common.components.TextRowItem
+import com.arnoagape.polyscribe.ui.screen.send.fields.DateTimeField
 import com.arnoagape.polyscribe.ui.screen.send.fields.NumberOfCopiesField
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.getFileName

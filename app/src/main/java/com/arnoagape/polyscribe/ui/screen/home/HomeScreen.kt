@@ -59,13 +59,9 @@ import java.time.Instant
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onFileClick: (File) -> Unit = {},
-    onSettingsClick: () -> Unit = {},
-    onFABClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {},
-    onHomeClick: () -> Unit = {},
+    onFileClick: (File) -> Unit,
+    onFABClick: () -> Unit
 ) {
-
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val refreshState = rememberPullToRefreshState()
@@ -168,7 +164,6 @@ private fun HomeContent(
     onFileClick: (File) -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(files) { file ->

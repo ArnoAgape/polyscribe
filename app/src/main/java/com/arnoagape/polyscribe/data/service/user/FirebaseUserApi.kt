@@ -95,9 +95,12 @@ class FirebaseUserApi : UserApi {
     }
 
     override fun isUserSignedIn(): Flow<Boolean> = callbackFlow {
+        trySend(auth.currentUser != null)
+
         val listener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser != null)
         }
+
         auth.addAuthStateListener(listener)
         awaitClose { auth.removeAuthStateListener(listener) }
     }

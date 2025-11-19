@@ -33,6 +33,12 @@ fun AppNavGraph(
 ) {
 
     val loginViewModel: LoginViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val detailViewModel: DetailViewModel = hiltViewModel()
+    val sendViewModel: SendViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+
     val context = LocalContext.current
     val showMessage: (String) -> Unit = { msg ->
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -40,6 +46,18 @@ fun AppNavGraph(
     val getString: (Int) -> String = { resId ->
         context.getString(resId)
     }
+    val emailSignUpLauncher = rememberEmailSignUpLauncher(
+        navController = navController,
+        showMessage = showMessage,
+        loginViewModel = loginViewModel,
+        getString = getString
+    )
+    val googleSignUpLauncher = rememberGoogleSignUpLauncher(
+        navController = navController,
+        showMessage = showMessage,
+        loginViewModel = loginViewModel,
+        getString = getString
+    )
 
     NavHost(
         navController = navController,
@@ -53,7 +71,7 @@ fun AppNavGraph(
         composable<Detail> { backStackEntry ->
             val args = backStackEntry.toRoute<Detail>()
             DetailScreen(
-                viewModel = hiltViewModel<DetailViewModel>(),
+                viewModel = detailViewModel,
                 onBackClick = { navController.navigateUp() },
                 fileId = args.fileId
             )
@@ -61,29 +79,15 @@ fun AppNavGraph(
 
         composable<Home> {
             HomeScreen(
-                viewModel = hiltViewModel<HomeViewModel>(),
+                viewModel = homeViewModel,
                 onFABClick = { navController.navigate(Send) },
-                onProfileClick = { navController.navigate(Profile) },
-                onFileClick = { navController.navigate(Detail) },
-                onHomeClick = { navController.navigate(Home) }
+                onFileClick = { navController.navigate(Detail) }
             )
         }
 
         composable<Login> {
-            val emailSignUpLauncher = rememberEmailSignUpLauncher(
-                navController = navController,
-                showMessage = showMessage,
-                loginViewModel = loginViewModel,
-                getString = getString
-            )
-            val googleSignUpLauncher = rememberGoogleSignUpLauncher(
-                navController = navController,
-                showMessage = showMessage,
-                loginViewModel = loginViewModel,
-                getString = getString
-            )
             LoginScreen(
-                viewModel = hiltViewModel<LoginViewModel>(),
+                viewModel = loginViewModel,
                 onEmailSignInClick = { emailSignUpLauncher() },
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onGuestSignInClick = { navController.navigate(Home) }
@@ -92,14 +96,14 @@ fun AppNavGraph(
 
         composable<Profile> {
             ProfileScreen(
-                viewModel = hiltViewModel<ProfileViewModel>(),
+                viewModel = profileViewModel,
                 onLoginScreen = { navController.navigate(Login) }
             )
         }
 
         composable<Send> {
             SendScreen(
-                viewModel = hiltViewModel<SendViewModel>(),
+                viewModel = sendViewModel,
                 onBackClick = { navController.navigateUp() },
                 onSaveClick = { navController.navigateUp() }
             )
@@ -107,7 +111,7 @@ fun AppNavGraph(
 
         composable<Settings> {
             SettingsScreen(
-                viewModel = hiltViewModel<SettingsViewModel>()
+                viewModel = settingsViewModel
             )
         }
     }
