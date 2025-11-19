@@ -21,6 +21,9 @@ class HomeViewModel @Inject constructor(
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
+    private val _events = Channel<Event>()
+    val eventsFlow = _events.receiveAsFlow()
+
     val uiState =
         fileRepository.files
             .map { files ->
@@ -35,9 +38,6 @@ class HomeViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 HomeUiState.Loading
             )
-
-    private val _events = Channel<Event>()
-    val eventsFlow = _events.receiveAsFlow()
 
     fun refreshPosts() {
         if (!networkUtils.isNetworkAvailable()) {

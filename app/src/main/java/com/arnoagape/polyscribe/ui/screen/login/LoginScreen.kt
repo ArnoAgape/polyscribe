@@ -39,7 +39,6 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit
