@@ -194,7 +194,8 @@ private fun HomeContent(
                             R.string.by,
                             file.author?.displayName.toString()
                         ),
-                        style = MaterialTheme.typography.titleSmall
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
 
                     Spacer(Modifier.height(8.dp))

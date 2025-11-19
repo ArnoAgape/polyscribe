@@ -33,6 +33,7 @@
     <string name="error_no_file">The file must be added</string>
 
     <string name="send_fragment_label">Send a document</string>
+    <string name="detail_fragment_label">Detail of the file</string>
     <string name="action_send">Send</string>
     <string name="action_save">Save</string>
     <string name="select_file">Select file</string>
@@ -64,6 +65,7 @@
     <string name="contentDescription_button_add">Add</string>
     <string name="contentDescription_go_back">Go back</string>
     <string name="contentDescription_remove_file">Remove file</string>
+    <string name="contentDescription_file_preview">Preview of the file</string>
     <string name="action_continue">Continue</string>
 
     <string name="sent_at">Sent on %1$s at %2$s</string>

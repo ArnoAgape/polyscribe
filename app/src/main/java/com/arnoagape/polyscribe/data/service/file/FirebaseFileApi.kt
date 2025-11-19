@@ -9,7 +9,6 @@ import androidx.core.net.toUri
 import com.arnoagape.polyscribe.data.dto.FileDto
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
@@ -65,8 +64,8 @@ class FirebaseFileApi @Inject constructor(
         return filesCollection
             .whereEqualTo("id", fileId)
             .limit(1)
-            .dataObjects<File>()
-            .map { it.firstOrNull() }
+            .dataObjects<FileDto>()
+            .map { File.fromDto(it.first()) }
     }
 
     override suspend fun uploadDocumentToFirebase(uri: Uri): String? {
@@ -104,7 +103,8 @@ class FirebaseFileApi @Inject constructor(
                 }
 
                 // --- 4️⃣ Infers the file extension ---
-                val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
+                val extension =
+                    MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
                 val fileName = "${System.currentTimeMillis()}.$extension"
                 val fileRef = storage.child("files/$fileName")
 

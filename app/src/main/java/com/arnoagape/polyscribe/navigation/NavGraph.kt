@@ -9,7 +9,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
 import com.arnoagape.polyscribe.ui.screen.detail.DetailScreen
 import com.arnoagape.polyscribe.ui.screen.detail.DetailViewModel
 import com.arnoagape.polyscribe.ui.screen.home.HomeScreen
@@ -34,7 +33,6 @@ fun AppNavGraph(
 
     val loginViewModel: LoginViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val detailViewModel: DetailViewModel = hiltViewModel()
     val sendViewModel: SendViewModel = hiltViewModel()
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
@@ -68,12 +66,10 @@ fun AppNavGraph(
             AuthCheckScreen(navController)
         }
 
-        composable<Detail> { backStackEntry ->
-            val args = backStackEntry.toRoute<Detail>()
+        composable<Detail> {
             DetailScreen(
-                viewModel = detailViewModel,
-                onBackClick = { navController.navigateUp() },
-                fileId = args.fileId
+                viewModel = hiltViewModel<DetailViewModel>(),
+                onBackClick = { navController.navigateUp() }
             )
         }
 
@@ -82,7 +78,7 @@ fun AppNavGraph(
                 viewModel = homeViewModel,
                 loginViewModel = loginViewModel,
                 onFABClick = { navController.navigate(Send) },
-                onFileClick = { navController.navigate(Detail) }
+                onFileClick = { file -> navController.navigate(Detail(file.id)) }
             )
         }
 

@@ -91,7 +91,6 @@ class SendViewModel @Inject constructor(
             initialValue = SendScreenState()
         )
 
-
     init {
         viewModelScope.launch {
             _user.value = userRepository.getCurrentUser()
@@ -135,6 +134,7 @@ class SendViewModel @Inject constructor(
             is FormEvent.CommentChanged -> {
                 _file.update { it.copy(comment = formEvent.comment) }
             }
+
             else -> Unit
         }
     }
@@ -182,6 +182,7 @@ class SendViewModel @Inject constructor(
         }
     }
 }
+
 data class SendScreenState(
     val uiState: SendUiState = SendUiState.Idle,
     val file: File = File(),

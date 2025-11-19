@@ -3,6 +3,7 @@ package com.arnoagape.polyscribe.ui.screen.detail
 import com.arnoagape.polyscribe.domain.model.File
 
 sealed class DetailUiState {
+    object Idle : DetailUiState()
     object Loading : DetailUiState()
     data class Success(val file: File) : DetailUiState()
     sealed class Error : DetailUiState() {

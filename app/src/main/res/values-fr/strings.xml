@@ -33,6 +33,7 @@
     <string name="error_no_file">Un document doit être joint à l\'envoi</string>
 
     <string name="send_fragment_label">Envoyer un document</string>
+    <string name="detail_fragment_label">Aperçu du fichier</string>
     <string name="action_send">Envoyer</string>
     <string name="action_save">Sauvegarder</string>
     <string name="select_file">Joindre un document</string>
@@ -64,6 +65,7 @@
     <string name="contentDescription_button_add">Ajout</string>
     <string name="contentDescription_go_back">Retour</string>
     <string name="contentDescription_remove_file">Supprimer le fichier</string>
+    <string name="contentDescription_file_preview">Aperçu du fichier</string>
     <string name="action_continue">Continuer</string>
 
     <string name="sent_at">Envoyé le %1$s à %2$s</string>
