@@ -19,7 +19,7 @@
     <string name="notifications">Notifications</string>
     <string name="settings">Settings</string>
     <string name="loading">Loading…</string>
-    <string name="publishing">Publishing…</string>
+    <string name="sending">Sending…</string>
     <string name="success_file">File sent successfully</string>
     <string name="success_user_updated">Details updated successfully</string>
     <string name="success_sign_up">Successfully logged in</string>

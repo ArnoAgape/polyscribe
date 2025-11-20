@@ -105,7 +105,7 @@ fun SendScreen(
 
                 CreateFile(
                     contentPadding = contentPadding,
-                    fileUrls = fileToDisplay.fileUrl,
+                    localUris = state.localUris,
                     onAddFile = { viewModel.onAction(FormEvent.AddFile(it)) },
                     onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
                     pictureUrls = emptyList(),
@@ -140,7 +140,7 @@ fun SendScreen(
                         CircularProgressIndicator()
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            text = stringResource(R.string.publishing),
+                            text = stringResource(R.string.sending),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -168,7 +168,7 @@ fun SendScreen(
 @Composable
 private fun CreateFile(
     contentPadding: PaddingValues = PaddingValues(),
-    fileUrls: List<String>,
+    localUris: List<Uri>,
     onAddFile: (Uri) -> Unit,
     onRemoveFile: (Uri) -> Unit,
     pictureUrls: List<String>,
@@ -190,8 +190,6 @@ private fun CreateFile(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-
-    val selectedFileUris = fileUrls.map { it.toUri() }
 
     val pictureLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -332,7 +330,7 @@ private fun CreateFile(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                selectedFileUris.forEach { uri ->
+                localUris.forEach { uri ->
                     FileRowItem(
                         fileName = context.getFileName(uri),
                         icon = Icons.Default.AttachFile,
@@ -369,7 +367,7 @@ private fun CreateFile(
 private fun CreateFilePreview() {
     PolyscribeTheme {
         CreateFile(
-            fileUrls = listOf("content://com.example.provider/document/resume.pdf"),
+            localUris = listOf("content://com.example.provider/document/resume.pdf").map { it.toUri() },
             onAddFile = {},
             onRemoveFile = {},
             pictureUrls = listOf(

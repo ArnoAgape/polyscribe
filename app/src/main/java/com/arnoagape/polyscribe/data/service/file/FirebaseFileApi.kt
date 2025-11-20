@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.webkit.MimeTypeMap
-import androidx.core.net.toUri
 import com.arnoagape.polyscribe.data.dto.FileDto
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
@@ -38,13 +37,13 @@ class FirebaseFileApi @Inject constructor(
             .map { list -> list.map { File.fromDto(it) } }
     }
 
-    override suspend fun sendFile(file: File) {
+    override suspend fun sendFile(localUris: List<Uri>, file: File): List<String> {
         if (!networkUtils.isNetworkAvailable()) {
             throw IOException("No internet connection")
         }
         try {
-            val uploadedFiles = file.fileUrl.mapNotNull { uriString ->
-                val uri = uriString.toUri()
+            val uploadedFiles = localUris.mapNotNull { uri ->
+                Log.d("DEBUG", "Input URL before upload = $uri")
                 uploadDocumentToFirebase(uri)
             }
 
@@ -53,6 +52,8 @@ class FirebaseFileApi @Inject constructor(
             )
 
             filesCollection.document(updated.id).set(updated.toDto()).await()
+
+            return uploadedFiles
 
         } catch (e: Exception) {
             Log.e("FirebaseFileApi", "Error while adding document", e)
@@ -71,52 +72,41 @@ class FirebaseFileApi @Inject constructor(
     override suspend fun uploadDocumentToFirebase(uri: Uri): String? {
         return withContext(Dispatchers.IO + SupervisorJob()) {
             var pfd: ParcelFileDescriptor? = null
-            try {
-                val storage = FirebaseStorage.getInstance().reference
 
-                // --- 1️⃣ Detects the MIME type of the file ---
+            try {
+                // 1. MIME type + extension
                 val mimeType = context.contentResolver.getType(uri)
                 pfd = context.contentResolver.openFileDescriptor(uri, "r")
 
-                // --- 2️⃣ Checks the maximum file size ---
-                val fileSize = pfd?.statSize ?: 0L
-                val maxSizeBytes = 20 * 1024 * 1024 // 20 Mb
-
-                if (fileSize > maxSizeBytes) {
-                    Log.w("FirebaseUpload", "File too large: ${fileSize / 1024 / 1024} Mo")
-                    throw IllegalArgumentException("File exceeds the maximum size of 20 Mb")
-                }
-
-                // --- 3️⃣ Checks the allowed MIME type ---
                 val allowedMimeTypes = listOf(
                     "image/jpeg",
                     "image/png",
                     "application/pdf",
                     "application/msword",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    "application/vnd.oasis.opendocument.text"
+                    "application/vnd.oasis.opendocument.text",
+                    "text/plain"
                 )
 
                 if (mimeType !in allowedMimeTypes) {
-                    Log.w("FirebaseUpload", "Unsupported MIME type: $mimeType")
                     throw IllegalArgumentException("Unsupported file type.")
                 }
 
-                // --- 4️⃣ Infers the file extension ---
                 val extension =
                     MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
                 val fileName = "${System.currentTimeMillis()}.$extension"
-                val fileRef = storage.child("files/$fileName")
 
-                // --- 5️⃣ File upload ---
-                fileRef.putFile(uri).await()
+                // 2. USE EXACT SAME API AS HEXAGONALGAMES
+                val storageRef = FirebaseStorage.getInstance()
+                    .reference
+                    .child("files/$fileName")
 
-                // --- 6️⃣ Collects the download URL ---
-                fileRef.downloadUrl.await().toString()
+                // 3. Upload
+                storageRef.putFile(uri).await()
 
-            } catch (e: IllegalArgumentException) {
-                Log.w("FirebaseUpload", "Upload aborted: ${e.message}")
-                throw e
+                // 4. URL fournie directement par Firebase (à NE PAS modifier)
+                return@withContext storageRef.downloadUrl.await().toString()
+
             } catch (e: Exception) {
                 Log.e("FirebaseUpload", "Error while uploading", e)
                 null

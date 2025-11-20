@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.data.repository
 
+import android.net.Uri
 import com.arnoagape.polyscribe.data.service.file.FileApi
 import com.arnoagape.polyscribe.domain.model.File
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +27,8 @@ class FileRepository @Inject constructor(
      * @throws java.io.IOException if there is no internet connection
      * @throws IllegalArgumentException if the file type or size is invalid
      */
-    suspend fun sendFile(file: File) = fileApi.sendFile(file)
+    suspend fun sendFile(localUris: List<Uri>, file: File): List<String> =
+        fileApi.sendFile(localUris, file)
 
     /**
      * Observes a single file by its unique ID.

@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
@@ -42,6 +43,10 @@ class SendViewModel @Inject constructor(
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
+    private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
+    val localUris = _localUris.asStateFlow()
+
+
     private val _file = MutableStateFlow(
         File(
             id = UUID.randomUUID().toString(),
@@ -65,25 +70,26 @@ class SendViewModel @Inject constructor(
     /**
      * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
      */
-    val isFileValid = file
-        .map { currentFile ->
-            currentFile.fileUrl.isNotEmpty()
-        }.stateIn(
+    val isFileValid = localUris
+        .map { uris -> uris.isNotEmpty() }
+        .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = false,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
         )
 
     val state: StateFlow<SendScreenState> =
         combine(
             uiState,
             file,
-            isFileValid
-        ) { ui, f, valid ->
+            isFileValid,
+            localUris
+        ) { ui, f, valid, local ->
             SendScreenState(
                 uiState = ui,
                 file = f,
-                isValid = valid
+                isValid = valid,
+                localUris = local
             )
         }.stateIn(
             scope = viewModelScope,
@@ -117,19 +123,13 @@ class SendViewModel @Inject constructor(
                 }
             }
 
-            is FormEvent.AddFile ->
-                _file.update { file ->
-                    file.copy(
-                        fileUrl = file.fileUrl.plus(formEvent.uri.toString())
-                    )
-                }
+            is FormEvent.AddFile -> {
+                _localUris.update { it + formEvent.uri }
+            }
 
-            is FormEvent.RemoveFile ->
-                _file.update { file ->
-                    file.copy(
-                        fileUrl = file.fileUrl.minus(formEvent.uri.toString())
-                    )
-                }
+            is FormEvent.RemoveFile -> {
+                _localUris.update { it - formEvent.uri }
+            }
 
             is FormEvent.CommentChanged -> {
                 _file.update { it.copy(comment = formEvent.comment) }
@@ -163,7 +163,11 @@ class SendViewModel @Inject constructor(
                 val fileToSave = _file.value.copy(author = currentUser)
 
                 // 4. Upload Storage + Firestore
-                fileRepository.sendFile(fileToSave)
+                val uploadedFiles = fileRepository.sendFile(_localUris.value, fileToSave)
+
+                _file.update {
+                    it.copy(fileUrl = uploadedFiles)
+                }
 
                 // 5. Success UI
                 _uiState.value = SendUiState.Success(fileToSave)
@@ -186,5 +190,6 @@ class SendViewModel @Inject constructor(
 data class SendScreenState(
     val uiState: SendUiState = SendUiState.Idle,
     val file: File = File(),
-    val isValid: Boolean = false
+    val isValid: Boolean = false,
+    val localUris: List<Uri> = emptyList()
 )

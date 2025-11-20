@@ -8,7 +8,7 @@ interface FileApi {
 
     fun getFilesOrderByCreationDateDesc(): Flow<List<File>>
 
-    suspend fun sendFile(file: File)
+    suspend fun sendFile(localUris: List<Uri>, file: File): List<String>
 
     fun getFileById(fileId: String): Flow<File?>
 

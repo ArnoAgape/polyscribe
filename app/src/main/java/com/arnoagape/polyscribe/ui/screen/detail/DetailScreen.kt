@@ -189,9 +189,12 @@ private fun DetailContent(
 
             if (documentUrl != null) {
 
-                val isImage = documentUrl.endsWith(".jpg", true) ||
-                        documentUrl.endsWith(".jpeg", true) ||
-                        documentUrl.endsWith(".png", true)
+                val baseUrl = documentUrl.substringBefore("?")
+
+                val isImage =
+                    baseUrl.endsWith(".jpg", ignoreCase = true) ||
+                            baseUrl.endsWith(".jpeg", ignoreCase = true) ||
+                            baseUrl.endsWith(".png", ignoreCase = true)
 
                 when {
                     isImage -> {
@@ -208,7 +211,7 @@ private fun DetailContent(
                         )
                     }
 
-                    documentUrl.endsWith(".pdf", true) -> {
+                    baseUrl.endsWith(".pdf", true) -> {
                         Icon(
                             imageVector = Icons.Default.PictureAsPdf,
                             contentDescription = "PDF",

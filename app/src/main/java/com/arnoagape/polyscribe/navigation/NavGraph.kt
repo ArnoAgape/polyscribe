@@ -32,10 +32,6 @@ fun AppNavGraph(
 ) {
 
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val homeViewModel: HomeViewModel = hiltViewModel()
-    val sendViewModel: SendViewModel = hiltViewModel()
-    val profileViewModel: ProfileViewModel = hiltViewModel()
-    val settingsViewModel: SettingsViewModel = hiltViewModel()
 
     val context = LocalContext.current
     val showMessage: (String) -> Unit = { msg ->
@@ -75,8 +71,8 @@ fun AppNavGraph(
 
         composable<Home> {
             HomeScreen(
-                viewModel = homeViewModel,
-                loginViewModel = loginViewModel,
+                viewModel = hiltViewModel<HomeViewModel>(),
+                loginViewModel = hiltViewModel<LoginViewModel>(),
                 onFABClick = { navController.navigate(Send) },
                 onFileClick = { file -> navController.navigate(Detail(file.id)) }
             )
@@ -92,7 +88,7 @@ fun AppNavGraph(
 
         composable<Profile> {
             ProfileScreen(
-                viewModel = profileViewModel,
+                viewModel = hiltViewModel<ProfileViewModel>(),
                 onLoginScreen = { navController.navigate(Login) },
                 onSaveClick = { navController.navigateUp() }
             )
@@ -100,7 +96,7 @@ fun AppNavGraph(
 
         composable<Send> {
             SendScreen(
-                viewModel = sendViewModel,
+                viewModel = hiltViewModel<SendViewModel>(),
                 onBackClick = { navController.navigateUp() },
                 onSaveClick = { navController.navigateUp() }
             )
@@ -108,7 +104,7 @@ fun AppNavGraph(
 
         composable<Settings> {
             SettingsScreen(
-                viewModel = settingsViewModel
+                viewModel = hiltViewModel<SettingsViewModel>(),
             )
         }
     }
