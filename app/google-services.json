@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "213819776571-snpj415q8cp2jhpcdmpah5jg13oskbdo.apps.googleusercontent.com",
+          "client_id": "213819776571-dgghcqahp7b0omuhl9odk60vr8go3lh8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.arnoagape.polyscribe",
-            "certificate_hash": "ca282d6129ce877e1c42c75b8e4a87054891f789"
+            "certificate_hash": "9d9edcd8f640fa4fb5670a6ce6f4c021fda9c134"
           }
         },
         {

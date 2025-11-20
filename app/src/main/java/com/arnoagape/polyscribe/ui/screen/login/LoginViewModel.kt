@@ -27,4 +27,5 @@ class LoginViewModel @Inject constructor(
             userRepository.ensureUserInFirestore()
         }
     }
+
 }

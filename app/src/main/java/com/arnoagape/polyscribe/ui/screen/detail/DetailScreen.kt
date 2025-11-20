@@ -2,6 +2,7 @@ package com.arnoagape.polyscribe.ui.screen.detail
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -118,15 +119,9 @@ private fun DetailContent(
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = modifier.padding(16.dp)
+            modifier = modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
-            // ---- DATE/TIME ----
-            val (date, time) = Format.getLocalizedDateParts(file.createdAt)
-
-            Text(stringResource(R.string.sent_at, date, time))
-
-            Spacer(Modifier.height(8.dp))
 
             // ---- AUTHOR ----
             file.author?.displayName?.let {
@@ -135,13 +130,59 @@ private fun DetailContent(
                         R.string.by,
                         file.author.displayName
                     ),
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
-                Spacer(Modifier.height(8.dp))
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier.height(12.dp))
+
+            // ---- COLLECT DATE/TIME ----
+            val (date, time) = Format.getLocalizedDateParts(file.dateTime)
+
+            Text(stringResource(R.string.detail_collect_date, date, time))
+
+            // ---- COLOR DETAILS ----
+            val coloredText = if (file.isColored) {
+                stringResource(R.string.yes)
+            } else {
+                stringResource(R.string.no)
+            }
+            Text(
+                text = stringResource(
+                    R.string.detail_color,
+                    coloredText
+                )
+            )
+
+            // ---- DOUBLE SIDED DETAILS ----
+            val doubleSidedText = if (file.isColored) {
+                stringResource(R.string.yes)
+            } else {
+                stringResource(R.string.no)
+            }
+            Text(
+                text = stringResource(
+                    R.string.detail_double_sided,
+                    doubleSidedText
+                )
+            )
+
+            // ---- NUMBER OF COPIES DETAILS ----
+            Text(
+                text = stringResource(
+                    R.string.detail_number_of_copies,
+                    file.numberOfCopies
+                )
+            )
+
+            // ---- COMMENTS DETAILS ----
+            Text(
+                text = stringResource(
+                    R.string.detail_comments,
+                    file.comment
+                )
+            )
 
             // ---- FILE PREVIEW ----
             val documentUrl = file.fileUrl.firstOrNull()

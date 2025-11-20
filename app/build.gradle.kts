@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.material)
+    implementation(libs.googleid)
 
     // Allows API < 26
     coreLibraryDesugaring(libs.desugar.jdk.libs)
@@ -99,6 +100,7 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.datastore.preferences)
     implementation(libs.androidx.datastore)
+    implementation (libs.androidx.credentials)
 
     //DI
     implementation(libs.hilt)

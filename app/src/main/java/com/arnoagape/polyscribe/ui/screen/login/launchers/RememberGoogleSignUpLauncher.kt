@@ -44,8 +44,18 @@ fun rememberGoogleSignUpLauncher(
                 launchSingleTop = true
             }
         } else {
-            currentShowMessage(getString(R.string.error_sign_up))
+            if (response == null) {
+                Log.e("GOOGLE_AUTH", "Canceled by user")
+                currentShowMessage("Canceled")
+            } else {
+                Log.e("GOOGLE_AUTH", "Error code = ${response.error?.errorCode}")
+                Log.e("GOOGLE_AUTH", "Error = ${response.error}")
+                Log.e("GOOGLE_AUTH", "Exception = ${response.error?.cause}")
+                Log.e("GOOGLE_AUTH", "Message = ${response.error?.message}")
+                currentShowMessage("Erreur Google: ${response.error?.errorCode}")
+            }
         }
+
     }
 
     val signUpIntent = remember {
@@ -53,9 +63,9 @@ fun rememberGoogleSignUpLauncher(
             .createSignInIntentBuilder()
             .setLogo(R.drawable.ic_polyscribe_logo)
             .setTheme(R.style.Theme_Polyscribe)
-            .setAvailableProviders(listOf(AuthUI.IdpConfig.GoogleBuilder().build()))
-            .build()
+            .setAvailableProviders(listOf(AuthUI.IdpConfig.GoogleBuilder().build())).build()
     }
+
 
     return {
         launcher.launch(signUpIntent)

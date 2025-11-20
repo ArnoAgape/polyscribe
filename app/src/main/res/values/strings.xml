@@ -71,5 +71,12 @@
 
     <string name="sent_at">Sent on %1$s at %2$s</string>
     <string name="by">By %1$s</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="detail_collect_date">Collect date: on %1$s at %2$s</string>
+    <string name="detail_color">Color: %1$s</string>
+    <string name="detail_double_sided">Double sided: %1$s</string>
+    <string name="detail_number_of_copies">Number of copies: %1$s</string>
+    <string name="detail_comments">Comments: %1$s</string>
     <string name="feature_coming_soon">Feature coming soon</string>
 </resources>
