@@ -171,12 +171,13 @@ class SendViewModel @Inject constructor(
 
                 // 5. Success UI
                 _uiState.value = SendUiState.Success(fileToSave)
-                _events.trySend(Event.ShowSnackBar(R.string.success_file))
+                _events.trySend(Event.FileSentSuccessfully)
 
             } catch (e: IOException) {
                 // 6. Network error (impossible upload)
                 _uiState.value = SendUiState.Error.Generic("Network error: ${e.message}")
                 _events.trySend(Event.ShowSnackBar(R.string.no_network))
+                return@launch
 
             } catch (_: Exception) {
                 // 7. Generic error (Firebase Storage, Firestore, etc.)

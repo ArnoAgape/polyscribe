@@ -63,6 +63,7 @@ fun ProfileScreen(
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 onSaveClick()
             }
+            else -> Unit
         }
     }
 

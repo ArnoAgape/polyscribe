@@ -17,4 +17,5 @@ sealed interface Event {
      * @param message The string resource ID of the message to display.
      */
     data class ShowSnackBar(val message: Int) : Event
+    object FileSentSuccessfully : Event
 }

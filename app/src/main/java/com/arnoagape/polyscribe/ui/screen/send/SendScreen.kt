@@ -76,6 +76,8 @@ fun SendScreen(
         when (event) {
             is Event.ShowSnackBar -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            }
+            Event.FileSentSuccessfully -> {
                 onSaveClick()
             }
         }

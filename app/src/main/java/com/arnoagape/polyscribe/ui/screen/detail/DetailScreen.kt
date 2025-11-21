@@ -63,6 +63,7 @@ fun DetailScreen(
             is Event.ShowSnackBar -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
+            else -> Unit
         }
     }
 
