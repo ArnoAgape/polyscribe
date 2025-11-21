@@ -1,5 +1,7 @@
 package com.arnoagape.polyscribe.navigation
 
+import android.R.attr.label
+import android.R.attr.onClick
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
@@ -7,7 +9,11 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItemColors
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,8 +50,9 @@ fun MainScreen() {
                             Icon(destination.icon, contentDescription = destination.label())
                         },
                         label = { Text(destination.label()) },
-                        selected = currentRoute == destination.route,
+                        selected = currentRoute == destination.routeName,
                         onClick = {
+                            if (currentRoute == destination.routeName) return@item
                             if (destination == AppDestinations.PROFILE) {
                                 if (loginViewModel.isSignedIn.value) {
                                     navController.navigate(Profile)
@@ -53,8 +60,10 @@ fun MainScreen() {
                                     navController.navigate(AuthCheck)
                                 }
                             } else {
-                                navController.navigate(destination.route) {
-                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                navController.navigate(destination.screenObject) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -75,7 +84,7 @@ fun MainScreen() {
 enum class AppDestinations(
     val icon: ImageVector,
     private val labelRes: Int,
-    val route: Any
+    val screenObject: Any
 ) {
     HOME(Icons.Default.Home, R.string.home, Home),
     PROFILE(Icons.Default.AccountBox, R.string.profile, Profile),
@@ -83,4 +92,7 @@ enum class AppDestinations(
 
     @Composable
     fun label(): String = stringResource(id = labelRes)
+
+    val routeName: String get() = screenObject::class.qualifiedName!!
+
 }
