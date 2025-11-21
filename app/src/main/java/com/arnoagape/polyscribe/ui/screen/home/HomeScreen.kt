@@ -66,7 +66,7 @@ fun HomeScreen(
     onFABClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val refreshState = rememberPullToRefreshState()
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
 
@@ -118,13 +118,13 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(contentPadding),
             state = refreshState,
-            isRefreshing = uiState is HomeUiState.Loading,
+            isRefreshing = state.isRefreshing,
             onRefresh = { viewModel.refreshPosts() }
         ) {
-            when (uiState) {
+            when (state.uiState) {
                 is HomeUiState.Idle, is HomeUiState.Success ->
                     HomeContent(
-                        files = (uiState as HomeUiState.Success).files,
+                        files = (state.uiState as HomeUiState.Success).files,
                         onFileClick = onFileClick
                     )
 
