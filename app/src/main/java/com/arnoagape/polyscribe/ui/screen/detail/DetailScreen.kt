@@ -5,17 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
-import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,20 +25,17 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
+import com.arnoagape.polyscribe.ui.common.components.ImageFilePreview
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.Format
 import com.google.firebase.Timestamp
@@ -197,43 +190,12 @@ private fun DetailContent(
                             baseUrl.endsWith(".jpeg", ignoreCase = true) ||
                             baseUrl.endsWith(".png", ignoreCase = true)
 
-                when {
-                    isImage -> {
-                        AsyncImage(
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .fillMaxWidth()
-                                .heightIn(max = 200.dp)
-                                .aspectRatio(16 / 9f),
-                            model = documentUrl,
-                            placeholder = ColorPainter(Color.DarkGray),
-                            contentDescription = "Image preview",
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-
-                    baseUrl.endsWith(".pdf", true) -> {
-                        Icon(
-                            imageVector = Icons.Default.PictureAsPdf,
-                            contentDescription = "PDF",
-                            modifier = Modifier
-                                .padding(32.dp)
-                                .fillMaxWidth()
-                                .height(60.dp)
-                        )
-                    }
-
-                    else -> {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
-                            contentDescription = "Document",
-                            modifier = Modifier
-                                .padding(32.dp)
-                                .fillMaxWidth()
-                                .height(60.dp)
-                        )
-                    }
-                }
+                ImageFilePreview(
+                    documentUrl = documentUrl,
+                    baseUrl = baseUrl,
+                    isImage = isImage,
+                    isDetailScreen = true
+                )
             }
         }
     }
