@@ -43,14 +43,12 @@ class FirebaseFileApi @Inject constructor(
         }
         try {
             val uploadedFiles = localUris.mapNotNull { uri ->
-                Log.d("DEBUG", "Input URL before upload = $uri")
                 uploadDocumentToFirebase(uri)
             }
 
             val updated = file.copy(
                 fileUrl = uploadedFiles
             )
-
             filesCollection.document(updated.id).set(updated.toDto()).await()
 
             return uploadedFiles

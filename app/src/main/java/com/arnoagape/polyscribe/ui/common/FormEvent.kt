@@ -9,8 +9,8 @@ import java.time.Instant
 sealed class FormEvent {
 
     data class DateTimeChanged(val dateTime: Instant) : FormEvent()
-    data class ColorChanged(val isColored: Boolean) : FormEvent()
-    data class DoubleSidedChanged(val isDoubleSided: Boolean) : FormEvent()
+    data class ColorChanged(val colored: Boolean) : FormEvent()
+    data class DoubleSidedChanged(val doubleSided: Boolean) : FormEvent()
     data class NumberOfCopiesSet(val value: Int) : FormEvent()
     data class AddFile(val uri: Uri) : FormEvent()
     data class RemoveFile(val uri: Uri) : FormEvent()

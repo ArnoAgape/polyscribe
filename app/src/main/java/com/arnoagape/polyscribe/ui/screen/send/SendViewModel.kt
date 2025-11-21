@@ -54,8 +54,8 @@ class SendViewModel @Inject constructor(
             createdAt = Timestamp.now(),
             dateTime = Instant.now(),
             author = null,
-            isColored = false,
-            isDoubleSided = false,
+            colored = false,
+            doubleSided = false,
             numberOfCopies = 1,
             comment = "",
         )
@@ -110,11 +110,11 @@ class SendViewModel @Inject constructor(
             }
 
             is FormEvent.ColorChanged -> {
-                _file.update { it.copy(isColored = formEvent.isColored) }
+                _file.update { it.copy(colored = formEvent.colored) }
             }
 
             is FormEvent.DoubleSidedChanged -> {
-                _file.update { it.copy(isDoubleSided = formEvent.isDoubleSided) }
+                _file.update { it.copy(doubleSided = formEvent.doubleSided) }
             }
 
             is FormEvent.NumberOfCopiesSet -> {

@@ -56,6 +56,7 @@ fun DetailScreen(
             is Event.ShowSnackBar -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
+
             else -> Unit
         }
     }
@@ -137,7 +138,7 @@ private fun DetailContent(
             Text(stringResource(R.string.detail_collect_date, date, time))
 
             // ---- COLOR DETAILS ----
-            val coloredText = if (file.isColored) {
+            val coloredText = if (file.colored) {
                 stringResource(R.string.yes)
             } else {
                 stringResource(R.string.no)
@@ -150,7 +151,7 @@ private fun DetailContent(
             )
 
             // ---- DOUBLE SIDED DETAILS ----
-            val doubleSidedText = if (file.isColored) {
+            val doubleSidedText = if (file.doubleSided) {
                 stringResource(R.string.yes)
             } else {
                 stringResource(R.string.no)
@@ -179,24 +180,10 @@ private fun DetailContent(
             )
 
             // ---- FILE PREVIEW ----
-            val documentUrl = file.fileUrl.firstOrNull()
-
-            if (documentUrl != null) {
-
-                val baseUrl = documentUrl.substringBefore("?")
-
-                val isImage =
-                    baseUrl.endsWith(".jpg", ignoreCase = true) ||
-                            baseUrl.endsWith(".jpeg", ignoreCase = true) ||
-                            baseUrl.endsWith(".png", ignoreCase = true)
-
-                ImageFilePreview(
-                    documentUrl = documentUrl,
-                    baseUrl = baseUrl,
-                    isImage = isImage,
-                    isDetailScreen = true
-                )
-            }
+            ImageFilePreview(
+                documentUrl = file.fileUrl.firstOrNull(),
+                isDetailScreen = true
+            )
         }
     }
 }
@@ -219,8 +206,8 @@ private fun PostScreenPreview() {
                     email = "jdoe@mail.com",
                     isProfessional = true
                 ),
-                isColored = false,
-                isDoubleSided = false,
+                colored = false,
+                doubleSided = false,
                 numberOfCopies = 1,
                 comment = ""
             ),

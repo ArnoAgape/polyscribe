@@ -14,32 +14,41 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = LightBlue,
     onPrimary = Color.White,
+    surfaceContainerLow = Color(0xFF020913),
     primaryContainer = Blue,
     secondaryContainer = LightBlue,
+    onSecondaryContainer = Yellow,
     onPrimaryContainer = Color.White,
-    surfaceContainer = Blue,
+    surfaceContainer = Color(0xFF051429),
     secondary = LightYellow,
     tertiary = White80,
     error = Color(0xFFB3261E),
+    outlineVariant = Blue,
     surfaceVariant = Color(0xFF49454F),
     onSurface = Color(0xFFE6E1E5),
-    onSurfaceVariant = Color(0xFFCAC4D0)
+    onSurfaceVariant = Color(0xFFCAC4D0),
+    surface = Color(0xFF051429),
+    background = Color(0xFF051429)
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Blue,
     onPrimary = Color.White,
+    surfaceContainerLow = Color(0xFF8EBFFF),
     primaryContainer = Blue,
     secondaryContainer = Blue,
-    onSecondaryContainer = Color.White,
+    onSecondaryContainer = Yellow,
     onPrimaryContainer = Color.Black,
     surfaceContainer = VeryLightBlue,
     secondary = Yellow,
     tertiary = White40,
     error = Color(0xFFB3261E),
+    outlineVariant = Blue,
     surfaceVariant = Color(0xFFE7E0EC),
     onSurface = Color(0xFF1C1B1F),
-    onSurfaceVariant = Color(0xFF49454F)
+    onSurfaceVariant = Color.Black,
+    surface = VeryLightBlue,
+    background = Color(0xFFBEDAFF)
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

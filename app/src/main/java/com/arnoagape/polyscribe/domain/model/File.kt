@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.domain.model
 
+import android.util.Log
 import com.arnoagape.polyscribe.data.dto.FileDto
 import com.google.firebase.Timestamp
 import java.time.Instant
@@ -10,8 +11,8 @@ data class File(
     val createdAt: Timestamp = Timestamp.now(),
     val dateTime: Instant = Instant.now(),
     val author: User? = null,
-    val isColored: Boolean = false,
-    val isDoubleSided: Boolean = false,
+    val colored: Boolean = false,
+    val doubleSided: Boolean = false,
     val numberOfCopies: Int = 1,
     val comment: String = ""
 ) {
@@ -23,8 +24,8 @@ data class File(
             createdAt = createdAt,
             dateTime = Timestamp(dateTime.epochSecond, dateTime.nano),
             author = author,
-            isColored = isColored,
-            isDoubleSided = isDoubleSided,
+            colored = colored,
+            doubleSided = doubleSided,
             numberOfCopies = numberOfCopies,
             comment = comment
         )
@@ -32,14 +33,15 @@ data class File(
 
     companion object {
         fun fromDto(dto: FileDto): File {
+            Log.e("FIRESTORE_READ", "DTO lu = $dto")
             return File(
                 id = dto.id,
                 fileUrl = dto.fileUrl,
                 createdAt = dto.createdAt,
                 dateTime = dto.dateTime.toDate().toInstant(),
                 author = dto.author,
-                isColored = dto.isColored,
-                isDoubleSided = dto.isDoubleSided,
+                colored = dto.colored,
+                doubleSided = dto.doubleSided,
                 numberOfCopies = dto.numberOfCopies,
                 comment = dto.comment
             )

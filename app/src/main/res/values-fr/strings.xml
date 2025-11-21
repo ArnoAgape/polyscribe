@@ -32,6 +32,8 @@
     <string name="no_files">Pour envoyer un nouveau document, appuyez sur le bouton "+"</string>
     <string name="error_number_of_copies">Le nombre de copies ne doit pas être égale à 0</string>
     <string name="error_no_file">Un document doit être joint à l\'envoi</string>
+    <string name="no_pdf_app">Aucune application pour lire les PDF</string>
+    <string name="error_open_pdf">Impossible d\'ouvrir le PDF</string>
 
     <string name="send_fragment_label">Envoyer un document</string>
     <string name="detail_fragment_label">Aperçu du fichier</string>

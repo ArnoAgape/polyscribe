@@ -196,25 +196,11 @@ private fun HomeContent(
                     Spacer(Modifier.height(8.dp))
 
                     // ---- FILE PREVIEW ----
-                    val documentUrl = file.fileUrl.firstOrNull()
-
-                    if (documentUrl != null) {
-
-                        val baseUrl = documentUrl.substringBefore("?")
-
-                        val isImage =
-                            baseUrl.endsWith(".jpg", ignoreCase = true) ||
-                                    baseUrl.endsWith(".jpeg", ignoreCase = true) ||
-                                    baseUrl.endsWith(".png", ignoreCase = true)
-
-                        ImageFilePreview(
-                            documentUrl = documentUrl,
-                            baseUrl = baseUrl,
-                            isImage = isImage,
-                            isDetailScreen = false,
-                            onClick = { onFileClick(file) }
-                        )
-                    }
+                    ImageFilePreview(
+                        documentUrl = file.fileUrl.firstOrNull(),
+                        isDetailScreen = false,
+                        onClick = { onFileClick(file) }
+                    )
                 }
             }
         }
@@ -239,8 +225,8 @@ private fun HomeContentPreview() {
                         email = "jdoe@mail.com",
                         isProfessional = true
                     ),
-                    isColored = false,
-                    isDoubleSided = false,
+                    colored = false,
+                    doubleSided = false,
                     numberOfCopies = 1,
                     comment = ""
                 ),
@@ -256,8 +242,8 @@ private fun HomeContentPreview() {
                         email = "hter@mail.com",
                         isProfessional = true
                     ),
-                    isColored = false,
-                    isDoubleSided = false,
+                    colored = false,
+                    doubleSided = false,
                     numberOfCopies = 1,
                     comment = "null"
                 ),
@@ -273,8 +259,8 @@ private fun HomeContentPreview() {
                         email = "ewatt@mail.com",
                         isProfessional = false
                     ),
-                    isColored = false,
-                    isDoubleSided = false,
+                    colored = false,
+                    doubleSided = false,
                     numberOfCopies = 1,
                     comment = "null"
                 )

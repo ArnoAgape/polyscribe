@@ -10,8 +10,8 @@ data class FileDto(
     val createdAt: Timestamp = Timestamp.now(),
     val dateTime: Timestamp = Timestamp.now(),
     val author: User? = null,
-    val isColored: Boolean = false,
-    val isDoubleSided: Boolean = false,
+    val colored: Boolean = false,
+    val doubleSided: Boolean = false,
     val numberOfCopies: Int = 1,
     val comment: String = ""
 ) : Serializable

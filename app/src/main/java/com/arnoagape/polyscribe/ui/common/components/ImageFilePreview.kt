@@ -1,5 +1,7 @@
 package com.arnoagape.polyscribe.ui.common.components
 
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -7,7 +9,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
@@ -23,10 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.arnoagape.polyscribe.R
 
@@ -34,34 +37,43 @@ import com.arnoagape.polyscribe.R
 fun ImageFilePreview(
     modifier: Modifier = Modifier,
     documentUrl: String?,
-    baseUrl: String,
-    isImage: Boolean,
     isDetailScreen: Boolean,
     onClick: (() -> Unit)? = null
 ) {
     var selectedImage by remember { mutableStateOf<String?>(null) }
 
-    val effectiveModifier = if (!isDetailScreen && onClick != null) {
-        modifier.clickable { onClick() }
-    } else modifier
+    if (documentUrl == null) return
+
+    val context = LocalContext.current
+    val baseUrl = documentUrl.substringBefore("?")
+
+    val isImage =
+        baseUrl.endsWith(".jpg", ignoreCase = true) ||
+                baseUrl.endsWith(".jpeg", ignoreCase = true) ||
+                baseUrl.endsWith(".png", ignoreCase = true)
+
+    val isPdf = baseUrl.endsWith(".pdf", ignoreCase = true)
 
     when {
         isImage -> {
             AsyncImage(
-                modifier = effectiveModifier
+                modifier = modifier
                     .padding(top = 8.dp)
                     .fillMaxWidth()
-                    .heightIn(max = 200.dp)
-                    .aspectRatio(16 / 9f)
-                    .let {
-                        if (isDetailScreen) it.clickable { selectedImage = documentUrl }
-                        else it
+                    .then(
+                        if (!isDetailScreen) Modifier.aspectRatio(16 / 9f)
+                        else Modifier.fillMaxSize()
+                    )
+                    .clickable {
+                        if (isDetailScreen) selectedImage = documentUrl
+                        else onClick?.invoke()
                     },
                 model = documentUrl,
                 placeholder = ColorPainter(Color.DarkGray),
                 contentDescription = stringResource(R.string.contentDescription_file_preview),
                 contentScale = ContentScale.Crop
             )
+
             if (isDetailScreen && selectedImage != null) {
                 Dialog(
                     onDismissRequest = { selectedImage = null }, // closes when click
@@ -77,7 +89,6 @@ fun ImageFilePreview(
                         AsyncImage(
                             model = selectedImage,
                             contentDescription = stringResource(R.string.contentDescription_file_preview),
-                            contentScale = ContentScale.Fit,
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -85,15 +96,52 @@ fun ImageFilePreview(
             }
         }
 
-        baseUrl.endsWith(".pdf", true) -> {
-            Icon(
-                imageVector = Icons.Default.PictureAsPdf,
-                contentDescription = "PDF",
-                modifier = Modifier
-                    .padding(32.dp)
-                    .fillMaxWidth()
-                    .height(60.dp)
-            )
+        isPdf -> {
+            if (isDetailScreen) {
+                Icon(
+                    imageVector = Icons.Default.PictureAsPdf,
+                    contentDescription = "PDF",
+                    modifier = modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .clickable {
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    setDataAndType(documentUrl.toUri(), "application/pdf")
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+                                }
+
+                                if (intent.resolveActivity(context.packageManager) != null) {
+                                    context.startActivity(intent)
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.no_pdf_app),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            } catch (_: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.error_open_pdf),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.PictureAsPdf,
+                    contentDescription = "PDF",
+                    modifier = modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .clickable { onClick?.invoke() }
+                )
+            }
         }
 
         else -> {

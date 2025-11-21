@@ -32,6 +32,8 @@
     <string name="no_files">To send a new file, please press the button "+"</string>
     <string name="error_number_of_copies">The number of copies must be superior to 0</string>
     <string name="error_no_file">The file must be added</string>
+    <string name="no_pdf_app">No app found to read PDF files</string>
+    <string name="error_open_pdf">Impossible to open PDF file</string>
 
     <string name="send_fragment_label">Send a document</string>
     <string name="detail_fragment_label">Detail of the file</string>

@@ -115,9 +115,9 @@ fun SendScreen(
                     onRemovePicture = {},
                     dateTime = fileToDisplay.dateTime,
                     onDateTimeChange = { viewModel.onAction(FormEvent.DateTimeChanged(it)) },
-                    colored = fileToDisplay.isColored,
+                    colored = fileToDisplay.colored,
                     onColorationChange = { viewModel.onAction(FormEvent.ColorChanged(it)) },
-                    doubleSided = fileToDisplay.isDoubleSided,
+                    doubleSided = fileToDisplay.doubleSided,
                     onDoubleSidedChange = { viewModel.onAction(FormEvent.DoubleSidedChanged(it)) },
                     numberOfCopies = fileToDisplay.numberOfCopies,
                     onNumberOfCopiesChange = { newValue ->
