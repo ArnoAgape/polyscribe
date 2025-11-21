@@ -35,7 +35,7 @@ import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
-import com.arnoagape.polyscribe.ui.common.components.ImageFilePreview
+import com.arnoagape.polyscribe.ui.common.components.FilePreviewList
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.Format
 import com.google.firebase.Timestamp
@@ -180,8 +180,8 @@ private fun DetailContent(
             )
 
             // ---- FILE PREVIEW ----
-            ImageFilePreview(
-                documentUrl = file.fileUrl.firstOrNull(),
+            FilePreviewList(
+                fileUrls = file.fileUrl,
                 isDetailScreen = true
             )
         }

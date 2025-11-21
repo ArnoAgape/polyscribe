@@ -43,7 +43,7 @@ import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
-import com.arnoagape.polyscribe.ui.common.components.ImageFilePreview
+import com.arnoagape.polyscribe.ui.common.components.FilePreviewList
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.Format
@@ -196,8 +196,8 @@ private fun HomeContent(
                     Spacer(Modifier.height(8.dp))
 
                     // ---- FILE PREVIEW ----
-                    ImageFilePreview(
-                        documentUrl = file.fileUrl.firstOrNull(),
+                    FilePreviewList(
+                        fileUrls = file.fileUrl,
                         isDetailScreen = false,
                         onClick = { onFileClick(file) }
                     )

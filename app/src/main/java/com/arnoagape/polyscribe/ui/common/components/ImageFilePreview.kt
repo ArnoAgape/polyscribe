@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,13 +35,11 @@ import com.arnoagape.polyscribe.R
 @Composable
 fun ImageFilePreview(
     modifier: Modifier = Modifier,
-    documentUrl: String?,
+    documentUrl: String,
     isDetailScreen: Boolean,
     onClick: (() -> Unit)? = null
 ) {
     var selectedImage by remember { mutableStateOf<String?>(null) }
-
-    if (documentUrl == null) return
 
     val context = LocalContext.current
     val baseUrl = documentUrl.substringBefore("?")
@@ -54,16 +51,15 @@ fun ImageFilePreview(
 
     val isPdf = baseUrl.endsWith(".pdf", ignoreCase = true)
 
+    val previewHeight = if (isDetailScreen) 150.dp else 100.dp
+
     when {
         isImage -> {
             AsyncImage(
                 modifier = modifier
                     .padding(top = 8.dp)
                     .fillMaxWidth()
-                    .then(
-                        if (!isDetailScreen) Modifier.aspectRatio(16 / 9f)
-                        else Modifier.fillMaxSize()
-                    )
+                    .height(previewHeight)
                     .clickable {
                         if (isDetailScreen) selectedImage = documentUrl
                         else onClick?.invoke()
@@ -102,9 +98,9 @@ fun ImageFilePreview(
                     imageVector = Icons.Default.PictureAsPdf,
                     contentDescription = "PDF",
                     modifier = modifier
-                        .padding(32.dp)
+                        .padding(16.dp)
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(previewHeight)
                         .clickable {
                             try {
                                 val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -136,9 +132,9 @@ fun ImageFilePreview(
                     imageVector = Icons.Default.PictureAsPdf,
                     contentDescription = "PDF",
                     modifier = modifier
-                        .padding(32.dp)
+                        .padding(16.dp)
                         .fillMaxWidth()
-                        .height(60.dp)
+                        .height(previewHeight)
                         .clickable { onClick?.invoke() }
                 )
             }
@@ -149,10 +145,29 @@ fun ImageFilePreview(
                 imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
                 contentDescription = "Document",
                 modifier = Modifier
-                    .padding(32.dp)
+                    .padding(16.dp)
                     .fillMaxWidth()
-                    .height(60.dp)
+                    .height(previewHeight)
             )
         }
+    }
+}
+
+@Composable
+fun FilePreviewList(
+    fileUrls: List<String>,
+    isDetailScreen: Boolean,
+    onClick: (() -> Unit)? = null
+) {
+    if (fileUrls.isEmpty()) return
+
+    val urlsToDisplay = if (isDetailScreen) fileUrls else listOf(fileUrls.first())
+
+    urlsToDisplay.forEach { url ->
+        ImageFilePreview(
+            documentUrl = url,
+            isDetailScreen = isDetailScreen,
+            onClick = onClick
+        )
     }
 }
