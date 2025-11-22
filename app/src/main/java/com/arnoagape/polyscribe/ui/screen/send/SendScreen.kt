@@ -1,7 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -34,12 +33,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -73,14 +75,18 @@ fun SendScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
-            is Event.ShowSnackBar -> {
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+            is Event.ShowMessage -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(event.message),
+                    duration = SnackbarDuration.Short
+                )
             }
 
-            Event.FileSentSuccessfully -> {
+            Event.ShowSuccessMessage -> {
                 onSaveClick()
             }
         }
@@ -89,7 +95,9 @@ fun SendScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.send_fragment_label)) },
+                title = {
+                    Text(stringResource(R.string.send_fragment_label))
+                },
                 navigationIcon = {
                     IconButton(onClick = { onBackClick() }) {
                         Icon(
@@ -113,9 +121,6 @@ fun SendScreen(
                     localUris = state.localUris,
                     onAddFile = { viewModel.onAction(FormEvent.AddFile(it)) },
                     onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
-                    pictureUrls = emptyList(),
-                    onAddPicture = { viewModel.onAction(FormEvent.AddFile(it)) },
-                    onRemovePicture = {},
                     dateTime = fileToDisplay.dateTime,
                     onDateTimeChange = { viewModel.onAction(FormEvent.DateTimeChanged(it)) },
                     colored = fileToDisplay.colored,
@@ -176,9 +181,6 @@ private fun CreateFile(
     localUris: List<Uri>,
     onAddFile: (Uri) -> Unit,
     onRemoveFile: (Uri) -> Unit,
-    pictureUrls: List<String>,
-    onAddPicture: (Uri) -> Unit,
-    onRemovePicture: (Uri) -> Unit,
     dateTime: Instant,
     onDateTimeChange: (Instant) -> Unit,
     colored: Boolean,
@@ -211,7 +213,7 @@ private fun CreateFile(
     /** ---------- CONTENT_DESCRIPTION ---------- **/
     val contentDescriptionAddFile = stringResource(R.string.contentDescription_add_file)
     val contentDescriptionAddPicture = stringResource(R.string.contentDescription_add_picture)
-
+    /** ---------- CONTENT_DESCRIPTION ---------- **/
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -240,7 +242,8 @@ private fun CreateFile(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     DateTimeField(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         value = dateTime,
                         onValueChange = onDateTimeChange,
                         label = stringResource(R.string.hint_datetime)
@@ -386,11 +389,6 @@ private fun CreateFilePreview() {
             localUris = listOf("content://com.example.provider/document/resume.pdf").map { it.toUri() },
             onAddFile = {},
             onRemoveFile = {},
-            pictureUrls = listOf(
-                "content://com.example.provider/images/photo.jpg"
-            ),
-            onAddPicture = {},
-            onRemovePicture = {},
             dateTime = Instant.EPOCH,
             onDateTimeChange = {},
             colored = false,

@@ -44,7 +44,11 @@ fun rememberEmailSignUpLauncher(
                 launchSingleTop = true
             }
         } else {
-            currentShowMessage(getString(R.string.error_sign_up))
+            if (response == null) {
+                currentShowMessage(getString(R.string.error_sign_up))
+            } else {
+                currentShowMessage("Google error: ${response.error?.errorCode}")
+            }
         }
     }
 

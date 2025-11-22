@@ -97,7 +97,7 @@ fun DateTimeField(
                         } else showDatePicker = false
                     },
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) { Text("OK") }
             },
@@ -105,7 +105,7 @@ fun DateTimeField(
                 TextButton(
                     onClick = { showDatePicker = false },
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text(stringResource(R.string.cancel))

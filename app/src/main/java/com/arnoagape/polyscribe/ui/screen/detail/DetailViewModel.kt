@@ -87,7 +87,7 @@ class DetailViewModel @Inject constructor(
     fun refreshData() {
         viewModelScope.launch {
             if (!networkUtils.isNetworkAvailable()) {
-                _events.trySend(Event.ShowSnackBar(R.string.no_network))
+                _events.trySend(Event.ShowMessage(R.string.no_network))
             } else {
                 observeFile()
             }

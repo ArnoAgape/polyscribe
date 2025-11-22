@@ -109,7 +109,7 @@ class ProfileViewModel @Inject constructor(
 
             // 1. Network checking
             if (!networkUtils.isNetworkAvailable()) {
-                _events.trySend(Event.ShowSnackBar(R.string.no_network))
+                _events.trySend(Event.ShowMessage(R.string.no_network))
                 return@launch
             }
 
@@ -117,7 +117,7 @@ class ProfileViewModel @Inject constructor(
             val currentUser = _user.value
             if (currentUser == null) {
                 _uiState.value = ProfileUiState.Error.NoAccount()
-                _events.trySend(Event.ShowSnackBar(R.string.error_no_account_profile))
+                _events.trySend(Event.ShowMessage(R.string.error_no_account_profile))
                 return@launch
             }
 
@@ -136,18 +136,18 @@ class ProfileViewModel @Inject constructor(
 
                     // 5. Success UI
                     _uiState.value = ProfileUiState.Success(userToSave)
-                    _events.trySend(Event.ShowSnackBar(R.string.success_user_updated))
+                    _events.trySend(Event.ShowMessage(R.string.success_user_updated))
                 }
 
             } catch (e: IOException) {
                 // 6. Network error (impossible upload)
                 _uiState.value = ProfileUiState.Error.Generic("Network error: ${e.message}")
-                _events.trySend(Event.ShowSnackBar(R.string.no_network))
+                _events.trySend(Event.ShowMessage(R.string.no_network))
 
             } catch (_: Exception) {
                 // 7. Generic error (Firebase Storage, Firestore, etc.)
                 _uiState.value = ProfileUiState.Error.Generic()
-                _events.trySend(Event.ShowSnackBar(R.string.error_generic))
+                _events.trySend(Event.ShowMessage(R.string.error_generic))
             }
         }
     }

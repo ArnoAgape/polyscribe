@@ -3,10 +3,8 @@ package com.arnoagape.polyscribe.ui.common.components
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
@@ -20,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.R
@@ -43,24 +42,31 @@ fun FileRowItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Icon(icon, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(fileName)
+            Text(fileName,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(3f))
         }
 
         IconButton(onClick = onRemove) {
-            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.contentDescription_remove_file))
+            Icon(Icons.Default.Close,
+                contentDescription = stringResource(R.string.contentDescription_remove_file))
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun FileRowItemPreview() {
     PolyscribeTheme {
         FileRowItem(
-            fileName = "example.pdf",
+            fileName = "example_lol_pdf_i_love_food_what_can_you.pdf",
             icon = Icons.Default.AttachFile,
             onRemove = {}
         )

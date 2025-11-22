@@ -45,14 +45,9 @@ fun rememberGoogleSignUpLauncher(
             }
         } else {
             if (response == null) {
-                Log.e("GOOGLE_AUTH", "Canceled by user")
                 currentShowMessage("Canceled")
             } else {
-                Log.e("GOOGLE_AUTH", "Error code = ${response.error?.errorCode}")
-                Log.e("GOOGLE_AUTH", "Error = ${response.error}")
-                Log.e("GOOGLE_AUTH", "Exception = ${response.error?.cause}")
-                Log.e("GOOGLE_AUTH", "Message = ${response.error?.message}")
-                currentShowMessage("Erreur Google: ${response.error?.errorCode}")
+                currentShowMessage("Google error: ${response.error?.errorCode}")
             }
         }
 

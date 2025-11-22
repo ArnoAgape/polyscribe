@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
  * @param onEvent A lambda executed for each new event emitted.
  */
 @Composable
-fun <T> EventsEffect(flow: Flow<T>, onEvent: (T) -> Unit) {
+fun <T> EventsEffect(flow: Flow<T>, onEvent: suspend (T) -> Unit) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnEvent by rememberUpdatedState(onEvent)
 
