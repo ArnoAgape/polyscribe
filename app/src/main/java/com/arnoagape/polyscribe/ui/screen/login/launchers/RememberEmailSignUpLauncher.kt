@@ -5,9 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.navigation.NavHostController
 import com.arnoagape.polyscribe.R
-import com.arnoagape.polyscribe.navigation.Home
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
@@ -16,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun rememberEmailSignUpLauncher(
-    navController: NavHostController,
     loginViewModel: LoginViewModel
 ): () -> Unit {
 
@@ -33,10 +30,6 @@ fun rememberEmailSignUpLauncher(
             loginViewModel.sendEvent(Event.ShowMessage(R.string.success_sign_up))
             loginViewModel.sendEvent(Event.NavigateToHome)
 
-            navController.navigate(Home) {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                launchSingleTop = true
-            }
         } else {
             if (response == null) {
                 loginViewModel.sendEvent(Event.ShowMessage(R.string.error_sign_up))

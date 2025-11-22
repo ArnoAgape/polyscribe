@@ -1,7 +1,5 @@
 package com.arnoagape.polyscribe.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -23,19 +21,17 @@ import com.arnoagape.polyscribe.ui.screen.send.SendViewModel
 import com.arnoagape.polyscribe.ui.screen.settings.SettingsScreen
 import com.arnoagape.polyscribe.ui.screen.settings.SettingsViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(
     navController: NavHostController
 ) {
+    val loginViewModel: LoginViewModel = hiltViewModel()
 
     val emailSignUpLauncher = rememberEmailSignUpLauncher(
-        navController = navController,
-        loginViewModel = hiltViewModel<LoginViewModel>(),
+        loginViewModel = loginViewModel,
     )
     val googleSignUpLauncher = rememberGoogleSignUpLauncher(
-        navController = navController,
-        loginViewModel = hiltViewModel<LoginViewModel>(),
+        loginViewModel = loginViewModel,
     )
 
     NavHost(
@@ -65,7 +61,7 @@ fun AppNavGraph(
 
         composable<Login> {
             LoginScreen(
-                viewModel = hiltViewModel<LoginViewModel>(),
+                viewModel = loginViewModel,
                 navController = navController,
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onEmailSignInClick = { emailSignUpLauncher() },
