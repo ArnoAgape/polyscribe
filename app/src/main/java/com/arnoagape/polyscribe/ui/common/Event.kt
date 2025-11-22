@@ -17,5 +17,6 @@ sealed interface Event {
      * @param message The string resource ID of the message to display.
      */
     data class ShowMessage(val message: Int) : Event
-    object ShowSuccessMessage : Event
+    data class ShowSuccessMessage(val message: Int) : Event
+    object NavigateToHome : Event
 }

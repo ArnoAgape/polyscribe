@@ -101,6 +101,7 @@ class SendViewModel @Inject constructor(
         viewModelScope.launch {
             _user.value = userRepository.getCurrentUser()
         }
+        networkUtils.checkNetwork(networkUtils, _events)
     }
 
     fun onAction(formEvent: FormEvent) {
@@ -171,7 +172,8 @@ class SendViewModel @Inject constructor(
 
                 // 5. Success UI
                 _uiState.value = SendUiState.Success(fileToSave)
-                _events.trySend(Event.ShowSuccessMessage)
+                _events.trySend(Event.ShowSuccessMessage(R.string.success_file))
+                _events.trySend(Event.NavigateToHome)
 
             } catch (e: IOException) {
                 // 6. Network error (impossible upload)

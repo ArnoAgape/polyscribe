@@ -24,7 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -53,7 +55,6 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
-    onSaveClick: () -> Unit,
     onLoginScreen: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -63,19 +64,32 @@ fun ProfileScreen(
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
+                val result = snackbarHostState.showSnackbar(
+                    message = context.getString(event.message),
+                    actionLabel = context.getString(R.string.try_again),
+                    withDismissAction = true,
+                    duration = SnackbarDuration.Short
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.saveUser()
+                }
+            }
+
+            is Event.ShowSuccessMessage -> {
                 snackbarHostState.showSnackbar(
                     message = context.getString(event.message),
                     duration = SnackbarDuration.Short
                 )
             }
-
-            Event.ShowSuccessMessage -> {
-                onSaveClick()
-            }
+            else -> Unit
         }
     }
 
-    Scaffold(
+    Scaffold(snackbarHost = {
+        SnackbarHost(
+            hostState = snackbarHostState
+        )
+    },
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),

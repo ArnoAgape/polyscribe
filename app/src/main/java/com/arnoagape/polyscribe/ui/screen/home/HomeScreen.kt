@@ -25,7 +25,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -70,16 +72,27 @@ fun HomeScreen(
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
-                snackbarHostState.showSnackbar(
+                val result = snackbarHostState.showSnackbar(
                     message = context.getString(event.message),
+                    actionLabel = context.getString(R.string.try_again),
+                    withDismissAction = true,
                     duration = SnackbarDuration.Short
                 )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.refreshFiles()
+                }
+
             }
             else -> Unit
         }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            )
+        },
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
@@ -119,7 +132,7 @@ fun HomeScreen(
                 .padding(contentPadding),
             state = refreshState,
             isRefreshing = state.isRefreshing,
-            onRefresh = { viewModel.refreshPosts() }
+            onRefresh = { viewModel.refreshFiles() }
         ) {
             when (state.uiState) {
                 is HomeUiState.Idle, is HomeUiState.Success ->
@@ -151,7 +164,9 @@ fun HomeScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.no_files),
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(14.dp),
                             textAlign = TextAlign.Center,
                         )
                     }

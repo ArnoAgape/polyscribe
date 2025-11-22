@@ -59,7 +59,7 @@ fun ConfirmDialogButton(
                         onConfirmButton()
                     },
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text("OK")
@@ -70,7 +70,7 @@ fun ConfirmDialogButton(
                 TextButton(
                     onClick = { showDialog = false },
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Text(stringResource(R.string.cancel))

@@ -80,16 +80,6 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Ensures the authenticated user is present in Firestore.
-     * This can be used to synchronize user data after login or profile updates.
-     */
-    fun syncUserWithFirestore() {
-        viewModelScope.launch {
-            userRepository.ensureUserInFirestore()
-        }
-    }
-
     fun onAction(formEvent: FormEvent) {
         when (formEvent) {
             is FormEvent.DisplayNameChanged -> {
@@ -108,10 +98,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
 
             // 1. Network checking
-            if (!networkUtils.isNetworkAvailable()) {
-                _events.trySend(Event.ShowMessage(R.string.no_network))
-                return@launch
-            }
+            networkUtils.checkNetwork(networkUtils, _events)
 
             // 2. If user logged in checking
             val currentUser = _user.value
@@ -136,7 +123,7 @@ class ProfileViewModel @Inject constructor(
 
                     // 5. Success UI
                     _uiState.value = ProfileUiState.Success(userToSave)
-                    _events.trySend(Event.ShowMessage(R.string.success_user_updated))
+                    _events.trySend(Event.ShowSuccessMessage(R.string.success_user_updated))
                 }
 
             } catch (e: IOException) {

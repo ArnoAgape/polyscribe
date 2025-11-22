@@ -1,4 +1,6 @@
 <resources>
+    <string name="app_name" translatable="false">Polyscribe</string>
+
     <string name="profile_picture">Your profile picture</string>
     <string name="user_name">Name</string>
     <string name="user_email">Email address</string>
@@ -7,7 +9,6 @@
     <string name="confirm_sign_out_message">Are you sure you want to sign out?</string>
     <string name="action_delete_account">Delete account</string>
     <string name="confirm_delete_account_message">You are about to delete your account. This can\'t be undone. Continue?</string>
-    <string name="app_name" translatable="false">Polyscribe</string>
     <string name="cancel">Cancel</string>
     <string name="or">or</string>
     <string name="add">Add</string>
@@ -28,7 +29,8 @@
     <string name="error_sign_up">Sign up canceled or failed</string>
     <string name="error_no_account_file">An account is mandatory in order to add a file</string>
     <string name="error_no_account_profile">An account is mandatory in order to update your profile</string>
-    <string name="no_network">No network</string>
+    <string name="no_network">No network available</string>
+    <string name="try_again">Try again</string>
     <string name="no_files">To send a new file, please press the button "+"</string>
     <string name="error_number_of_copies">The number of copies must be superior to 0</string>
     <string name="error_no_file">The file must be added</string>

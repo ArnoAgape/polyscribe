@@ -34,7 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -80,19 +82,37 @@ fun SendScreen(
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
+                val result = snackbarHostState.showSnackbar(
+                    message = context.getString(event.message),
+                    actionLabel = context.getString(R.string.try_again),
+                    withDismissAction = true,
+                    duration = SnackbarDuration.Short
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.sendFile()
+                }
+
+            }
+
+            is Event.ShowSuccessMessage -> {
                 snackbarHostState.showSnackbar(
                     message = context.getString(event.message),
                     duration = SnackbarDuration.Short
                 )
             }
 
-            Event.ShowSuccessMessage -> {
+            Event.NavigateToHome -> {
                 onSaveClick()
             }
         }
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            )
+        },
         topBar = {
             TopAppBar(
                 title = {

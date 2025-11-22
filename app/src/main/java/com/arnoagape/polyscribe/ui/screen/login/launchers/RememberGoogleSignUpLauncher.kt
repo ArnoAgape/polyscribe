@@ -1,7 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.login.launchers
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -34,7 +33,6 @@ fun rememberGoogleSignUpLauncher(
 
         if (result.resultCode == Activity.RESULT_OK) {
             val user = firebaseAuth.currentUser
-            Log.d("Auth", "Signed up: ${user?.email}")
 
             loginViewModel.syncUserWithFirestore()
             currentShowMessage(getString(R.string.success_sign_up))

@@ -2,7 +2,6 @@ package com.arnoagape.polyscribe.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
@@ -26,7 +25,7 @@ class HomeViewModel @Inject constructor(
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
-    private val _events = Channel<Event>()
+    private val _events = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = _events.receiveAsFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -65,11 +64,13 @@ class HomeViewModel @Inject constructor(
             )
         )
 
-    fun refreshPosts() {
+    init {
+        networkUtils.checkNetwork(networkUtils, _events)
+    }
+
+    fun refreshFiles() {
         viewModelScope.launch {
-            if (!networkUtils.isNetworkAvailable()) {
-                _events.trySend(Event.ShowMessage(R.string.no_network))
-            }
+            networkUtils.checkNetwork(networkUtils, _events)
             _isRefreshing.value = true
 
             kotlinx.coroutines.delay(700)
