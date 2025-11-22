@@ -1,10 +1,8 @@
 package com.arnoagape.polyscribe.navigation
 
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,26 +29,13 @@ fun AppNavGraph(
     navController: NavHostController
 ) {
 
-    val loginViewModel: LoginViewModel = hiltViewModel()
-
-    val context = LocalContext.current
-    val showMessage: (String) -> Unit = { msg ->
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-    }
-    val getString: (Int) -> String = { resId ->
-        context.getString(resId)
-    }
     val emailSignUpLauncher = rememberEmailSignUpLauncher(
         navController = navController,
-        showMessage = showMessage,
-        loginViewModel = loginViewModel,
-        getString = getString
+        loginViewModel = hiltViewModel<LoginViewModel>(),
     )
     val googleSignUpLauncher = rememberGoogleSignUpLauncher(
         navController = navController,
-        showMessage = showMessage,
-        loginViewModel = loginViewModel,
-        getString = getString
+        loginViewModel = hiltViewModel<LoginViewModel>(),
     )
 
     NavHost(
@@ -80,6 +65,8 @@ fun AppNavGraph(
 
         composable<Login> {
             LoginScreen(
+                viewModel = hiltViewModel<LoginViewModel>(),
+                navController = navController,
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onEmailSignInClick = { emailSignUpLauncher() },
                 onGuestSignInClick = { navController.navigate(Home) }

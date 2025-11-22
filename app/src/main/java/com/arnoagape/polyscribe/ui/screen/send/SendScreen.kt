@@ -96,14 +96,12 @@ fun SendScreen(
 
             is Event.ShowSuccessMessage -> {
                 snackbarHostState.showSnackbar(
-                    message = context.getString(event.message),
-                    duration = SnackbarDuration.Short
+                    message = context.getString(event.message)
                 )
-            }
-
-            Event.NavigateToHome -> {
                 onSaveClick()
             }
+
+            else -> Unit
         }
     }
 

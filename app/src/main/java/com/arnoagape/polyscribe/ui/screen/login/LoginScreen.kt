@@ -22,29 +22,66 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.navigation.Home
+import com.arnoagape.polyscribe.ui.common.Event
+import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel,
+    navController: NavHostController,
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Scaffold { contentPadding ->
+    EventsEffect(viewModel.eventsFlow) { event ->
+        when (event) {
+            is Event.ShowMessage -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(event.message),
+                    duration = SnackbarDuration.Short
+                )
+            }
+
+            Event.NavigateToHome -> {
+                navController.navigate(Home) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+
+            }
+
+            else -> Unit
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        }
+    ) { contentPadding ->
         Column(
             modifier = Modifier
                 .padding(contentPadding)

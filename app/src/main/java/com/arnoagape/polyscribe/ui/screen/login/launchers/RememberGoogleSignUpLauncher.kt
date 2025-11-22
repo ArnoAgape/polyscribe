@@ -4,12 +4,11 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.navigation.NavHostController
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.navigation.Home
+import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -18,13 +17,10 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun rememberGoogleSignUpLauncher(
     navController: NavHostController,
-    showMessage: (String) -> Unit,
-    getString: (Int) -> String,
     loginViewModel: LoginViewModel
 ): () -> Unit {
 
     val firebaseAuth = remember { FirebaseAuth.getInstance() }
-    val currentShowMessage by rememberUpdatedState(showMessage)
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -35,7 +31,8 @@ fun rememberGoogleSignUpLauncher(
             val user = firebaseAuth.currentUser
 
             loginViewModel.syncUserWithFirestore()
-            currentShowMessage(getString(R.string.success_sign_up))
+            loginViewModel.sendEvent(Event.ShowMessage(R.string.success_sign_up))
+            loginViewModel.sendEvent(Event.NavigateToHome)
 
             navController.navigate(Home) {
                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
@@ -43,9 +40,7 @@ fun rememberGoogleSignUpLauncher(
             }
         } else {
             if (response == null) {
-                currentShowMessage("Canceled")
-            } else {
-                currentShowMessage("Google error: ${response.error?.errorCode}")
+                loginViewModel.sendEvent(Event.ShowMessage(R.string.error_sign_up))
             }
         }
 

@@ -81,7 +81,12 @@ fun HomeScreen(
                 if (result == SnackbarResult.ActionPerformed) {
                     viewModel.refreshFiles()
                 }
+            }
 
+            is Event.ShowSuccessMessage -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(event.message)
+                )
             }
             else -> Unit
         }
