@@ -96,7 +96,7 @@ fun ImageFilePreview(
             if (isDetailScreen) {
                 Icon(
                     imageVector = Icons.Default.PictureAsPdf,
-                    contentDescription = "PDF",
+                    contentDescription = stringResource(R.string.contentDescription_file_preview_pdf),
                     modifier = modifier
                         .padding(16.dp)
                         .fillMaxWidth()
@@ -130,7 +130,7 @@ fun ImageFilePreview(
             } else {
                 Icon(
                     imageVector = Icons.Default.PictureAsPdf,
-                    contentDescription = "PDF",
+                    contentDescription = stringResource(R.string.contentDescription_file_preview_pdf),
                     modifier = modifier
                         .padding(16.dp)
                         .fillMaxWidth()
@@ -143,7 +143,7 @@ fun ImageFilePreview(
         else -> {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
-                contentDescription = "Document",
+                contentDescription = stringResource(R.string.contentDescription_file_preview),
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()

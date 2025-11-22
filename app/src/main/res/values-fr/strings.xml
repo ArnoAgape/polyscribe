@@ -55,6 +55,7 @@
     <string name="sign_in_guest">Continuer en tant qu\'invité</string>
     <string name="sign_up">S\'inscrire</string>
     <string name="email">E-mail</string>
+    <string name="copies">Copies</string>
     <string name="password">Mot de passe</string>
     <string name="confirm_password">Confirmer le mot de passe</string>
     <string name="hint_date">Date</string>
@@ -62,13 +63,18 @@
     <string name="hint_color">Couleur :</string>
     <string name="hint_double_sided">Recto-verso :</string>
     <string name="hint_number_of_copies">Nombre d\'exemplaires :</string>
-    <string name="hint_comments">Commentaires</string>
-    <string name="hint_datetime">Date de collecte</string>
+    <string name="hint_comments">Commentaires :</string>
+    <string name="hint_datetime">Date de collecte :</string>
 
-    <string name="contentDescription_button_add">Ajout</string>
+    <string name="contentDescription_button_add">Cliquer ici pour envoyer un nouveau document</string>
     <string name="contentDescription_go_back">Retour</string>
-    <string name="contentDescription_remove_file">Supprimer le fichier</string>
+    <string name="contentDescription_remove_file">Cliquer ici pour supprimer le fichier joint</string>
     <string name="contentDescription_file_preview">Aperçu du fichier</string>
+    <string name="contentDescription_file_preview_pdf">Aperçu du fichier PDF</string>
+    <string name="contentDescription_add_copy">Ajouter une copie</string>
+    <string name="contentDescription_remove_copy">Supprimer une copie</string>
+    <string name="contentDescription_add_file">Cliquer ici pour joindre un document</string>
+    <string name="contentDescription_add_picture">Cliquer ici pour joindre une image</string>
     <string name="action_continue">Continuer</string>
 
     <string name="sent_at">Envoyé le %1$s à %2$s</string>

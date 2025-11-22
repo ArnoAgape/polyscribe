@@ -44,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -77,6 +79,7 @@ fun SendScreen(
             is Event.ShowSnackBar -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
             }
+
             Event.FileSentSuccessfully -> {
                 onSaveClick()
             }
@@ -205,6 +208,11 @@ private fun CreateFile(
         uris.forEach { onAddFile(it) }
     }
 
+    /** ---------- CONTENT_DESCRIPTION ---------- **/
+    val contentDescriptionAddFile = stringResource(R.string.contentDescription_add_file)
+    val contentDescriptionAddPicture = stringResource(R.string.contentDescription_add_picture)
+
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -307,8 +315,11 @@ private fun CreateFile(
                     Icon(Icons.Default.AttachFile, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        stringResource(R.string.add_file),
-                        maxLines = 1
+                        text = stringResource(R.string.add_file),
+                        maxLines = 1,
+                        modifier = Modifier.semantics {
+                            contentDescription = contentDescriptionAddFile
+                        }
                     )
                 }
 
@@ -320,7 +331,10 @@ private fun CreateFile(
                     Spacer(Modifier.width(8.dp))
                     Text(
                         stringResource(R.string.add_picture),
-                        maxLines = 1
+                        maxLines = 1,
+                        modifier = Modifier.semantics {
+                            contentDescription = contentDescriptionAddPicture
+                        }
                     )
                 }
             }

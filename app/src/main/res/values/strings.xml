@@ -55,6 +55,7 @@
     <string name="sign_in_guest">Continue as guest</string>
     <string name="sign_up">Sign up</string>
     <string name="email">Email</string>
+    <string name="copies">Copies</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm password</string>
     <string name="hint_date">Date</string>
@@ -62,13 +63,18 @@
     <string name="hint_color">Color:</string>
     <string name="hint_double_sided">Double sided:</string>
     <string name="hint_number_of_copies">Number of copies:</string>
-    <string name="hint_comments">Comments</string>
-    <string name="hint_datetime">Collect date</string>
+    <string name="hint_comments">Comments:</string>
+    <string name="hint_datetime">Collect date:</string>
 
-    <string name="contentDescription_button_add">Add</string>
+    <string name="contentDescription_button_add">Click here to send a new document</string>
     <string name="contentDescription_go_back">Go back</string>
-    <string name="contentDescription_remove_file">Remove file</string>
+    <string name="contentDescription_remove_file">Click here to remove the current file</string>
     <string name="contentDescription_file_preview">Preview of the file</string>
+    <string name="contentDescription_file_preview_pdf">Preview of the PDF file</string>
+    <string name="contentDescription_add_copy">Add a copy</string>
+    <string name="contentDescription_remove_copy">Remove a copy</string>
+    <string name="contentDescription_add_file">Click here to attach a document</string>
+    <string name="contentDescription_add_picture">Click here to attach a picture</string>
     <string name="action_continue">Continue</string>
 
     <string name="sent_at">Sent on %1$s at %2$s</string>
