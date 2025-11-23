@@ -10,14 +10,11 @@ import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun rememberEmailSignUpLauncher(
     loginViewModel: LoginViewModel
 ): () -> Unit {
-
-    val firebaseAuth = remember { FirebaseAuth.getInstance() }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -25,7 +22,6 @@ fun rememberEmailSignUpLauncher(
         val response = IdpResponse.fromResultIntent(result.data)
 
         if (result.resultCode == Activity.RESULT_OK) {
-            val user = firebaseAuth.currentUser
             loginViewModel.syncUserWithFirestore()
             loginViewModel.sendEvent(Event.ShowMessage(R.string.success_sign_up))
             loginViewModel.sendEvent(Event.NavigateToHome)

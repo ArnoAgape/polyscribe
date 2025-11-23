@@ -192,6 +192,7 @@ private fun DetailContent(
             )
 
             // ---- FILE PREVIEW ----
+            Text(text = stringResource(R.string.preview_file))
             FilePreviewList(
                 fileUrls = file.fileUrl,
                 isDetailScreen = true
