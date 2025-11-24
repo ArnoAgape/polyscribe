@@ -62,7 +62,7 @@ fun AppNavGraph(
         composable<Login> {
             LoginScreen(
                 viewModel = loginViewModel,
-                navController = navController,
+                onSaveClicked = { navController.navigate(Home)},
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onEmailSignInClick = { emailSignUpLauncher() },
                 onGuestSignInClick = { navController.navigate(Home) }

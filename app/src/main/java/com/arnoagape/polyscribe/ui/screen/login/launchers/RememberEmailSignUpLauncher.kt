@@ -24,7 +24,6 @@ fun rememberEmailSignUpLauncher(
         if (result.resultCode == Activity.RESULT_OK) {
             loginViewModel.syncUserWithFirestore()
             loginViewModel.sendEvent(Event.ShowMessage(R.string.success_sign_up))
-            loginViewModel.sendEvent(Event.NavigateToHome)
 
         } else {
             if (response == null) {

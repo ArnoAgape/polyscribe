@@ -3,7 +3,7 @@ package com.arnoagape.polyscribe.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val Blue = Color(0xFF134383)
-val LightBlue = Color(0xFF3D8DFF)
+val LightBlue = Color(0xFF2073DF)
 val VeryLightBlue = Color(0xFFC0DBFF)
 val White80 = Color(0xCCFFFFFF)
 val LightYellow = Color(0xCCFBBF0C)

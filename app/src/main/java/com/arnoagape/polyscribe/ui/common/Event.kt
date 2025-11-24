@@ -18,5 +18,4 @@ sealed interface Event {
      */
     data class ShowMessage(val message: Int) : Event
     data class ShowSuccessMessage(val message: Int) : Event
-    object NavigateToHome : Event
 }

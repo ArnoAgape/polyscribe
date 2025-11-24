@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -38,9 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.arnoagape.polyscribe.R
-import com.arnoagape.polyscribe.navigation.Home
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
@@ -49,7 +47,7 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    navController: NavHostController,
+    onSaveClicked: () -> Unit,
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit
@@ -60,17 +58,8 @@ fun LoginScreen(
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
-                snackbarHostState.showSnackbar(
-                    message = context.getString(event.message),
-                    duration = SnackbarDuration.Short
-                )
-            }
-
-            Event.NavigateToHome -> {
-                navController.navigate(Home) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                }
-
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                onSaveClicked()
             }
 
             else -> Unit
