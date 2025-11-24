@@ -1,6 +1,5 @@
 package com.arnoagape.polyscribe.ui.screen.detail
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -59,7 +58,6 @@ class DetailViewModel @Inject constructor(
         )
 
     init {
-        Log.d("DetailViewModel", "fileId = $fileId")
         observeFile()
     }
 
@@ -75,7 +73,6 @@ class DetailViewModel @Inject constructor(
                     )
                 }
                 .collect { file ->
-                    Log.d("DetailViewModel", "Firestore returned = $file")
                     _uiState.value = when (file) {
                         null -> DetailUiState.Error.Empty("Impossible to find the file")
                         else -> DetailUiState.Success(file)

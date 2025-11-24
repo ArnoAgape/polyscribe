@@ -101,7 +101,6 @@ class SendViewModel @Inject constructor(
         viewModelScope.launch {
             _user.value = userRepository.getCurrentUser()
         }
-        networkUtils.checkNetwork(networkUtils, _events)
     }
 
     fun onAction(formEvent: FormEvent) {
