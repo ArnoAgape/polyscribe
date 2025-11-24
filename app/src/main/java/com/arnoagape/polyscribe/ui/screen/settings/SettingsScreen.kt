@@ -123,7 +123,7 @@ private fun SettingsContent(
 
                 /** ---------- NOTIFICATIONS ---------- **/
                 TextRowItem(
-                    textRes = R.string.notifications,
+                    text = stringResource(R.string.notifications),
                     trailingContent = {
                         Switch(
                             checked = notificationsEnabled,

@@ -94,7 +94,6 @@ class FirebaseFileApi @Inject constructor(
                     MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
                 val fileName = "${System.currentTimeMillis()}.$extension"
 
-                // 2. USE EXACT SAME API AS HEXAGONALGAMES
                 val storageRef = FirebaseStorage.getInstance()
                     .reference
                     .child("files/$fileName")

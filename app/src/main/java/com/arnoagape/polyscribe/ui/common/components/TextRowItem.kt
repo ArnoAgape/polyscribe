@@ -11,13 +11,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextRowItem(
+    text: String,
     modifier: Modifier = Modifier,
-    textRes: Int,
     trailingContent: @Composable () -> Unit
 ) {
     Row(
@@ -28,7 +27,7 @@ fun TextRowItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(stringResource(textRes))
+        Text(text)
         trailingContent()
     }
 }

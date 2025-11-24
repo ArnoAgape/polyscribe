@@ -91,16 +91,7 @@ fun SendScreen(
                 if (result == SnackbarResult.ActionPerformed) {
                     viewModel.sendFile()
                 }
-
             }
-
-            is Event.ShowSuccessMessage -> {
-                snackbarHostState.showSnackbar(
-                    message = context.getString(event.message)
-                )
-                onSaveClick()
-            }
-
             else -> Unit
         }
     }
@@ -270,7 +261,7 @@ private fun CreateFile(
 
                 /** ---------- COLORATION ---------- **/
                 TextRowItem(
-                    textRes = R.string.hint_color,
+                    text = stringResource(R.string.hint_color),
                     trailingContent = {
                         Switch(
                             checked = colored,
@@ -281,7 +272,7 @@ private fun CreateFile(
 
                 /** ---------- DOUBLE SIDED ---------- **/
                 TextRowItem(
-                    textRes = R.string.hint_double_sided,
+                    text = stringResource(R.string.hint_double_sided),
                     trailingContent = {
                         Switch(
                             checked = doubleSided,

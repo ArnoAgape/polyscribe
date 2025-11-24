@@ -176,7 +176,7 @@ private fun LoginContent(
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(stringResource(R.string.sign_in_google))
                 }
-
+                /*
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // 🔹 Separator
@@ -193,7 +193,7 @@ private fun LoginContent(
                     border = ButtonDefaults.outlinedButtonBorder(enabled = true)
                 ) {
                     Text(stringResource(R.string.sign_in_guest))
-                }
+                } */
             }
         }
     }
