@@ -81,7 +81,6 @@ fun ProfileScreen(
                     duration = SnackbarDuration.Short
                 )
             }
-            else -> Unit
         }
     }
 

@@ -88,7 +88,6 @@ fun HomeScreen(
                     message = context.getString(event.message)
                 )
             }
-            else -> Unit
         }
     }
 
