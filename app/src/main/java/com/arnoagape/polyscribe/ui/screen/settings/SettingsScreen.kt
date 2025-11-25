@@ -92,7 +92,7 @@ fun SettingsScreen(
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-private fun SettingsContent(
+fun SettingsContent(
     contentPadding: PaddingValues = PaddingValues(),
     notificationsEnabled: Boolean,
     onNotificationEnabledClicked: (Boolean) -> Unit

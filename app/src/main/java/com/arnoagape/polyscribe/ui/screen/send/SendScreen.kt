@@ -48,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -93,6 +94,7 @@ fun SendScreen(
                     viewModel.sendFile()
                 }
             }
+
             is Event.ShowSuccessMessage -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 onSaveClick()
@@ -187,9 +189,8 @@ fun SendScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CreateFile(
+fun CreateFile(
     contentPadding: PaddingValues = PaddingValues(),
     localUris: List<Uri>,
     onAddFile: (Uri) -> Unit,
@@ -206,7 +207,10 @@ private fun CreateFile(
     onCommentsChanged: (String) -> Unit,
     onSaveClicked: () -> Unit,
     isFileValid: Boolean,
-    isLoading: Boolean
+    isLoading: Boolean,
+    isInTest: Boolean = false,
+    onAddFileClickTest: (() -> Unit)? = null,
+    onAddPictureClickTest: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -269,7 +273,8 @@ private fun CreateFile(
                     trailingContent = {
                         Switch(
                             checked = colored,
-                            onCheckedChange = onColorationChange
+                            onCheckedChange = onColorationChange,
+                            modifier = Modifier.testTag(stringResource(R.string.hint_color))
                         )
                     }
                 )
@@ -280,7 +285,8 @@ private fun CreateFile(
                     trailingContent = {
                         Switch(
                             checked = doubleSided,
-                            onCheckedChange = onDoubleSidedChange
+                            onCheckedChange = onDoubleSidedChange,
+                            modifier = Modifier.testTag(stringResource(R.string.hint_double_sided))
                         )
                     }
                 )
@@ -315,17 +321,23 @@ private fun CreateFile(
             ) {
 
                 Button(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(stringResource(R.string.add_file)),
                     onClick = {
-                        fileLauncher.launch(
-                            arrayOf(
-                                "application/pdf",
-                                "application/msword",
-                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                "application/vnd.oasis.opendocument.text",
-                                "text/plain"
+                        if (isInTest) {
+                            onAddFileClickTest?.invoke()
+                        } else {
+                            fileLauncher.launch(
+                                arrayOf(
+                                    "application/pdf",
+                                    "application/msword",
+                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                    "application/vnd.oasis.opendocument.text",
+                                    "text/plain"
+                                )
                             )
-                        )
+                        }
                     }
                 ) {
                     Icon(Icons.Default.AttachFile, contentDescription = null)
@@ -340,8 +352,16 @@ private fun CreateFile(
                 }
 
                 Button(
-                    modifier = Modifier.weight(1f),
-                    onClick = { pictureLauncher.launch("image/*") }
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(stringResource(R.string.add_picture)),
+                    onClick = {
+                        if (isInTest) {
+                            onAddPictureClickTest?.invoke()
+                        } else {
+                            pictureLauncher.launch("image/*")
+                        }
+                    }
                 ) {
                     Icon(Icons.Default.Photo, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
@@ -376,7 +396,9 @@ private fun CreateFile(
 
             /** ---------- SEND BUTTON ---------- **/
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(stringResource(R.string.action_send)),
                 onClick = onSaveClicked,
                 enabled = isFileValid && !isLoading
             ) {

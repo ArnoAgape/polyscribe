@@ -1,8 +1,7 @@
-package com.arnoagape.polyscribe.screen.settings
+package com.arnoagape.polyscribe.ui.screen.settings
 
 import com.arnoagape.polyscribe.MainDispatcherRule
 import com.arnoagape.polyscribe.data.repository.SettingsRepository
-import com.arnoagape.polyscribe.ui.screen.settings.SettingsViewModel
 import com.google.firebase.messaging.FirebaseMessaging
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify

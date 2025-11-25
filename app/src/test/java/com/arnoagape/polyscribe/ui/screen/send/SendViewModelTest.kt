@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.screen.send
+package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
 import app.cash.turbine.test
@@ -8,8 +8,6 @@ import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
-import com.arnoagape.polyscribe.ui.screen.send.SendUiState
-import com.arnoagape.polyscribe.ui.screen.send.SendViewModel
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -78,7 +76,6 @@ class SendViewModelTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `sendFile emits Success when repository succeeds`() = runTest {
 

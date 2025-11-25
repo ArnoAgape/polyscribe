@@ -183,7 +183,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeContent(
+fun HomeContent(
     modifier: Modifier = Modifier,
     files: List<File>,
     onFileClick: (File) -> Unit

@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.screen.profile
+package com.arnoagape.polyscribe.ui.screen.profile
 
 import app.cash.turbine.test
 import com.arnoagape.polyscribe.MainDispatcherRule
@@ -7,8 +7,6 @@ import com.arnoagape.polyscribe.TestUtils
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
-import com.arnoagape.polyscribe.ui.screen.profile.ProfileUiState
-import com.arnoagape.polyscribe.ui.screen.profile.ProfileViewModel
 import com.arnoagape.polyscribe.ui.utils.AndroidEmailValidator
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery

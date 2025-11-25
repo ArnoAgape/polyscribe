@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -133,7 +134,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileContent(
+fun ProfileContent(
     contentPadding: PaddingValues = PaddingValues(),
     userName: String,
     onNameChanged: (String) -> Unit,
@@ -206,6 +207,7 @@ private fun ProfileContent(
 
                 /** ---------- SAVE BUTTON ---------- **/
                 Button(
+                    modifier = Modifier.testTag(stringResource(R.string.action_save)),
                     onClick = {
                         keyboardController?.hide()
                         onSaveClick()
@@ -229,9 +231,9 @@ private fun ProfileContent(
             ConfirmDialogButton(
                 buttonColor = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
                 onConfirmButton = onSignOutClick,
-                actionButton = R.string.action_sign_out,
-                confirmButtonTitle = R.string.action_sign_out,
-                confirmButtonMessage = R.string.confirm_sign_out_message
+                actionButton = stringResource(R.string.action_sign_out),
+                confirmButtonTitle = stringResource(R.string.action_sign_out),
+                confirmButtonMessage = stringResource(R.string.confirm_sign_out_message)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -240,9 +242,9 @@ private fun ProfileContent(
             ConfirmDialogButton(
                 buttonColor = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
                 onConfirmButton = onDeleteAccountClick,
-                actionButton = R.string.action_delete_account,
-                confirmButtonTitle = R.string.action_delete_account,
-                confirmButtonMessage = R.string.confirm_delete_account_message
+                actionButton = stringResource(R.string.action_delete_account),
+                confirmButtonTitle = stringResource(R.string.action_delete_account),
+                confirmButtonMessage = stringResource(R.string.confirm_delete_account_message)
             )
         }
     }

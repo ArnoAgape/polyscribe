@@ -118,8 +118,8 @@ fun DetailScreen(
 }
 
 @Composable
-private fun DetailContent(
-    modifier: Modifier,
+fun DetailContent(
+    modifier: Modifier = Modifier,
     file: File
 ) {
     Surface(
@@ -204,7 +204,7 @@ private fun DetailContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @PreviewLightDark
 @Composable
-private fun PostScreenPreview() {
+private fun DetailScreenPreview() {
     PolyscribeTheme {
         DetailContent(
             file = File(
@@ -223,8 +223,7 @@ private fun PostScreenPreview() {
                 doubleSided = false,
                 numberOfCopies = 1,
                 comment = ""
-            ),
-            modifier = Modifier.fillMaxWidth()
+            )
         )
     }
 }

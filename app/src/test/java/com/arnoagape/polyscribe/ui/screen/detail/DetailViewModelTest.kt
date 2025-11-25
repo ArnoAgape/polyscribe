@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.screen.detail
+package com.arnoagape.polyscribe.ui.screen.detail
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
@@ -8,10 +8,7 @@ import com.arnoagape.polyscribe.TestUtils
 import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.ui.common.Event
-import com.arnoagape.polyscribe.ui.screen.detail.DetailUiState
-import com.arnoagape.polyscribe.ui.screen.detail.DetailViewModel
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
-import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -38,13 +35,17 @@ class DetailViewModelTest {
 
     @Before
     fun setup() {
-        clearAllMocks()
         fileRepo = mockk()
         userRepo = mockk(relaxed = true)
         fakeNetwork = mockk()
 
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
         every { fakeNetwork.checkNetwork(any(), any()) } returns Unit
+
+        savedStateHandle = SavedStateHandle().apply {
+            set("fileId", "123")
+        }
+        every { userRepo.isUserSignedIn() } returns flowOf(true)
 
     }
 
@@ -59,13 +60,10 @@ class DetailViewModelTest {
 
     @Test
     fun `observeFile sets Loading first`() = runTest {
-        savedStateHandle = SavedStateHandle().apply {
-            set("fileId", "123")
-        }
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
+
         coEvery { fileRepo.getFileById("123") } returns flow {
             delay(1)
-            emit(TestUtils.fakeFile(id = "1"))
+            emit(TestUtils.fakeFile(id = "123"))
         }
 
         createViewModel()
@@ -78,9 +76,6 @@ class DetailViewModelTest {
 
     @Test
     fun `observeFile emits Error_Empty when file is null`() = runTest {
-        savedStateHandle = SavedStateHandle().apply { set("fileId", "123") }
-
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
 
         coEvery { fileRepo.getFileById("123") } returns flow {
             delay(1)
@@ -98,8 +93,6 @@ class DetailViewModelTest {
 
     @Test
     fun `observeFile emits Generic error when exception thrown`() = runTest {
-        savedStateHandle = SavedStateHandle().apply { set("fileId", "123") }
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
 
         coEvery { fileRepo.getFileById("123") } returns flow {
             delay(1)
@@ -117,8 +110,7 @@ class DetailViewModelTest {
 
     @Test
     fun `refreshData sends no_network event when offline`() = runTest {
-        savedStateHandle = SavedStateHandle().apply { set("fileId", "123") }
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
+
         coEvery { fileRepo.getFileById("123") } returns flow {
             delay(1)
             emit(TestUtils.fakeFile(id = "1"))
@@ -137,9 +129,6 @@ class DetailViewModelTest {
 
     @Test
     fun `refreshData reobserves file when online`() = runTest {
-        savedStateHandle = SavedStateHandle().apply { set("fileId", "123") }
-
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
 
         val file = TestUtils.fakeFile(id = "1")
         coEvery { fileRepo.getFileById("123") } returns flow {
@@ -151,7 +140,5 @@ class DetailViewModelTest {
 
         viewModel.refreshData()
     }
-
-
 
 }

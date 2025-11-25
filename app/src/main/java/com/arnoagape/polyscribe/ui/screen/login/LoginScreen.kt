@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -88,7 +89,7 @@ fun LoginScreen(
 }
 
 @Composable
-private fun LoginContent(
+fun LoginContent(
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit
@@ -134,7 +135,8 @@ private fun LoginContent(
                     onClick = { onEmailSignInClick() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
+                        .height(50.dp)
+                        .testTag(stringResource(R.string.sign_in_email)),
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Icon(
@@ -153,7 +155,8 @@ private fun LoginContent(
                     onClick = onGoogleSignInClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
+                        .height(50.dp)
+                        .testTag(stringResource(R.string.sign_in_google)),
                     border = ButtonDefaults.outlinedButtonBorder(enabled = true)
                 ) {
                     Icon(

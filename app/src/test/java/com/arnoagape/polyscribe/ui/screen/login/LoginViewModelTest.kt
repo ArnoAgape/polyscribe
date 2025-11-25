@@ -1,16 +1,16 @@
-package com.arnoagape.polyscribe.screen.login
+package com.arnoagape.polyscribe.ui.screen.login
 
 import app.cash.turbine.test
 import com.arnoagape.polyscribe.MainDispatcherRule
+import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.TestUtils
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.ui.common.Event
-import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
-import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.flowOf
@@ -28,11 +28,8 @@ class LoginViewModelTest {
 
     @Before
     fun setup() {
-        clearAllMocks()
         userRepo = mockk(relaxed = true)
-
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
-
     }
 
     @Test
@@ -67,16 +64,19 @@ class LoginViewModelTest {
 
 
     @Test
-    fun `sendEvent sends event through eventsFlow`() = runTest {
+    fun `sendEvent emits multiple events in correct order`() = runTest {
         every { userRepo.isUserSignedIn() } returns flowOf(false)
-
         viewModel = LoginViewModel(userRepo)
 
-        viewModel.eventsFlow.test {
-            viewModel.sendEvent(Event.ShowMessage(com.arnoagape.polyscribe.R.string.no_network))
+        val eventNoNetwork = Event.ShowMessage(R.string.no_network)
+        val eventSuccess = Event.ShowSuccessMessage(R.string.success_user_updated)
 
-            val event = awaitItem()
-            assertTrue(event is Event.ShowMessage)
+        viewModel.eventsFlow.test {
+            viewModel.sendEvent(eventNoNetwork)
+            viewModel.sendEvent(eventSuccess)
+
+            assertEquals(eventNoNetwork, awaitItem())
+            assertEquals(eventSuccess, awaitItem())
         }
     }
 }

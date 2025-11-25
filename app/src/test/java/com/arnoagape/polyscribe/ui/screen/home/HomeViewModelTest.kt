@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.screen.home
+package com.arnoagape.polyscribe.ui.screen.home
 
 import app.cash.turbine.test
 import com.arnoagape.polyscribe.MainDispatcherRule
@@ -8,8 +8,6 @@ import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.ui.common.Event
-import com.arnoagape.polyscribe.ui.screen.home.HomeUiState
-import com.arnoagape.polyscribe.ui.screen.home.HomeViewModel
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery
 import io.mockk.every

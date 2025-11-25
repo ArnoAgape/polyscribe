@@ -23,20 +23,21 @@ import com.arnoagape.polyscribe.R
 fun ConfirmDialogButton(
     buttonColor: ButtonColors,
     onConfirmButton: () -> Unit,
-    actionButton: Int,
-    confirmButtonTitle: Int,
-    confirmButtonMessage: Int
+    actionButton: String,
+    confirmButtonTitle: String,
+    confirmButtonMessage: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
     Button(
         onClick = { showDialog = true },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         colors = buttonColor
     ) {
         Text(
             modifier = Modifier.padding(8.dp),
-            text = stringResource(actionButton)
+            text = actionButton
         )
     }
 
@@ -45,11 +46,11 @@ fun ConfirmDialogButton(
             onDismissRequest = { showDialog = false },
 
             title = {
-                Text(text = stringResource(confirmButtonTitle))
+                Text(text = confirmButtonTitle)
             },
 
             text = {
-                Text(text = stringResource(confirmButtonMessage))
+                Text(text = confirmButtonMessage)
             },
 
             confirmButton = {
