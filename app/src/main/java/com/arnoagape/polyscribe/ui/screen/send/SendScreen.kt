@@ -81,6 +81,22 @@ fun SendScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val pictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris ->
+        uris.forEach { uri ->
+            viewModel.onAction(FormEvent.AddFile(uri))
+        }
+    }
+
+    val fileLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        uris.forEach { uri ->
+            viewModel.onAction(FormEvent.AddFile(uri))
+        }
+    }
+
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
@@ -135,6 +151,18 @@ fun SendScreen(
                     contentPadding = contentPadding,
                     localUris = state.localUris,
                     onAddFile = { viewModel.onAction(FormEvent.AddFile(it)) },
+                    onAddFileClick = {
+                        fileLauncher.launch(
+                            arrayOf(
+                                "application/pdf",
+                                "application/msword",
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                "application/vnd.oasis.opendocument.text",
+                                "text/plain"
+                            )
+                        )
+                    },
+                    onAddPictureClick = { pictureLauncher.launch("image/*") },
                     onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
                     dateTime = fileToDisplay.dateTime,
                     onDateTimeChange = { viewModel.onAction(FormEvent.DateTimeChanged(it)) },
@@ -194,6 +222,8 @@ fun CreateFile(
     contentPadding: PaddingValues = PaddingValues(),
     localUris: List<Uri>,
     onAddFile: (Uri) -> Unit,
+    onAddFileClick: () -> Unit,
+    onAddPictureClick: () -> Unit,
     onRemoveFile: (Uri) -> Unit,
     dateTime: Instant,
     onDateTimeChange: (Instant) -> Unit,
@@ -207,25 +237,10 @@ fun CreateFile(
     onCommentsChanged: (String) -> Unit,
     onSaveClicked: () -> Unit,
     isFileValid: Boolean,
-    isLoading: Boolean,
-    isInTest: Boolean = false,
-    onAddFileClickTest: (() -> Unit)? = null,
-    onAddPictureClickTest: (() -> Unit)? = null,
+    isLoading: Boolean
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-
-    val pictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetMultipleContents()
-    ) { uris ->
-        uris.forEach { onAddFile(it) }
-    }
-
-    val fileLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenMultipleDocuments()
-    ) { uris ->
-        uris.forEach { onAddFile(it) }
-    }
 
     /** ---------- CONTENT_DESCRIPTION ---------- **/
     val contentDescriptionAddFile = stringResource(R.string.contentDescription_add_file)
@@ -324,21 +339,7 @@ fun CreateFile(
                     modifier = Modifier
                         .weight(1f)
                         .testTag(stringResource(R.string.add_file)),
-                    onClick = {
-                        if (isInTest) {
-                            onAddFileClickTest?.invoke()
-                        } else {
-                            fileLauncher.launch(
-                                arrayOf(
-                                    "application/pdf",
-                                    "application/msword",
-                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                    "application/vnd.oasis.opendocument.text",
-                                    "text/plain"
-                                )
-                            )
-                        }
-                    }
+                    onClick = onAddFileClick
                 ) {
                     Icon(Icons.Default.AttachFile, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
@@ -355,13 +356,7 @@ fun CreateFile(
                     modifier = Modifier
                         .weight(1f)
                         .testTag(stringResource(R.string.add_picture)),
-                    onClick = {
-                        if (isInTest) {
-                            onAddPictureClickTest?.invoke()
-                        } else {
-                            pictureLauncher.launch("image/*")
-                        }
-                    }
+                    onClick = onAddPictureClick
                 ) {
                     Icon(Icons.Default.Photo, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
@@ -423,6 +418,8 @@ private fun CreateFilePreview() {
         CreateFile(
             localUris = listOf("content://com.example.provider/document/resume.pdf").map { it.toUri() },
             onAddFile = {},
+            onAddFileClick = {},
+            onAddPictureClick = {},
             onRemoveFile = {},
             dateTime = Instant.EPOCH,
             onDateTimeChange = {},

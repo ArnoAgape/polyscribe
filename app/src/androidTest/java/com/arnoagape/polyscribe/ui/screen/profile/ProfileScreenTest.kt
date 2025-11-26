@@ -68,7 +68,7 @@ class ProfileScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithContentDescription(profileImage)
+        composeTestRule.onNodeWithContentDescription(profileImage).assertExists()
         composeTestRule.onNodeWithText(nameField).assertIsDisplayed()
         composeTestRule.onNodeWithText(userName).assertIsDisplayed()
         composeTestRule.onNodeWithText(emailField).assertIsDisplayed()

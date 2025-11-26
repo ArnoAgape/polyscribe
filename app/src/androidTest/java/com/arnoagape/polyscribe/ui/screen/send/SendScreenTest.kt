@@ -34,6 +34,8 @@ class SendScreenTest {
             CreateFile(
                 localUris = emptyList(),
                 onAddFile = { },
+                onAddFileClick = { addFileClicked = true },
+                onAddPictureClick = { addPictureClicked = true },
                 onRemoveFile = {},
                 dateTime = Instant.EPOCH,
                 onDateTimeChange = {},
@@ -47,11 +49,7 @@ class SendScreenTest {
                 onCommentsChanged = {},
                 onSaveClicked = {},
                 isFileValid = true,
-                isLoading = false,
-
-                isInTest = true,
-                onAddFileClickTest = { addFileClicked = true },
-                onAddPictureClickTest = { addPictureClicked = true }
+                isLoading = false
             )
         }
 

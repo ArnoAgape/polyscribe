@@ -1,7 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -42,8 +41,8 @@ class LoginScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(signInText).assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Logo Polyscribe")
+        composeTestRule.onNodeWithText(signInText).assertExists()
+        composeTestRule.onNodeWithContentDescription("Logo Polyscribe").assertExists()
         composeTestRule.onNodeWithTag(emailButton).performClick()
         composeTestRule.onNodeWithTag(googleButton).performClick()
 

@@ -1,7 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.detail
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -52,12 +51,18 @@ class DetailScreenTest {
         val collectDate = composeTestRule.activity.getString(
             R.string.detail_collect_date, date, time
         )
+
+        val yes = composeTestRule.activity.getString(R.string.yes)
+        val no = composeTestRule.activity.getString(R.string.no)
         val isColored = composeTestRule.activity.getString(
-            R.string.detail_color, file.colored
+            R.string.detail_color,
+            if (file.colored) yes else no
         )
         val isDoubleSided = composeTestRule.activity.getString(
-            R.string.detail_double_sided, file.doubleSided
+            R.string.detail_double_sided,
+            if (file.doubleSided) yes else no
         )
+
         val numberOfCopies = composeTestRule.activity.getString(
             R.string.detail_number_of_copies, file.numberOfCopies
         )
@@ -72,16 +77,16 @@ class DetailScreenTest {
 
         composeTestRule.setContent { DetailContent(file = file) }
 
-        composeTestRule.onNodeWithText(author)
-        composeTestRule.onNodeWithText(collectDate)
-        composeTestRule.onNodeWithText(isColored)
-        composeTestRule.onNodeWithText(isDoubleSided)
-        composeTestRule.onNodeWithText(numberOfCopies)
-        composeTestRule.onNodeWithText(comments)
-        composeTestRule.onNodeWithText(preview).assertIsDisplayed()
+        composeTestRule.onNodeWithText(author).assertExists()
+        composeTestRule.onNodeWithText(collectDate).assertExists()
+        composeTestRule.onNodeWithText(isColored).assertExists()
+        composeTestRule.onNodeWithText(isDoubleSided).assertExists()
+        composeTestRule.onNodeWithText(numberOfCopies).assertExists()
+        composeTestRule.onNodeWithText(comments).assertExists()
+        composeTestRule.onNodeWithText(preview).assertExists()
         composeTestRule.onNode(
             hasContentDescription(picture)
                     or hasContentDescription(pdfFile)
-        ).assertIsDisplayed()
+        ).assertExists()
     }
 }

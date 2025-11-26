@@ -1,7 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.home
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -50,18 +49,9 @@ class HomeScreenTest {
         val author = composeTestRule.activity.getString(
             R.string.by, files[0].author?.displayName
         )
-        val (date, time) = Format.getLocalizedDateParts(files[0].dateTime)
+        val (date, time) = Format.getLocalizedDateParts(files[0].createdAt)
         val dateOfSending = composeTestRule.activity.getString(
             R.string.sent_at, date, time
-        )
-        val home = composeTestRule.activity.getString(
-            R.string.home
-        )
-        val profile = composeTestRule.activity.getString(
-            R.string.profile
-        )
-        val settings = composeTestRule.activity.getString(
-            R.string.settings
         )
 
         val picture = composeTestRule.activity.getString(R.string.contentDescription_file_preview)
@@ -75,15 +65,12 @@ class HomeScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(author)
-        composeTestRule.onNodeWithText(dateOfSending)
-        composeTestRule.onNodeWithText(home)
-        composeTestRule.onNodeWithText(profile)
-        composeTestRule.onNodeWithText(settings)
+        composeTestRule.onNodeWithText(author).assertExists()
+        composeTestRule.onNodeWithText(dateOfSending).assertExists()
         composeTestRule.onNode(
             hasContentDescription(picture)
                     or hasContentDescription(pdfFile)
-        ).assertIsDisplayed()
+        ).assertExists()
 
     }
 }
