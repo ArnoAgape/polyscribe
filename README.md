@@ -30,6 +30,19 @@ L’application permet aux clients d’**envoyer leurs documents directement dep
 - ✅ **Centraliser** les informations clients
 - ✅ **Améliorer la communication** entre les utilisateurs et Polyscribe
 
+
+---
+
+## 📸 Captures d'écran
+
+<p align="center">
+  <img src="images/home.png" alt="Phone 1" width="30%"/>
+  <img src="images/send_1.png" alt="Phone 2" width="30%"/>
+  <img src="images/send_2.png" alt="Phone 3" width="30%"/>
+  <img src="images/home_2.png" alt="Phone 3" width="30%"/>
+  <img src="images/detail.png" alt="Phone 3" width="30%"/>
+</p>
+
 ---
 
 ## ⚙️ Architecture & technologies
