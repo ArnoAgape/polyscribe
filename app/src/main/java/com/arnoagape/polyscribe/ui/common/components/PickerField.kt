@@ -19,6 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
+/**
+ * Displays a clickable field with a label, value and trailing icon.
+ * Used for opening pickers such as date, time or options.
+ *
+ * @param modifier Optional layout modifier.
+ * @param label Label displayed above the value.
+ * @param value Current value to display.
+ * @param icon Icon shown on the right.
+ * @param onClick Action triggered when the field is tapped.
+ */
 @Composable
 fun PickerField(
     modifier: Modifier = Modifier,

@@ -22,6 +22,10 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
 
+/**
+ * Firebase implementation of [FileApi].
+ * Handles file uploads to Firebase Storage and metadata persistence in Firestore.
+ */
 class FirebaseFileApi @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val networkUtils: NetworkUtils
@@ -30,6 +34,10 @@ class FirebaseFileApi @Inject constructor(
     private val firestore = FirebaseFirestore.getInstance()
     private val filesCollection = firestore.collection("files")
 
+    /**
+     * Retrieves all files ordered by creation date (descending)
+     * and maps Firestore DTOs to domain models.
+     */
     override fun getFilesOrderByCreationDateDesc(): Flow<List<File>> {
         return filesCollection
             .orderBy("createdAt", Query.Direction.DESCENDING)
@@ -37,6 +45,12 @@ class FirebaseFileApi @Inject constructor(
             .map { list -> list.map { File.fromDto(it) } }
     }
 
+    /**
+     * Uploads multiple URIs, stores their URLs in Firestore,
+     * and returns the list of generated URLs.
+     *
+     * @throws IOException when the device is offline
+     */
     override suspend fun sendFile(localUris: List<Uri>, file: File): List<String> {
         if (!networkUtils.isNetworkAvailable()) {
             throw IOException("No internet connection")
@@ -46,9 +60,7 @@ class FirebaseFileApi @Inject constructor(
                 uploadDocumentToFirebase(uri)
             }
 
-            val updated = file.copy(
-                fileUrl = uploadedFiles
-            )
+            val updated = file.copy(fileUrl = uploadedFiles)
             filesCollection.document(updated.id).set(updated.toDto()).await()
 
             return uploadedFiles
@@ -59,6 +71,10 @@ class FirebaseFileApi @Inject constructor(
         }
     }
 
+    /**
+     * Observes a single file by ID.
+     * Returns null when not found.
+     */
     override fun getFileById(fileId: String): Flow<File?> {
         return filesCollection
             .whereEqualTo("id", fileId)
@@ -67,19 +83,20 @@ class FirebaseFileApi @Inject constructor(
             .map { File.fromDto(it.first()) }
     }
 
+    /**
+     * Uploads a document to Firebase Storage.
+     * Validates MIME type and returns the public download URL.
+     */
     override suspend fun uploadDocumentToFirebase(uri: Uri): String? {
         return withContext(Dispatchers.IO + SupervisorJob()) {
             var pfd: ParcelFileDescriptor? = null
 
             try {
-                // 1. MIME type + extension
                 val mimeType = context.contentResolver.getType(uri)
                 pfd = context.contentResolver.openFileDescriptor(uri, "r")
 
                 val allowedMimeTypes = listOf(
-                    "image/jpeg",
-                    "image/png",
-                    "application/pdf",
+                    "image/jpeg", "image/png", "application/pdf",
                     "application/msword",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     "application/vnd.oasis.opendocument.text",
@@ -98,10 +115,7 @@ class FirebaseFileApi @Inject constructor(
                     .reference
                     .child("files/$fileName")
 
-                // 3. Upload
                 storageRef.putFile(uri).await()
-
-                // 4. URL fournie directement par Firebase (à NE PAS modifier)
                 return@withContext storageRef.downloadUrl.await().toString()
 
             } catch (e: Exception) {

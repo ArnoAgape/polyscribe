@@ -7,19 +7,32 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 
 /**
- * This class provides a repository for accessing and managing User data.
- * It utilizes dependency injection to retrieve a UserApi instance for interacting
- * with the data source. The class is marked as a Singleton using @Singleton annotation,
- * ensuring there's only one instance throughout the application.
+ * Repository that handles user-related data operations.
+ * Uses [UserApi] to interact with the underlying data source.
  */
 @Singleton
-class UserRepository @Inject constructor(private val userApi: UserApi) {
+class UserRepository @Inject constructor(
+    private val userApi: UserApi
+) {
 
+    /** Returns the currently signed-in user. */
     suspend fun getCurrentUser() = userApi.getCurrentUser()
+
+    /** Observes the authenticated user's data. */
     fun observeUser(): Flow<User?> = userApi.observeUser()
+
+    /** Updates the user data. */
     suspend fun updateUser(user: User) = userApi.updateUser(user)
+
+    /** Ensures the user exists in Firestore. */
     suspend fun ensureUserInFirestore() = userApi.ensureUserInFirestore()
+
+    /** Signs the user out. */
     fun signOut() = userApi.signOut()
+
+    /** Emits whether a user is currently signed in. */
     fun isUserSignedIn(): Flow<Boolean> = userApi.isUserSignedIn()
+
+    /** Permanently deletes the user's account. */
     suspend fun deleteUser() = userApi.deleteUser()
 }

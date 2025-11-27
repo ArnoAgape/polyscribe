@@ -34,11 +34,16 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
+/**
+ * Displays the settings screen where the user can configure app preferences
+ * such as notification settings.
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel
 ) {
+
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsStateWithLifecycle()
 
     val notificationsPermissionState =
@@ -135,7 +140,6 @@ fun SettingsContent(
         }
     }
 }
-
 
 @PreviewLightDark
 @Composable

@@ -19,6 +19,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.R
 
+/**
+ * Displays a button that opens a confirmation dialog before executing an action.
+ *
+ * @param buttonColor Button color configuration.
+ * @param onConfirmButton Callback executed when the user confirms the action.
+ * @param actionButton Text displayed on the main button.
+ * @param confirmButtonTitle Title of the confirmation dialog.
+ * @param confirmButtonMessage Message shown inside the dialog.
+ */
 @Composable
 fun ConfirmDialogButton(
     buttonColor: ButtonColors,
@@ -27,6 +36,7 @@ fun ConfirmDialogButton(
     confirmButtonTitle: String,
     confirmButtonMessage: String
 ) {
+
     var showDialog by remember { mutableStateOf(false) }
 
     Button(

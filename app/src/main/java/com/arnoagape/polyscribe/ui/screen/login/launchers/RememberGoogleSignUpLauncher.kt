@@ -11,6 +11,14 @@ import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 
+/**
+ * Creates and remembers a Google sign-up launcher using FirebaseUI Auth.
+ * On success, the user is synced with Firestore and a success message is sent.
+ * On failure, an error event is emitted.
+ *
+ * @param loginViewModel ViewModel used to sync the user and emit events.
+ * @return A lambda that launches the Google sign-up flow.
+ */
 @Composable
 fun rememberGoogleSignUpLauncher(
     loginViewModel: LoginViewModel

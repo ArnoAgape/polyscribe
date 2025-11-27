@@ -44,6 +44,16 @@ import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
+/**
+ * Displays the login screen with multiple sign-in options:
+ * email, Google, and guest access.
+ *
+ * @param viewModel ViewModel providing authentication state and events.
+ * @param onSaveClicked Callback executed after successful sign-in.
+ * @param onGoogleSignInClick Launches the Google sign-in flow.
+ * @param onGuestSignInClick Logs in as a guest user.
+ * @param onEmailSignInClick Launches the email sign-in flow.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
@@ -53,6 +63,7 @@ fun LoginScreen(
     onGuestSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit
 ) {
+
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -111,7 +122,7 @@ fun LoginContent(
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 🔹 Logo
+                /** ---------- LOGO POLYSCRIBE ---------- **/
                 Image(
                     painter = painterResource(id = R.drawable.ic_polyscribe_logo), // ton logo ici
                     contentDescription = "Logo Polyscribe",
@@ -130,7 +141,7 @@ fun LoginContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 🔹 Email Button
+                /** ---------- EMAIL BUTTON ---------- **/
                 Button(
                     onClick = { onEmailSignInClick() },
                     modifier = Modifier
@@ -150,7 +161,7 @@ fun LoginContent(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // 🔹 Google Button
+                /** ---------- GOOGLE BUTTON ---------- **/
                 OutlinedButton(
                     onClick = onGoogleSignInClick,
                     modifier = Modifier
@@ -171,12 +182,12 @@ fun LoginContent(
                 /*
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 🔹 Separator
+                /** ---------- ADD BUTTONS FILE ---------- **/
                 OrSeparator()
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 🔹 Continue as guest
+                /** ---------- GUEST BUTTON ---------- **/
                 OutlinedButton(
                     onClick = onGuestSignInClick,
                     modifier = Modifier

@@ -52,12 +52,19 @@ import com.arnoagape.polyscribe.ui.common.FormEvent
 import com.arnoagape.polyscribe.ui.common.components.ConfirmDialogButton
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
+/**
+ * Displays the user profile screen with editable account information.
+ *
+ * @param viewModel ViewModel providing profile data and actions.
+ * @param onLoginScreen Callback invoked when redirecting to the login screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
     onLoginScreen: () -> Unit
 ) {
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }

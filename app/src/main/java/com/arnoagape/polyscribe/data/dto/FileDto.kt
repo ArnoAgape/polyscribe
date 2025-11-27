@@ -4,6 +4,11 @@ import com.arnoagape.polyscribe.domain.model.User
 import com.google.firebase.Timestamp
 import java.io.Serializable
 
+/**
+ * Data model representing a file stored in Firestore/Storage.
+ * Contains metadata, print options, author information
+ * and creation timestamps.
+ */
 data class FileDto(
     val id: String = "",
     val fileUrl: List<String> = emptyList(),

@@ -22,6 +22,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel responsible for loading a single file and exposing UI state
+ * for the detail screen.
+ *
+ * It observes the file in Firestore, handles loading/error states,
+ * and emits one-time events such as network warnings.
+ */
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val fileRepository: FileRepository,
@@ -92,6 +99,10 @@ class DetailViewModel @Inject constructor(
     }
 }
 
+/**
+ * Combined UI state for the detail screen,
+ * merging file loading state and authentication status.
+ */
 data class DetailScreenState(
     val uiState: DetailUiState = DetailUiState.Idle,
     val isSignedIn: Boolean = false

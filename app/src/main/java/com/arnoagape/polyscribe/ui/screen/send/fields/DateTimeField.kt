@@ -30,6 +30,14 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * Displays a form field for selecting a date and time value.
+ *
+ * @param modifier Optional layout modifier.
+ * @param value Current date-time as an [Instant].
+ * @param onValueChange Callback invoked when the date-time changes.
+ * @param label Label displayed above the field.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateTimeField(
@@ -38,6 +46,7 @@ fun DateTimeField(
     onValueChange: (Instant) -> Unit,
     label: String
 ) {
+
     val zone = ZoneId.systemDefault()
 
     // Convert Instant -> LocalDate + LocalTime

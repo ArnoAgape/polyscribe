@@ -29,6 +29,12 @@ import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
 
+/**
+ * ViewModel responsible for preparing and uploading a file.
+ *
+ * Manages local URIs, file metadata, validation logic,
+ * network checks, and one-time UI events.
+ */
 @HiltViewModel
 class SendViewModel @Inject constructor(
     private val fileRepository: FileRepository,
@@ -103,6 +109,9 @@ class SendViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Handles user actions modifying the file or selected URIs.
+     */
     fun onAction(formEvent: FormEvent) {
         when (formEvent) {
             is FormEvent.DateTimeChanged -> {
@@ -139,6 +148,10 @@ class SendViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Uploads the selected files to Firebase Storage and Firestore.
+     * Performs network and authentication checks before uploading.
+     */
     fun sendFile() {
         viewModelScope.launch {
 
@@ -188,6 +201,10 @@ class SendViewModel @Inject constructor(
     }
 }
 
+/**
+ * Combined UI state for the send screen,
+ * containing the file, selection, and validation status.
+ */
 data class SendScreenState(
     val uiState: SendUiState = SendUiState.Idle,
     val file: File = File(),

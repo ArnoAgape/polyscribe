@@ -44,6 +44,12 @@ import com.arnoagape.polyscribe.ui.utils.Format
 import com.google.firebase.Timestamp
 import java.time.Instant
 
+/**
+ * Displays the detail view of a file.
+ *
+ * @param viewModel The ViewModel providing file data and state.
+ * @param onBackClick Callback invoked when the back button is pressed.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
@@ -130,7 +136,7 @@ fun DetailContent(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            // ---- AUTHOR ----
+            /** ---------- AUTHOR ---------- **/
             file.author?.displayName?.let {
                 Text(
                     text = stringResource(
@@ -144,12 +150,12 @@ fun DetailContent(
 
             Spacer(modifier.height(12.dp))
 
-            // ---- COLLECT DATE/TIME ----
+            /** ---------- COLLECT DATE/TIME ---------- **/
             val (date, time) = Format.getLocalizedDateParts(file.dateTime)
 
             Text(stringResource(R.string.detail_collect_date, date, time))
 
-            // ---- COLOR DETAILS ----
+            /** ---------- COLOR DETAILS ---------- **/
             val coloredText = if (file.colored) {
                 stringResource(R.string.yes)
             } else {
@@ -162,7 +168,7 @@ fun DetailContent(
                 )
             )
 
-            // ---- DOUBLE SIDED DETAILS ----
+            /** ---------- DOUBLE SIDED DETAILS ---------- **/
             val doubleSidedText = if (file.doubleSided) {
                 stringResource(R.string.yes)
             } else {
@@ -175,7 +181,7 @@ fun DetailContent(
                 )
             )
 
-            // ---- NUMBER OF COPIES DETAILS ----
+            /** ---------- NUMBER OF COPIES DETAILS ---------- **/
             Text(
                 text = stringResource(
                     R.string.detail_number_of_copies,
@@ -183,7 +189,7 @@ fun DetailContent(
                 )
             )
 
-            // ---- COMMENTS DETAILS ----
+            /** ---------- COMMENT DETAILS ---------- **/
             Text(
                 text = stringResource(
                     R.string.detail_comments,
@@ -191,7 +197,7 @@ fun DetailContent(
                 )
             )
 
-            // ---- FILE PREVIEW ----
+            /** ---------- FILE PREVIEW ---------- **/
             Text(text = stringResource(R.string.preview_file))
             FilePreviewList(
                 fileUrls = file.fileUrl,

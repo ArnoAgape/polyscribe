@@ -34,6 +34,15 @@ import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.arnoagape.polyscribe.R
 
+/**
+ * Displays a preview of a document based on its type (image/PDF/other).
+ * On detail screens, clicking an image opens it in a fullscreen dialog.
+ *
+ * @param modifier Optional layout modifier.
+ * @param documentUrl URL of the file to preview.
+ * @param isDetailScreen Whether the preview is shown on a detail screen.
+ * @param onClick Optional callback when the preview is clicked (non-detail only).
+ */
 @Composable
 fun ImageFilePreview(
     modifier: Modifier = Modifier,
@@ -41,6 +50,7 @@ fun ImageFilePreview(
     isDetailScreen: Boolean,
     onClick: (() -> Unit)? = null
 ) {
+
     var selectedImage by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
@@ -166,12 +176,21 @@ fun ImageFilePreview(
     }
 }
 
+/**
+ * Displays a list of previews for provided file URLs.
+ * On non-detail screens, only the first preview is displayed.
+ *
+ * @param fileUrls List of document URLs to preview.
+ * @param isDetailScreen Whether full preview list should be shown.
+ * @param onClick Optional callback when a preview is clicked.
+ */
 @Composable
 fun FilePreviewList(
     fileUrls: List<String>,
     isDetailScreen: Boolean,
     onClick: (() -> Unit)? = null
 ) {
+
     if (fileUrls.isEmpty()) return
 
     val urlsToDisplay = if (isDetailScreen) fileUrls else listOf(fileUrls.first())

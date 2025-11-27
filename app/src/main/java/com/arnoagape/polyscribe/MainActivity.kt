@@ -8,6 +8,9 @@ import com.arnoagape.polyscribe.navigation.MainScreen
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Main activity that sets up the app theme and hosts the root composable.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

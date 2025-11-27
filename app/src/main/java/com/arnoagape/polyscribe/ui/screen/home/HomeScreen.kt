@@ -55,6 +55,14 @@ import com.arnoagape.polyscribe.ui.utils.Format
 import com.google.firebase.Timestamp
 import java.time.Instant
 
+/**
+ * Displays the home screen showing the list of uploaded files.
+ *
+ * @param viewModel ViewModel providing file data and UI state.
+ * @param loginViewModel ViewModel providing authentication state.
+ * @param onFileClick Callback invoked when a file is selected.
+ * @param onFABClick Callback invoked when the FAB is pressed.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -63,6 +71,7 @@ fun HomeScreen(
     onFileClick: (File) -> Unit,
     onFABClick: () -> Unit
 ) {
+
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val refreshState = rememberPullToRefreshState()
@@ -201,14 +210,14 @@ fun HomeContent(
                     modifier = Modifier.padding(8.dp),
                 ) {
 
-                    // ---- DATE/TIME ----
+                    /** ---------- DATE/TIME ---------- **/
                     val (date, time) = Format.getLocalizedDateParts(file.createdAt)
 
                     Text(stringResource(R.string.sent_at, date, time))
 
                     Spacer(Modifier.height(8.dp))
 
-                    // ---- NAME ----
+                    /** ---------- NAME ---------- **/
                     Text(
                         text = stringResource(
                             R.string.by,
@@ -220,7 +229,7 @@ fun HomeContent(
 
                     Spacer(Modifier.height(8.dp))
 
-                    // ---- FILE PREVIEW ----
+                    /** ---------- FILE PREVIEW ---------- **/
                     FilePreviewList(
                         fileUrls = file.fileUrl,
                         isDetailScreen = false,

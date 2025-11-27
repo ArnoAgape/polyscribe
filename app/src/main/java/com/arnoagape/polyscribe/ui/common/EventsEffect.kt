@@ -12,16 +12,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 /**
- * A reusable composable utility that collects events from a [Flow] and executes
- * a provided action whenever a new event is emitted.
+ * Collects events from a [Flow] and executes the given callback for each event.
  *
- * It automatically handles lifecycle awareness using [repeatOnLifecycle],
- * ensuring that event collection only occurs while the [androidx.lifecycle.LifecycleOwner]
- * is in the [Lifecycle.State.STARTED] state.
- *`
+ * This effect is lifecycle-aware and collects events only while the
+ * [LocalLifecycleOwner] is in the [Lifecycle.State.STARTED] state.
  *
- * @param flow The [Flow] emitting events from the ViewModel.
- * @param onEvent A lambda executed for each new event emitted.
+ * @param flow Flow emitting events from the ViewModel.
+ * @param onEvent Callback invoked for each emitted event.
  */
 @Composable
 fun <T> EventsEffect(flow: Flow<T>, onEvent: suspend (T) -> Unit) {

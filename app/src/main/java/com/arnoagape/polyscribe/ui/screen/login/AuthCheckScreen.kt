@@ -10,6 +10,13 @@ import com.arnoagape.polyscribe.navigation.AuthCheck
 import com.arnoagape.polyscribe.navigation.Home
 import com.arnoagape.polyscribe.navigation.Login
 
+/**
+ * Checks whether the user is signed in and navigates accordingly.
+ * Redirects signed-in users to [Home] and others to [Login].
+ *
+ * @param navController Navigation controller used for redirection.
+ * @param loginViewModel Injected ViewModel providing sign-in state.
+ */
 @Composable
 fun AuthCheckScreen(
     navController: NavHostController,

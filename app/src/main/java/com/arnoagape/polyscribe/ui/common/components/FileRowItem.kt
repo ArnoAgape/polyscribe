@@ -24,6 +24,13 @@ import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
+/**
+ * Displays a file item with an icon, file name and a remove button.
+ *
+ * @param fileName Name of the file to display.
+ * @param icon Icon representing the file type.
+ * @param onRemove Callback executed when the remove action is triggered.
+ */
 @Composable
 fun FileRowItem(
     fileName: String,

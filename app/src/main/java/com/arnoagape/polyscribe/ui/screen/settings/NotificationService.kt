@@ -14,8 +14,11 @@ import com.arnoagape.polyscribe.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
+/**
+ * Firebase Messaging service responsible for receiving push notifications
+ * and displaying them using the system notification manager.
+ */
 class NotificationService : FirebaseMessagingService() {
-
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onMessageReceived(message: RemoteMessage) {
@@ -23,6 +26,9 @@ class NotificationService : FirebaseMessagingService() {
         showNotification(message.notification?.title, message.notification?.body)
     }
 
+    /**
+     * Displays a system notification using the given title and body.
+     */
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun showNotification(title: String?, body: String?) {
         val channelId = "default_channel"

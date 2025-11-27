@@ -13,8 +13,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.R
 
+/**
+ * Displays a horizontal separator with the text "or" between two dividers.
+ * Used to visually separate authentication options.
+ */
 @Composable
 fun OrSeparator() {
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically

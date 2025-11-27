@@ -4,13 +4,21 @@ import android.net.Uri
 import com.arnoagape.polyscribe.domain.model.File
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Interface defining file-related operations.
+ * Implementations handle storage, upload and retrieval logic.
+ */
 interface FileApi {
 
+    /** Returns all files ordered by creation date (descending). */
     fun getFilesOrderByCreationDateDesc(): Flow<List<File>>
 
+    /** Uploads a file and returns the list of uploaded URLs. */
     suspend fun sendFile(localUris: List<Uri>, file: File): List<String>
 
+    /** Observes a file by its ID. */
     fun getFileById(fileId: String): Flow<File?>
 
+    /** Uploads a single document to Firebase Storage and returns its URL. */
     suspend fun uploadDocumentToFirebase(uri: Uri): String?
 }

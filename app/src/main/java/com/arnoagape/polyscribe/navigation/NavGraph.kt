@@ -21,18 +21,19 @@ import com.arnoagape.polyscribe.ui.screen.send.SendViewModel
 import com.arnoagape.polyscribe.ui.screen.settings.SettingsScreen
 import com.arnoagape.polyscribe.ui.screen.settings.SettingsViewModel
 
+/**
+ * Defines the navigation graph for the application.
+ * Each destination binds its screen with the appropriate ViewModel.
+ */
 @Composable
 fun AppNavGraph(
     navController: NavHostController
 ) {
     val loginViewModel: LoginViewModel = hiltViewModel()
 
-    val emailSignUpLauncher = rememberEmailSignUpLauncher(
-        loginViewModel = loginViewModel,
-    )
-    val googleSignUpLauncher = rememberGoogleSignUpLauncher(
-        loginViewModel = loginViewModel,
-    )
+    // Sign-in launchers
+    val emailSignUpLauncher = rememberEmailSignUpLauncher(loginViewModel)
+    val googleSignUpLauncher = rememberGoogleSignUpLauncher(loginViewModel)
 
     NavHost(
         navController = navController,
@@ -62,7 +63,7 @@ fun AppNavGraph(
         composable<Login> {
             LoginScreen(
                 viewModel = loginViewModel,
-                onSaveClicked = { navController.navigate(Home)},
+                onSaveClicked = { navController.navigate(Home) },
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onEmailSignInClick = { emailSignUpLauncher() },
                 onGuestSignInClick = { navController.navigate(Home) }

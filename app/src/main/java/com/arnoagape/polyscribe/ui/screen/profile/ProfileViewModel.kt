@@ -24,6 +24,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+/**
+ * ViewModel responsible for managing user profile data.
+ *
+ * It observes the authenticated user, validates input fields,
+ * persists profile updates, emits UI events, and handles sign-out or deletion.
+ */
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
@@ -80,6 +86,9 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Updates local user fields based on form input.
+     */
     fun onAction(formEvent: FormEvent) {
         when (formEvent) {
             is FormEvent.DisplayNameChanged -> {
@@ -94,6 +103,10 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Attempts to save the user profile to Firebase.
+     * Validates network state, handles errors, and emits UI events.
+     */
     fun saveUser() {
         viewModelScope.launch {
 
@@ -140,8 +153,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     /**
-     * Signs the user out using [UserRepository.signOut].
-     * If successful, the local [_user] state is reset to null.
+     * Signs out the current user and clears local state.
      */
     fun signOut() {
         viewModelScope.launch {
@@ -153,8 +165,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     /**
-     * Deletes the currently authenticated user's account and associated Firestore data.
-     * If successful, clears the local user state.
+     * Deletes the current user's account and associated Firestore data.
      */
     fun deleteAccount() {
         viewModelScope.launch {

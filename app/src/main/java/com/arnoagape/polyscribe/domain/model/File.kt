@@ -1,10 +1,14 @@
 package com.arnoagape.polyscribe.domain.model
 
-import android.util.Log
 import com.arnoagape.polyscribe.data.dto.FileDto
 import com.google.firebase.Timestamp
 import java.time.Instant
 
+/**
+ * Domain model representing a file stored in Firebase.
+ * Contains metadata, print options, author information,
+ * and timestamp values.
+ */
 data class File(
     val id: String = "",
     val fileUrl: List<String> = emptyList(),
@@ -17,6 +21,9 @@ data class File(
     val comment: String = ""
 ) {
 
+    /**
+     * Converts this domain model to its Firestore DTO representation.
+     */
     fun toDto(): FileDto {
         return FileDto(
             id = id,
@@ -32,8 +39,10 @@ data class File(
     }
 
     companion object {
+        /**
+         * Converts a [FileDto] from Firestore to a domain [File] model.
+         */
         fun fromDto(dto: FileDto): File {
-            Log.e("FIRESTORE_READ", "DTO lu = $dto")
             return File(
                 id = dto.id,
                 fileUrl = dto.fileUrl,

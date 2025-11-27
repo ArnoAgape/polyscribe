@@ -33,11 +33,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.arnoagape.polyscribe.R
 
+/**
+ * Displays a field allowing the user to increase or decrease
+ * the number of copies, ensuring it stays above 1.
+ *
+ * @param numberOfCopies Current number of copies.
+ * @param onNumberOfCopiesChange Callback invoked when the value changes.
+ */
 @Composable
 fun NumberOfCopiesField(
     numberOfCopies: Int,
     onNumberOfCopiesChange: (Int) -> Unit
 ) {
+
     var isDialogOpen by remember { mutableStateOf(false) }
 
     val context = LocalContext.current

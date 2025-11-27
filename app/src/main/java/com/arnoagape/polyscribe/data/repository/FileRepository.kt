@@ -8,9 +8,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repository responsible for managing file-related operations.
- * It delegates data access to the [FileApi] (FirebaseFileApi implementation),
- * providing a clean abstraction layer for ViewModels.
+ * Repository that manages file-related operations.
+ * Delegates data access to [FileApi] to provide
+ * a clean abstraction layer for ViewModels.
  */
 @Singleton
 class FileRepository @Inject constructor(
@@ -18,20 +18,21 @@ class FileRepository @Inject constructor(
 ) {
 
     /**
-     * Observes the list of all files ordered by descending creation date.
+     * Observes all files ordered by descending creation date.
      */
     val files: Flow<List<File>> = fileApi.getFilesOrderByCreationDateDesc()
 
     /**
      * Uploads a new file to Firebase (Storage + Firestore).
-     * @throws java.io.IOException if there is no internet connection
-     * @throws IllegalArgumentException if the file type or size is invalid
+     *
+     * @throws java.io.IOException when no internet connection is available
+     * @throws IllegalArgumentException when file type or size is invalid
      */
     suspend fun sendFile(localUris: List<Uri>, file: File): List<String> =
         fileApi.sendFile(localUris, file)
 
     /**
-     * Observes a single file by its unique ID.
+     * Observes a single file identified by its ID.
      */
     fun getFileById(fileId: String): Flow<File?> =
         fileApi.getFileById(fileId)

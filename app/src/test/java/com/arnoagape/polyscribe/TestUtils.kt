@@ -5,8 +5,17 @@ import com.arnoagape.polyscribe.domain.model.User
 import com.google.firebase.Timestamp
 import java.time.Instant
 
+/**
+ * Utility object providing fake domain models for unit tests.
+ */
 object TestUtils {
 
+    /**
+     * Creates a fake [File] instance with predefined values.
+     *
+     * @param id Unique identifier for the file.
+     * @return A fake [File] used for testing.
+     */
     fun fakeFile(id: String): File {
         return File(
             id = id,
@@ -27,6 +36,12 @@ object TestUtils {
         )
     }
 
+    /**
+     * Creates a fake [User] instance for testing purposes.
+     *
+     * @param id Unique identifier for the user.
+     * @return A fake [User].
+     */
     fun fakeUser(id: String): User {
         return User(id,
             displayName = "Gerry Ariella",

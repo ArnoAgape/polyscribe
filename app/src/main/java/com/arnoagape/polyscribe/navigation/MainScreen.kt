@@ -1,7 +1,5 @@
 package com.arnoagape.polyscribe.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Home
@@ -18,18 +16,21 @@ import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
+/**
+ * Root composable of the app.
+ * Hosts navigation, bottom bar visibility logic
+ * and injects required ViewModels.
+ */
 @Composable
 fun MainScreen() {
 
-    // Navigation
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     val loginViewModel: LoginViewModel = hiltViewModel()
 
-    // BottomBar screens
+    // Determines when the bottom bar should be displayed
     val isBottomBarDestination =
         currentRoute == Home::class.qualifiedName ||
                 currentRoute == Profile::class.qualifiedName ||
@@ -66,8 +67,7 @@ fun MainScreen() {
                     )
                 }
             }
-        )
-        {
+        ) {
             AppNavGraph(navController = navController)
         }
     } else {
@@ -75,6 +75,10 @@ fun MainScreen() {
     }
 }
 
+/**
+ * Enum listing the main screens of the app,
+ * along with their icons, labels, and navigation routes.
+ */
 enum class AppDestinations(
     val icon: ImageVector,
     private val labelRes: Int,
@@ -84,9 +88,10 @@ enum class AppDestinations(
     PROFILE(Icons.Default.AccountBox, R.string.profile, Profile),
     SETTINGS(Icons.Default.Settings, R.string.settings, Settings);
 
+    /** Returns the localized label of the destination. */
     @Composable
     fun label(): String = stringResource(id = labelRes)
 
+    /** Class name used as navigation route. */
     val routeName: String get() = screenObject::class.qualifiedName!!
-
 }

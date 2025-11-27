@@ -11,16 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Utility class providing methods related to network connectivity.
- *
- * This class is used to verify whether the device currently has access
- * to an active internet connection. It leverages [ConnectivityManager]
- * and [NetworkCapabilities] for accurate network state detection.
- *
- * Annotated with [@Singleton] to ensure only one instance exists in the
- * dependency graph.
- *
- * @param context The application context used to access system services.
+ * Utility class checking network availability using system capabilities.
  */
 @Singleton
 class NetworkUtils @Inject constructor(
@@ -28,11 +19,7 @@ class NetworkUtils @Inject constructor(
 ) {
 
     /**
-     * Checks whether the device has an active network connection with
-     * internet capability.
-     *
-     * @return `true` if an active network connection with internet access is available,
-     * or `false` otherwise.
+     * Returns true if the device has an active internet connection.
      */
     fun isNetworkAvailable(): Boolean {
         val connectivityManager =
@@ -42,6 +29,9 @@ class NetworkUtils @Inject constructor(
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
+    /**
+     * Sends a no-network event if no internet connection is available.
+     */
     fun checkNetwork(networkUtils: NetworkUtils, events: Channel<Event>) {
         if (!networkUtils.isNetworkAvailable()) {
             events.trySend(Event.ShowMessage(R.string.no_network))

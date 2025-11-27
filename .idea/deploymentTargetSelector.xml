@@ -24,12 +24,6 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="displaysCorrectFileDetails()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="displaysCorrectHomeContent()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="displaysCorrectLoginContent()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
@@ -37,6 +31,9 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="displaysCorrectSendContent()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="Tests in 'com.arnoagape.polyscribe.ui.screen'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -13,6 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Displays a row containing text and custom trailing content.
+ *
+ * @param text Main text to display.
+ * @param modifier Optional layout modifier.
+ * @param trailingContent Composable displayed on the right side.
+ */
 @Composable
 fun TextRowItem(
     text: String,

@@ -12,6 +12,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel responsible for authentication logic.
+ *
+ * Exposes the sign-in state, synchronizes the user with Firestore,
+ * and emits one-time events for UI actions such as messages.
+ */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository
@@ -28,12 +34,18 @@ class LoginViewModel @Inject constructor(
                 false
             )
 
+    /**
+     * Ensures that the authenticated user has a document in Firestore.
+     */
     fun syncUserWithFirestore() {
         viewModelScope.launch {
             userRepository.ensureUserInFirestore()
         }
     }
 
+    /**
+     * Emits a one-time UI event.
+     */
     fun sendEvent(event: Event) {
         _events.trySend(event)
     }

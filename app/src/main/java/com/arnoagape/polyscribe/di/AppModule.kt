@@ -11,28 +11,25 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * This class acts as a Dagger Hilt module, responsible for providing dependencies to other parts of the application.
- * It's installed in the SingletonComponent, ensuring that dependencies provided by this module are created only once
- * and remain available throughout the application's lifecycle.
+ * Hilt module providing application-wide dependencies.
+ * Installed in [SingletonComponent] to ensure single instances
+ * across the whole app lifecycle.
  */
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
-  /**
-   * Provides a Singleton instance of PostApi using a FirebasePostApi implementation for testing purposes.
-   * This means that whenever a dependency on PostApi is requested, the same instance of PostFakeApi will be used
-   * throughout the application, ensuring consistent data for testing scenarios.
-   *
-   * @return A Singleton instance of FirebasePostApi.
-   */
-  @Provides
-  @Singleton
-  fun provideFileApi(firebaseFileApi: FirebaseFileApi): FileApi = firebaseFileApi
 
-  @Provides
-  @Singleton
-  fun provideUserApi(): UserApi {
-    return FirebaseUserApi()
-  }
+    /**
+     * Provides a singleton [FileApi] implementation backed by Firebase.
+     */
+    @Provides
+    @Singleton
+    fun provideFileApi(firebaseFileApi: FirebaseFileApi): FileApi = firebaseFileApi
 
+    /**
+     * Provides a singleton [UserApi] implementation backed by Firebase.
+     */
+    @Provides
+    @Singleton
+    fun provideUserApi(): UserApi = FirebaseUserApi()
 }

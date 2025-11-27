@@ -19,6 +19,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel responsible for loading and refreshing the list of files.
+ *
+ * It exposes UI state, manages refresh actions, and emits one-time
+ * events such as network warnings.
+ */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     fileRepository: FileRepository,
@@ -80,6 +86,10 @@ class HomeViewModel @Inject constructor(
     }
 }
 
+/**
+ * Combined UI state for the home screen,
+ * including loading state and refresh status.
+ */
 data class HomeScreenState(
     val uiState: HomeUiState = HomeUiState.Idle,
     val isRefreshing: Boolean = false

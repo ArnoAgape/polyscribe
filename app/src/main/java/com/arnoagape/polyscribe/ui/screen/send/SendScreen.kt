@@ -70,6 +70,13 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.getFileName
 import java.time.Instant
 
+/**
+ * Displays the screen used for uploading and configuring a new file.
+ *
+ * @param viewModel ViewModel providing the file state and actions.
+ * @param onBackClick Callback invoked when the back button is pressed.
+ * @param onSaveClick Callback invoked after a successful upload.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendScreen(
@@ -77,6 +84,7 @@ fun SendScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit
 ) {
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -307,7 +315,6 @@ fun CreateFile(
                 )
 
                 /** ---------- NUMBER OF COPIES ---------- **/
-
                 NumberOfCopiesField(
                     numberOfCopies = numberOfCopies,
                     onNumberOfCopiesChange = onNumberOfCopiesChange
@@ -327,14 +334,14 @@ fun CreateFile(
                 )
             }
 
-            /** ---------- ADD BUTTONS FILE ---------- **/
+            /** ---------- ADD FILES BUTTONS ---------- **/
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
+                /** ---------- ADD FILE BUTTON ---------- **/
                 Button(
                     modifier = Modifier
                         .weight(1f)
@@ -352,6 +359,7 @@ fun CreateFile(
                     )
                 }
 
+                /** ---------- ADD PICTURE BUTTON ---------- **/
                 Button(
                     modifier = Modifier
                         .weight(1f)
@@ -387,7 +395,6 @@ fun CreateFile(
             }
 
             Spacer(Modifier.height(16.dp))
-
 
             /** ---------- SEND BUTTON ---------- **/
             Button(

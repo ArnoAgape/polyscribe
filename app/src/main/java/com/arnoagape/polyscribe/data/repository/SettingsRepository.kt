@@ -10,13 +10,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repository responsible for managing user settings stored in a [DataStore].
- * This class provides a reactive flow for observing notification preferences
- * and exposes a suspend function to update those preferences.
- *
- * The DataStore ensures persistence of user preferences across app launches.
- *
- * @constructor Injects a [DataStore] instance used to persist key-value settings.
+ * Repository that manages user settings stored in [DataStore].
+ * Provides reactive preference flows and update operations.
  */
 @Singleton
 class SettingsRepository @Inject constructor(
@@ -24,16 +19,16 @@ class SettingsRepository @Inject constructor(
 ) {
 
     /**
-     * Holds preference keys used by [DataStore].
+     * Preference keys used by the DataStore.
      */
     private object Keys {
-        /** Key used to store whether notifications are enabled. */
+        /** Indicates whether notifications are enabled. */
         val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
     }
 
     /**
-     * A reactive [Flow] that emits the current state of the notification setting.
-     * Defaults to `true` if no preference has been set yet.
+     * Emits the current notification preference.
+     * Defaults to `true` when unset.
      */
     val notificationsEnabled: Flow<Boolean> =
         dataStore.data.map { prefs ->
@@ -41,9 +36,7 @@ class SettingsRepository @Inject constructor(
         }
 
     /**
-     * Updates the notification preference in [DataStore].
-     *
-     * @param enabled `true` to enable notifications, `false` to disable them.
+     * Updates the notification preference.
      */
     suspend fun setNotificationsEnabled(enabled: Boolean) {
         dataStore.edit { prefs ->

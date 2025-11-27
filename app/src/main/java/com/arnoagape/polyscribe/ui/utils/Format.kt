@@ -6,8 +6,15 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+/**
+ * Utility object providing date and time formatting helpers,
+ * localized for French and English.
+ */
 object Format {
 
+    /**
+     * Returns a localized date and time pair from a [Timestamp] or [Instant].
+     */
     fun getLocalizedDateParts(value: Any): Pair<String, String> {
         val locale = Locale.getDefault()
 
@@ -46,7 +53,9 @@ object Format {
         }
     }
 
-
+    /**
+     * Returns the English ordinal suffix for a given day (e.g., 1st, 2nd, 3rd).
+     */
     fun getEnglishOrdinalSuffix(day: Int): String = when {
         day in 11..13 -> "th"
         day % 10 == 1 -> "st"
