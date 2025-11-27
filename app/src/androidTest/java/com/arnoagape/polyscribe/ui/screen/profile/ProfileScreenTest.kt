@@ -27,7 +27,7 @@ class ProfileScreenTest {
         displayName = "Gerry Ariella",
         phoneNumber = "0606060606",
         email = "gariella@mail.com",
-        isProfessional = false
+        professional = false
     )
 
     @Test

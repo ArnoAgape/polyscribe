@@ -18,9 +18,10 @@ class FileRepository @Inject constructor(
 ) {
 
     /**
-     * Observes all files ordered by descending creation date.
+     * Observes all files ordered by descending creation date for a specific user.
      */
-    val files: Flow<List<File>> = fileApi.getFilesOrderByCreationDateDesc()
+    fun filesForUser(userId: String): Flow<List<File>> =
+        fileApi.getFilesOrderByUser(userId)
 
     /**
      * Uploads a new file to Firebase (Storage + Firestore).
@@ -32,8 +33,8 @@ class FileRepository @Inject constructor(
         fileApi.sendFile(localUris, file)
 
     /**
-     * Observes a single file identified by its ID.
+     * Observes a single file identified by its ID and user ID.
      */
-    fun getFileById(fileId: String): Flow<File?> =
-        fileApi.getFileById(fileId)
+    fun getFileById(fileId: String, userId: String): Flow<File?> =
+        fileApi.getFileById(fileId, userId)
 }

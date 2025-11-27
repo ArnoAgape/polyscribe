@@ -34,7 +34,7 @@ class DetailScreenTest {
                 displayName = "Arno",
                 phoneNumber = "06 01 02 03 04",
                 email = "jdoe@mail.com",
-                isProfessional = true
+                professional = true
             ),
             colored = false,
             doubleSided = false,

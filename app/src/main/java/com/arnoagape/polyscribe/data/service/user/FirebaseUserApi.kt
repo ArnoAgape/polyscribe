@@ -27,7 +27,7 @@ class FirebaseUserApi : UserApi {
         displayName = displayName,
         phoneNumber = phoneNumber,
         email = email,
-        isProfessional = false
+        professional = false
     )
 
     /** Returns the currently authenticated user. */
@@ -62,15 +62,8 @@ class FirebaseUserApi : UserApi {
                 }
             }
 
-            val userData = mapOf(
-                "displayName" to user.displayName,
-                "phoneNumber" to user.phoneNumber,
-                "email" to user.email,
-                "isProfessional" to user.isProfessional
-            )
-
             usersCollection.document(currentUser.uid)
-                .set(userData, SetOptions.merge())
+                .set(user.toDto(), SetOptions.merge())
                 .await()
 
             Result.success(Unit)
@@ -83,15 +76,17 @@ class FirebaseUserApi : UserApi {
      * Ensures the authenticated user has a Firestore document.
      */
     override suspend fun ensureUserInFirestore(): Result<Unit> {
-        val firebaseUser =
-            auth.currentUser ?: return Result.failure(Exception("User not signed in"))
+        val firebaseUser = auth.currentUser
+            ?: return Result.failure(Exception("User not signed in"))
+
         val user = firebaseUser.toDomain()
+        val userDto = user.toDto()
 
         return try {
-            val doc = usersCollection.document(user.id).get().await()
-            if (!doc.exists()) {
-                usersCollection.document(user.id).set(user).await()
-            }
+            usersCollection.document(user.id)
+                .set(userDto, SetOptions.merge())
+                .await()
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

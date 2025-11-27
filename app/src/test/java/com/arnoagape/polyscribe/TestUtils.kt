@@ -27,7 +27,7 @@ object TestUtils {
                 displayName = "John Doe",
                 phoneNumber = "06 01 02 03 04",
                 email = "jdoe@mail.com",
-                isProfessional = true
+                professional = true
             ),
             colored = false,
             doubleSided = false,
@@ -47,7 +47,7 @@ object TestUtils {
             displayName = "Gerry Ariella",
             phoneNumber = "0606060606",
             email = "gariella@mail.com",
-            isProfessional = false)
+            professional = false)
     }
 
 }

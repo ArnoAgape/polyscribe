@@ -13,8 +13,8 @@ import com.firebase.ui.auth.IdpResponse
 
 /**
  * Creates and remembers an email sign-up launcher using FirebaseUI Auth.
- * When the sign-up succeeds, the user is synced with Firestore and a success
- * event is emitted. When it fails, an error event is emitted.
+ * On success, the user is synced with Firestore and a success message is sent.
+ * On failure, an error event is emitted.
  *
  * @param loginViewModel ViewModel used to sync the user and send UI events.
  * @return A lambda that launches the email sign-up flow.

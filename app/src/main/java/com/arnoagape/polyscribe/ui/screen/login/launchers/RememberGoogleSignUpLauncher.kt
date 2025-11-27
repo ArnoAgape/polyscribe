@@ -38,7 +38,6 @@ fun rememberGoogleSignUpLauncher(
                 loginViewModel.sendEvent(Event.ShowMessage(R.string.error_sign_up))
             }
         }
-
     }
 
     val signUpIntent = remember {
@@ -46,7 +45,8 @@ fun rememberGoogleSignUpLauncher(
             .createSignInIntentBuilder()
             .setLogo(R.drawable.ic_polyscribe_logo)
             .setTheme(R.style.Theme_Polyscribe)
-            .setAvailableProviders(listOf(AuthUI.IdpConfig.GoogleBuilder().build())).build()
+            .setAvailableProviders(listOf(AuthUI.IdpConfig.GoogleBuilder().build()))
+            .build()
     }
 
     return {

@@ -17,6 +17,7 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -35,14 +36,16 @@ class FirebaseFileApi @Inject constructor(
     private val filesCollection = firestore.collection("files")
 
     /**
-     * Retrieves all files ordered by creation date (descending)
+     * Retrieves all files ordered by creation date (descending) from a specific user
      * and maps Firestore DTOs to domain models.
      */
-    override fun getFilesOrderByCreationDateDesc(): Flow<List<File>> {
+    override fun getFilesOrderByUser(userId: String): Flow<List<File>> {
         return filesCollection
+            .whereEqualTo("author.id", userId)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .dataObjects<FileDto>()
             .map { list -> list.map { File.fromDto(it) } }
+            .catch { emit(emptyList()) }
     }
 
     /**
@@ -62,7 +65,6 @@ class FirebaseFileApi @Inject constructor(
 
             val updated = file.copy(fileUrl = uploadedFiles)
             filesCollection.document(updated.id).set(updated.toDto()).await()
-
             return uploadedFiles
 
         } catch (e: Exception) {
@@ -72,15 +74,15 @@ class FirebaseFileApi @Inject constructor(
     }
 
     /**
-     * Observes a single file by ID.
-     * Returns null when not found.
+     * Observes a single file by ID and userId.
      */
-    override fun getFileById(fileId: String): Flow<File?> {
+    override fun getFileById(fileId: String, userId: String): Flow<File?> {
         return filesCollection
-            .whereEqualTo("id", fileId)
-            .limit(1)
+            .document(fileId)
             .dataObjects<FileDto>()
-            .map { File.fromDto(it.first()) }
+            .map { dto ->
+                if (dto?.author?.id == userId) File.fromDto(dto) else null
+            }
     }
 
     /**

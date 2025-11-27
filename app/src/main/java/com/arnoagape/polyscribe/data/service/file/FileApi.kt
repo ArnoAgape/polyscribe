@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.Flow
  */
 interface FileApi {
 
-    /** Returns all files ordered by creation date (descending). */
-    fun getFilesOrderByCreationDateDesc(): Flow<List<File>>
+    /** Returns all files ordered by creation date from a specific user. */
+    fun getFilesOrderByUser(userId: String): Flow<List<File>>
 
     /** Uploads a file and returns the list of uploaded URLs. */
     suspend fun sendFile(localUris: List<Uri>, file: File): List<String>
 
-    /** Observes a file by its ID. */
-    fun getFileById(fileId: String): Flow<File?>
+    /** Observes a file by its ID and user ID. */
+    fun getFileById(fileId: String, userId: String): Flow<File?>
 
     /** Uploads a single document to Firebase Storage and returns its URL. */
     suspend fun uploadDocumentToFirebase(uri: Uri): String?

@@ -257,7 +257,7 @@ private fun HomeContentPreview() {
                         displayName = "John Doe",
                         phoneNumber = "06 01 02 03 04",
                         email = "jdoe@mail.com",
-                        isProfessional = true
+                        professional = true
                     ),
                     colored = false,
                     doubleSided = false,
@@ -274,7 +274,7 @@ private fun HomeContentPreview() {
                         displayName = "Harry Ter",
                         phoneNumber = "06 12 23 34 45",
                         email = "hter@mail.com",
-                        isProfessional = true
+                        professional = true
                     ),
                     colored = false,
                     doubleSided = false,
@@ -291,7 +291,7 @@ private fun HomeContentPreview() {
                         displayName = "Emma Watt",
                         phoneNumber = "06 02 03 04 05",
                         email = "ewatt@mail.com",
-                        isProfessional = false
+                        professional = false
                     ),
                     colored = false,
                     doubleSided = false,
