@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="profile_picture">Votre photo de profil</string>
     <string name="user_name">Nom</string>
     <string name="user_email">E-mail</string>
@@ -24,6 +25,8 @@
     <string name="success_file">Document envoyé avec succès</string>
     <string name="success_user_updated">Informations du profil mises à jour avec succès</string>
     <string name="success_sign_up">Identifié avec succès</string>
+    <string name="success_sign_out">Déconnecté avec succès</string>
+    <string name="success_deleted_account">Compte supprimé avec succès</string>
 
     <string name="error_generic">Une erreur est survenue</string>
     <string name="error_sign_up">Inscription annulée ou échouée</string>

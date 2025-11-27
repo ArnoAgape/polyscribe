@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -84,19 +85,21 @@ fun ProfileScreen(
             }
 
             is Event.ShowSuccessMessage -> {
-                snackbarHostState.showSnackbar(
-                    message = context.getString(event.message),
-                    duration = SnackbarDuration.Short
-                )
+                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+
+                if (event.message == R.string.success_deleted_account) {
+                    onLoginScreen()
+                }
             }
         }
     }
 
-    Scaffold(snackbarHost = {
-        SnackbarHost(
-            hostState = snackbarHostState
-        )
-    },
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            )
+        },
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),

@@ -160,6 +160,7 @@ class ProfileViewModel @Inject constructor(
             val result = userRepository.signOut()
             if (result.isSuccess) {
                 _user.value = null
+                _events.trySend(Event.ShowSuccessMessage(R.string.success_sign_out))
             }
         }
     }
@@ -172,6 +173,7 @@ class ProfileViewModel @Inject constructor(
             val result = userRepository.deleteUser()
             if (result.isSuccess) {
                 _user.value = null
+                _events.trySend(Event.ShowSuccessMessage(R.string.success_deleted_account))
             }
         }
     }

@@ -25,6 +25,8 @@
     <string name="success_file">File sent successfully</string>
     <string name="success_user_updated">Details updated successfully</string>
     <string name="success_sign_up">Successfully logged in</string>
+    <string name="success_sign_out">Successfully logged out</string>
+    <string name="success_deleted_account">Account deleted successfully</string>
 
     <string name="error_generic">An issue occurred</string>
     <string name="error_sign_up">Sign up canceled or failed</string>
