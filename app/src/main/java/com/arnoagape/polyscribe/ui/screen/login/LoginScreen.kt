@@ -116,7 +116,7 @@ fun LoginContent(
             ) {
                 /** ---------- LOGO POLYSCRIBE ---------- **/
                 Image(
-                    painter = painterResource(id = R.drawable.ic_polyscribe_logo), // ton logo ici
+                    painter = painterResource(id = R.drawable.ic_polyscribe_logo),
                     contentDescription = "Logo Polyscribe",
                     modifier = Modifier
                         .size(160.dp)

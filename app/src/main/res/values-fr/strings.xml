@@ -56,7 +56,7 @@
 
     <string name="sign_in_google">Continuer avec Google</string>
     <string name="sign_in_email">Continuer avec un email</string>
-    <string name="sign_in_title">Inscrivez-vous, connectez-vous ou continuez en tant qu\'invité pour utiliser Polyscribe</string>
+    <string name="sign_in_title">Inscrivez-vous avec une adresse e-mail ou un compte Google pour utiliser Polyscribe</string>
     <string name="sign_in_guest">Continuer en tant qu\'invité</string>
     <string name="sign_up">S\'inscrire</string>
     <string name="email">E-mail</string>
