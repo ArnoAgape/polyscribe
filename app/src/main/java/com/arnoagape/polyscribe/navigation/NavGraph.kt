@@ -87,7 +87,7 @@ fun AppNavGraph(
 
         composable<Settings> {
             SettingsScreen(
-                viewModel = hiltViewModel<SettingsViewModel>(),
+                viewModel = hiltViewModel<SettingsViewModel>()
             )
         }
     }
