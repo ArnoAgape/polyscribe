@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
     id("com.google.gms.google-services")
+    id("org.sonarqube") version "7.1.0.6387"
 }
 
 android {

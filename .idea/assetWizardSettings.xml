@@ -79,8 +79,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\Arno\Desktop\polyscribe-devanture.svg" />
-                                                <entry key="scalingPercent" value="54" />
+                                                <entry key="imagePath" value="C:\Users\Arno\Desktop\Polyscribe\images\logo\polyscribe-devanture.svg" />
+                                                <entry key="scalingPercent" value="50" />
                                               </map>
                                             </option>
                                           </PersistentState>
