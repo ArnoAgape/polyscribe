@@ -24,9 +24,6 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="displaysCorrectSendContent()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="Tests in 'com.arnoagape.polyscribe.ui.screen'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
