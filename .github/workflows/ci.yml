@@ -1,0 +1,51 @@
+name: Android CI
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # ---------- TESTS UNITAIRES ----------
+    - name: Run Unit Tests
+      run: ./gradlew testDebugUnitTest
+
+    # ---------- EMULATEUR ANDROID ----------
+    - name: Start emulator
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 33
+        arch: x86_64
+        script: ./gradlew connectedDebugAndroidTest
+
+    # ---------- ANALYSE SONAR ----------
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v2
+      with:
+        args: >
+          -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
+          -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+          -Dsonar.host.url=https://sonarcloud.io
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    # ---------- QUALITY GATE ----------
+    - name: SonarCloud Quality Gate
+      uses: SonarSource/sonarcloud-quality-gate-action@v1
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
