@@ -27,5 +27,8 @@ render.experimental.xml
 *.jks
 *.keystore
 
+# Keystore configuration
+keystore.properties
+
 # Android Profiling
 *.hprof
