@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  buildAndTest:
     name: Build & Test
     runs-on: ubuntu-latest
 
@@ -32,6 +32,11 @@ jobs:
         api-level: 33
         arch: x86_64
         script: ./gradlew connectedDebugAndroidTest
+
+  sonar:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
 
     # ---------- ANALYSE SONAR ----------
     - name: SonarCloud Scan
