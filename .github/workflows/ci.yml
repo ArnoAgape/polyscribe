@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  buildAndTest:
     name: Build & Test
     runs-on: ubuntu-latest
 

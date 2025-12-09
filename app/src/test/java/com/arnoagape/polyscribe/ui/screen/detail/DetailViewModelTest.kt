@@ -39,8 +39,9 @@ class DetailViewModelTest {
         userRepo = mockk(relaxed = true)
         fakeNetwork = mockk()
 
-        coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
+        coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1234")
         every { fakeNetwork.checkNetwork(any(), any()) } returns Unit
+        every { userRepo.observeUser() } returns flowOf(TestUtils.fakeUser(id = "1234"))
 
         savedStateHandle = SavedStateHandle().apply {
             set("fileId", "123")
@@ -61,7 +62,7 @@ class DetailViewModelTest {
     @Test
     fun `observeFile sets Loading first`() = runTest {
 
-        coEvery { fileRepo.getFileById("123") } returns flow {
+        coEvery { fileRepo.getFileById(any(),any()) } returns flow {
             delay(1)
             emit(TestUtils.fakeFile(id = "123"))
         }
@@ -77,7 +78,7 @@ class DetailViewModelTest {
     @Test
     fun `observeFile emits Error_Empty when file is null`() = runTest {
 
-        coEvery { fileRepo.getFileById("123") } returns flow {
+        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
             delay(1)
             emit(null)
         }
@@ -94,7 +95,7 @@ class DetailViewModelTest {
     @Test
     fun `observeFile emits Generic error when exception thrown`() = runTest {
 
-        coEvery { fileRepo.getFileById("123") } returns flow {
+        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
             delay(1)
             throw RuntimeException("boom")
         }
@@ -111,7 +112,7 @@ class DetailViewModelTest {
     @Test
     fun `refreshData sends no_network event when offline`() = runTest {
 
-        coEvery { fileRepo.getFileById("123") } returns flow {
+        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
             delay(1)
             emit(TestUtils.fakeFile(id = "1"))
         }
@@ -131,7 +132,7 @@ class DetailViewModelTest {
     fun `refreshData reobserves file when online`() = runTest {
 
         val file = TestUtils.fakeFile(id = "1")
-        coEvery { fileRepo.getFileById("123") } returns flow {
+        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
             emit(file)
         }
         every { fakeNetwork.isNetworkAvailable() } returns true

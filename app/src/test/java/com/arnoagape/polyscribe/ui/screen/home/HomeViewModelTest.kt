@@ -41,15 +41,16 @@ class HomeViewModelTest {
 
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
         every { fakeNetwork.checkNetwork(any(), any()) } returns Unit
+        every { userRepo.observeUser() } returns flowOf(TestUtils.fakeUser(id = "1234"))
 
     }
 
     @Test
     fun `uiState is Success when repository returns files`() = runTest {
         val fakeFiles = listOf(TestUtils.fakeFile("1"))
-        every { fileRepo.files } returns flowOf(fakeFiles)
+        every { fileRepo.filesForUser("1234") } returns flowOf(fakeFiles)
 
-        viewModel = HomeViewModel(fileRepo, fakeNetwork)
+        viewModel = HomeViewModel(fileRepo, userRepo,fakeNetwork)
 
         viewModel.uiState.test {
             val latest = expectMostRecentItem()
@@ -61,9 +62,9 @@ class HomeViewModelTest {
     @Test
     fun `uiState is Error_Empty when repository returns empty list`() = runTest {
         fileRepo = mockkClass(FileRepository::class)
-        every { fileRepo.files } returns flowOf(emptyList())
+        every { fileRepo.filesForUser("1234") } returns flowOf(emptyList())
 
-        viewModel = HomeViewModel(fileRepo, fakeNetwork)
+        viewModel = HomeViewModel(fileRepo, userRepo,fakeNetwork)
 
         viewModel.uiState.test {
             val latest = expectMostRecentItem()
@@ -77,12 +78,12 @@ class HomeViewModelTest {
         val errorFlow = flow<List<File>> { throw Exception("Database failed") }
 
         fileRepo = mockk(relaxed = true)
-        every { fileRepo.files } returns errorFlow
+        every { fileRepo.filesForUser("1234") } returns errorFlow
         every { userRepo.isUserSignedIn() } returns flowOf(true)
         every { fakeNetwork.isNetworkAvailable() } returns true
 
         // Act
-        viewModel = HomeViewModel(fileRepo, fakeNetwork)
+        viewModel = HomeViewModel(fileRepo, userRepo,fakeNetwork)
 
         // Assert
         viewModel.uiState.test {
@@ -103,9 +104,9 @@ class HomeViewModelTest {
             events.trySend(Event.ShowMessage(R.string.no_network))
         }
 
-        every { fileRepo.files } returns flowOf(emptyList())
+        every { fileRepo.filesForUser("1234") } returns flowOf(emptyList())
 
-        viewModel = HomeViewModel(fileRepo, fakeNetwork)
+        viewModel = HomeViewModel(fileRepo, userRepo,fakeNetwork)
 
         viewModel.eventsFlow.test {
             awaitItem()
