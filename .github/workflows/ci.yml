@@ -4,8 +4,8 @@ on:
   pull_request:
 
 jobs:
-  buildAndTest:
-    name: Build & Test
+  buildAndTests:
+    name: Build & Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -25,12 +25,17 @@ jobs:
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
 
-      # ---------- EMULATEUR ANDROID ----------
-      - name: Start emulator
+      # ---------- TESTS INSTRUMENTES ----------
+      - name: Run Instrumented Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
+          api-level: 29
+          target: google_apis
           arch: x86_64
+          profile: Pixel_6
+          force-avd-creation: true
+          emulator-options: "-no-window -no-audio -accel auto"
+          disable-animations: true
           script: ./gradlew connectedDebugAndroidTest
 
   sonar:
