@@ -34,7 +34,7 @@ jobs:
           script: ./gradlew connectedDebugAndroidTest
 
   sonar:
-    name: Build & Test
+    name: SonarScan
     runs-on: ubuntu-latest
     steps:
 
