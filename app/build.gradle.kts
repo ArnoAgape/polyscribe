@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
     id("com.google.gms.google-services")
-    id("org.sonarqube") version "7.1.0.6387"
+    id("org.sonarqube") version "7.2.0.6526"
 }
 
 // Create a variable called keystorePropertiesFile, and initialize it to your
@@ -21,9 +21,7 @@ val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 
 // Load your keystore.properties file into the keystoreProperties object.
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-}
+keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
 android {
     namespace = "com.arnoagape.polyscribe"
@@ -44,10 +42,10 @@ android {
 
     signingConfigs {
         create("config") {
-            storeFile = rootProject.file(project.findProperty("storeFile") ?: keystoreProperties["storeFile"] as String)
-            storePassword = (project.findProperty("storePassword") ?: keystoreProperties["storePassword"]) as String
-            keyAlias = (project.findProperty("keyAlias") ?: keystoreProperties["keyAlias"]) as String
-            keyPassword = (project.findProperty("keyPassword") ?: keystoreProperties["keyPassword"]) as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
         }
     }
 
