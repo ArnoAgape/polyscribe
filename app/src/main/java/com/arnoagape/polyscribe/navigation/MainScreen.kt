@@ -35,7 +35,7 @@ fun MainScreen() {
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
 
     LaunchedEffect(isSignedIn) {
-        if (isSignedIn == null) {
+        if (isSignedIn == false) {
             navController.navigate(Login) {
                 popUpTo(0) { inclusive = true }
                 launchSingleTop = true
