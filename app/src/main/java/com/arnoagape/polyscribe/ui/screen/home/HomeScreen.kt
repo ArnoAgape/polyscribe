@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -70,14 +71,15 @@ fun HomeScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isSignedIn by viewModel.isSignedIn.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
                 val result = snackbarHostState.showSnackbar(
-                    message = context.getString(event.message),
-                    actionLabel = context.getString(R.string.try_again),
+                    message = resources.getString(event.message),
+                    actionLabel = resources.getString(R.string.try_again),
                     withDismissAction = true,
                     duration = SnackbarDuration.Short
                 )
@@ -88,7 +90,7 @@ fun HomeScreen(
 
             is Event.ShowSuccessMessage -> {
                 snackbarHostState.showSnackbar(
-                    message = context.getString(event.message)
+                    message = resources.getString(event.message)
                 )
             }
         }
@@ -116,6 +118,7 @@ fun HomeContent(
 ) {
     val refreshState = rememberPullToRefreshState()
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     Scaffold(
         snackbarHost = {
@@ -140,7 +143,7 @@ fun HomeContent(
                     if (isSignedIn) onFABClick()
                     else Toast.makeText(
                         context,
-                        context.getString(R.string.error_no_account_file),
+                        resources.getString(R.string.error_no_account_file),
                         Toast.LENGTH_SHORT
                     ).show()
                 },

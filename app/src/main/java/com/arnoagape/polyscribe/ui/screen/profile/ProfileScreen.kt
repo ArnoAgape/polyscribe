@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -66,14 +67,15 @@ fun ProfileScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
                 val result = snackbarHostState.showSnackbar(
-                    message = context.getString(event.message),
-                    actionLabel = context.getString(R.string.try_again),
+                    message = resources.getString(event.message),
+                    actionLabel = resources.getString(R.string.try_again),
                     withDismissAction = true,
                     duration = SnackbarDuration.Short
                 )
@@ -154,79 +156,74 @@ fun ProfileContent(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+
+        /** ---------- SCROLLABLE FORM CONTENT ---------- **/
         Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
+                .padding(contentPadding)
+                .verticalScroll(scrollState)
+                .imePadding()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            /** ---------- SCROLLABLE FORM CONTENT ---------- **/
-            Column(
+            /** ---------- PROFILE IMAGE ---------- **/
+            Image(
+                painter = painterResource(R.drawable.img_profile_default),
+                contentDescription = stringResource(R.string.profile_picture),
                 modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-                    .imePadding()
-                    .padding(contentPadding),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .size(150.dp)
+                    .clip(CircleShape)
+            )
+
+            /** ---------- NAME FIELD ---------- **/
+            OutlinedTextField(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth(),
+                value = userName,
+                onValueChange = onNameChanged,
+                label = { Text(stringResource(id = R.string.user_name)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true
+            )
+
+            /** ---------- EMAIL FIELD ---------- **/
+            OutlinedTextField(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth(),
+                value = emailAddress,
+                onValueChange = onEmailChanged,
+                label = { Text(stringResource(id = R.string.user_email)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                singleLine = true,
+                enabled = false
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            /** ---------- SAVE BUTTON ---------- **/
+            Button(
+                modifier = Modifier.testTag(stringResource(R.string.action_save)),
+                onClick = {
+                    keyboardController?.hide()
+                    onSaveClick()
+                },
+                enabled = isUserFieldsValid && !isLoading,
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer)
             ) {
-                /** ---------- PROFILE IMAGE ---------- **/
-                Image(
-                    painter = painterResource(R.drawable.img_profile_default),
-                    contentDescription = stringResource(R.string.profile_picture),
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape)
-                )
-
-                /** ---------- NAME FIELD ---------- **/
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxWidth(),
-                    value = userName,
-                    onValueChange = onNameChanged,
-                    label = { Text(stringResource(id = R.string.user_name)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    singleLine = true
-                )
-
-                /** ---------- EMAIL FIELD ---------- **/
-                OutlinedTextField(
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .fillMaxWidth(),
-                    value = emailAddress,
-                    onValueChange = onEmailChanged,
-                    label = { Text(stringResource(id = R.string.user_email)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    singleLine = true,
-                    enabled = false
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                /** ---------- SAVE BUTTON ---------- **/
-                Button(
-                    modifier = Modifier.testTag(stringResource(R.string.action_save)),
-                    onClick = {
-                        keyboardController?.hide()
-                        onSaveClick()
-                    },
-                    enabled = isUserFieldsValid && !isLoading,
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Text(text = stringResource(id = R.string.action_save))
-                    }
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(text = stringResource(id = R.string.action_save))
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             /** ---------- SIGN OUT BUTTON ---------- **/
             ConfirmDialogButton(

@@ -82,7 +82,7 @@
     <string name="contentDescription_add_picture">Click here to attach a picture</string>
     <string name="action_continue">Continue</string>
 
-    <string name="sent_at">File sent on %1$s at %2$s</string>
+    <string name="sent_at">Sent on %1$s at %2$s</string>
     <string name="by">By %1$s</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

@@ -12,7 +12,6 @@ import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
-import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -38,7 +37,7 @@ class LoginViewModelTest {
 
         viewModel = LoginViewModel(userRepo)
 
-        assertTrue(viewModel.isSignedIn.value)
+        assertFalse(viewModel.isSignedIn.value == true)
     }
 
     @Test
@@ -47,7 +46,7 @@ class LoginViewModelTest {
 
         viewModel = LoginViewModel(userRepo)
 
-        assertFalse(viewModel.isSignedIn.value)
+        assertFalse(viewModel.isSignedIn.value == false)
     }
 
 

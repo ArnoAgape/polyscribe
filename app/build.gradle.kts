@@ -1,6 +1,4 @@
-import com.android.build.gradle.BaseExtension
-import java.io.FileInputStream
-import java.util.Properties
+import com.android.build.api.dsl.ApplicationExtension
 
 plugins {
     alias(libs.plugins.android.application)
@@ -9,8 +7,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.dependency.analysis)
     id("com.google.gms.google-services")
-    id("org.sonarqube") version "7.2.0.6526"
+    id("org.sonarqube") version "7.2.2.6593"
 }
 
 android {
@@ -56,7 +55,7 @@ android {
 }
 
 // Test reports with JaCoCo
-val androidExtension = extensions.getByType<BaseExtension>()
+val androidExtension = extensions.getByType<ApplicationExtension>()
 val jacocoTestReport by tasks.registering(JacocoReport::class) {
     dependsOn("testDebugUnitTest", "createDebugCoverageReport")
     group = "Reporting"
@@ -68,10 +67,15 @@ val jacocoTestReport by tasks.registering(JacocoReport::class) {
     }
 
     val debugTree = fileTree(layout.buildDirectory.dir("/tmp/kotlin-classes/debug"))
-    val mainSrc = androidExtension.sourceSets.getByName("main").java.srcDirs
+    val mainSourceSet = androidExtension.sourceSets.getByName("main")
+
+    val mainSrc = files(
+        mainSourceSet.java.directories,
+        mainSourceSet.kotlin.directories
+    )
 
     classDirectories.setFrom(debugTree)
-    sourceDirectories.setFrom(files(mainSrc))
+    sourceDirectories.setFrom(mainSrc)
     executionData.setFrom(fileTree(layout.buildDirectory) {
         include("**/*.exec", "**/*.ec")
     })
@@ -79,7 +83,6 @@ val jacocoTestReport by tasks.registering(JacocoReport::class) {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -88,10 +91,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.material)
-    implementation(libs.googleid)
 
     // Allows API < 26
     coreLibraryDesugaring(libs.desugar.jdk.libs)
@@ -105,8 +106,6 @@ dependencies {
     implementation(libs.firebase.ui.storage)
     implementation(libs.play.services.auth)
     implementation(libs.datastore.preferences)
-    implementation(libs.androidx.datastore)
-    implementation (libs.androidx.credentials)
 
     //DI
     implementation(libs.hilt)
@@ -125,10 +124,9 @@ dependencies {
     testImplementation (libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugRuntimeOnly(libs.androidx.compose.ui.test.manifest)
 
 }
