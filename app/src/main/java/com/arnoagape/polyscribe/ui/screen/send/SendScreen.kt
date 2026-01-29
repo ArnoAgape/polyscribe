@@ -9,37 +9,26 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Photo
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -49,12 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -63,12 +47,13 @@ import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.FormEvent
-import com.arnoagape.polyscribe.ui.common.components.FileRowItem
-import com.arnoagape.polyscribe.ui.common.components.TextRowItem
-import com.arnoagape.polyscribe.ui.screen.send.fields.DateTimeField
-import com.arnoagape.polyscribe.ui.screen.send.fields.NumberOfCopiesField
+import com.arnoagape.polyscribe.ui.screen.send.sections.SendActionsSection
+import com.arnoagape.polyscribe.ui.screen.send.sections.SendCommentsSection
+import com.arnoagape.polyscribe.ui.screen.send.sections.SendDateTimeSection
+import com.arnoagape.polyscribe.ui.screen.send.sections.SendFilesSection
+import com.arnoagape.polyscribe.ui.screen.send.sections.SendPrintOptionsSection
+import com.arnoagape.polyscribe.ui.screen.send.sections.SendSubmitSection
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
-import com.arnoagape.polyscribe.ui.utils.getFileName
 import java.time.Instant
 
 /**
@@ -230,193 +215,70 @@ fun SendScreen(
 fun SendContent(
     contentPadding: PaddingValues = PaddingValues(),
     localUris: List<Uri>,
+    dateTime: Instant,
+    colored: Boolean,
+    doubleSided: Boolean,
+    numberOfCopies: Int,
+    comments: String,
+    isFileValid: Boolean,
+    isLoading: Boolean,
+    onDateTimeChange: (Instant) -> Unit,
+    onColorationChange: (Boolean) -> Unit,
+    onDoubleSidedChange: (Boolean) -> Unit,
+    onNumberOfCopiesChange: (Int) -> Unit,
+    onCommentsChanged: (String) -> Unit,
     onAddFileClick: () -> Unit,
     onAddPictureClick: () -> Unit,
     onRemoveFile: (Uri) -> Unit,
-    dateTime: Instant,
-    onDateTimeChange: (Instant) -> Unit,
-    colored: Boolean,
-    onColorationChange: (Boolean) -> Unit,
-    doubleSided: Boolean,
-    onDoubleSidedChange: (Boolean) -> Unit,
-    numberOfCopies: Int,
-    onNumberOfCopiesChange: (Int) -> Unit,
-    comments: String,
-    onCommentsChanged: (String) -> Unit,
-    onSaveClicked: () -> Unit,
-    isFileValid: Boolean,
-    isLoading: Boolean
+    onSaveClicked: () -> Unit
 ) {
-    val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    /** ---------- CONTENT_DESCRIPTION ---------- **/
-    val contentDescriptionAddFile = stringResource(R.string.contentDescription_add_file)
-    val contentDescriptionAddPicture = stringResource(R.string.contentDescription_add_picture)
-    /** ---------- CONTENT_DESCRIPTION ---------- **/
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .navigationBarsPadding()
+            .imePadding()
+            .padding(contentPadding)
+            .padding(SendDimens.ScreenPadding),
+        verticalArrangement = Arrangement.spacedBy(SendDimens.SectionSpacing)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .navigationBarsPadding()
-                .imePadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
 
-            /** ---------- SCROLLABLE FORM CONTENT ---------- **/
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(scrollState)
-                    .padding(contentPadding),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+        SendDateTimeSection(dateTime, onDateTimeChange)
 
-                /** ---------- DATE & TIME ---------- **/
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    DateTimeField(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        value = dateTime,
-                        onValueChange = onDateTimeChange,
-                        label = stringResource(R.string.hint_datetime)
-                    )
-                }
+        SendPrintOptionsSection(
+            colored = colored,
+            onColorationChange = onColorationChange,
+            doubleSided = doubleSided,
+            onDoubleSidedChange = onDoubleSidedChange,
+            numberOfCopies = numberOfCopies,
+            onNumberOfCopiesChange = onNumberOfCopiesChange
+        )
 
-                /** ---------- COLORATION ---------- **/
-                TextRowItem(
-                    text = stringResource(R.string.hint_color),
-                    trailingContent = {
-                        Switch(
-                            checked = colored,
-                            onCheckedChange = onColorationChange,
-                            modifier = Modifier.testTag(stringResource(R.string.hint_color))
-                        )
-                    }
-                )
+        SendCommentsSection(
+            comments = comments,
+            onCommentsChanged = onCommentsChanged
+        )
 
-                /** ---------- DOUBLE SIDED ---------- **/
-                TextRowItem(
-                    text = stringResource(R.string.hint_double_sided),
-                    trailingContent = {
-                        Switch(
-                            checked = doubleSided,
-                            onCheckedChange = onDoubleSidedChange,
-                            modifier = Modifier.testTag(stringResource(R.string.hint_double_sided))
-                        )
-                    }
-                )
+        SendActionsSection(
+            onAddFileClick = onAddFileClick,
+            onAddPictureClick = onAddPictureClick
+        )
 
-                /** ---------- NUMBER OF COPIES ---------- **/
-                NumberOfCopiesField(
-                    numberOfCopies = numberOfCopies,
-                    onNumberOfCopiesChange = onNumberOfCopiesChange
-                )
+        SendFilesSection(
+            uris = localUris,
+            onRemoveFile = onRemoveFile
+        )
 
-                /** ---------- COMMENTS ---------- **/
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    value = comments,
-                    onValueChange = onCommentsChanged,
-                    label = { Text(stringResource(id = R.string.hint_comments)) },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Sentences
-                    )
-                )
-            }
-
-            /** ---------- ADD FILES BUTTONS ---------- **/
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                /** ---------- ADD FILE BUTTON ---------- **/
-                Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag(stringResource(R.string.add_file)),
-                    onClick = onAddFileClick
-                ) {
-                    Icon(Icons.Default.AttachFile, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.add_file),
-                        maxLines = 1,
-                        modifier = Modifier.semantics {
-                            contentDescription = contentDescriptionAddFile
-                        }
-                    )
-                }
-
-                /** ---------- ADD PICTURE BUTTON ---------- **/
-                Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag(stringResource(R.string.add_picture)),
-                    onClick = onAddPictureClick
-                ) {
-                    Icon(Icons.Default.Photo, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        stringResource(R.string.add_picture),
-                        maxLines = 1,
-                        modifier = Modifier.semantics {
-                            contentDescription = contentDescriptionAddPicture
-                        }
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            /** ---------- FILES LISTED ONE AFTER ANOTHER ---------- **/
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                localUris.forEach { uri ->
-                    FileRowItem(
-                        fileName = context.getFileName(uri),
-                        icon = Icons.Default.AttachFile,
-                        onRemove = { onRemoveFile(uri) }
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            /** ---------- SEND BUTTON ---------- **/
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(stringResource(R.string.action_send)),
-                onClick = onSaveClicked,
-                enabled = isFileValid && !isLoading
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text(text = stringResource(id = R.string.action_send))
-                }
-            }
-        }
+        SendSubmitSection(
+            isFileValid = isFileValid,
+            isLoading = isLoading,
+            onSaveClicked = onSaveClicked
+        )
     }
 }
+
 
 @PreviewLightDark
 @Composable

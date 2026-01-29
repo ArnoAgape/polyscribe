@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -47,6 +46,8 @@ class DetailViewModel @Inject constructor(
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
@@ -57,11 +58,13 @@ class DetailViewModel @Inject constructor(
     val state: StateFlow<DetailScreenState> =
         combine(
             uiState,
-            isUserSignedIn
-        ) { ui, signedIn ->
+            isUserSignedIn,
+            _isRefreshing
+        ) { ui, signedIn, refresh ->
             DetailScreenState(
                 uiState = ui,
-                isSignedIn = signedIn
+                isSignedIn = signedIn,
+                isRefreshing = refresh
             )
         }.stateIn(
             scope = viewModelScope,
@@ -101,8 +104,7 @@ class DetailViewModel @Inject constructor(
         viewModelScope.launch {
             if (!networkUtils.isNetworkAvailable()) {
                 _events.trySend(Event.ShowMessage(R.string.no_network))
-            } else {
-                observeFile()
+                return@launch
             }
         }
     }
@@ -114,5 +116,6 @@ class DetailViewModel @Inject constructor(
  */
 data class DetailScreenState(
     val uiState: DetailUiState = DetailUiState.Loading,
-    val isSignedIn: Boolean = false
+    val isSignedIn: Boolean = false,
+    val isRefreshing: Boolean = false,
 )

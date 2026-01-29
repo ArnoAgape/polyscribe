@@ -67,7 +67,7 @@
     <string name="hint_time">Heure</string>
     <string name="hint_color">Couleur :</string>
     <string name="hint_double_sided">Recto-verso :</string>
-    <string name="hint_number_of_copies">Nombre d\'exemplaires :</string>
+    <string name="hint_number_of_copies">Exemplaires :</string>
     <string name="hint_comments">Commentaires :</string>
     <string name="hint_datetime">Date de collecte :</string>
 
@@ -89,7 +89,6 @@
     <string name="collect_date_title">Date de collecte</string>
     <string name="detail_collect_date">%1$s à %2$s</string>
     <string name="print_options">Options d\'impression :</string>
-    <string name="detail_number_of_copies">Nombre de copies : %1$s</string>
     <string name="detail_comments">Commentaires :</string>
     <string name="feature_coming_soon">Fonctionnalité à venir</string>
 </resources>

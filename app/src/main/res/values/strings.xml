@@ -89,7 +89,6 @@
     <string name="collect_date_title">Collect date:</string>
     <string name="detail_collect_date">%1$s at %2$s</string>
     <string name="print_options">Print options:</string>
-    <string name="detail_number_of_copies">Number of copies</string>
     <string name="detail_comments">Comments:</string>
     <string name="feature_coming_soon">Feature coming soon</string>
 </resources>
