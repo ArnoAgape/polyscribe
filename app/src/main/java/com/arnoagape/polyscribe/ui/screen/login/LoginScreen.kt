@@ -64,7 +64,7 @@ fun LoginScreen(
 
     // Navigation after login success
     LaunchedEffect(isSignedIn) {
-        if (isSignedIn) {
+        if (isSignedIn == true) {
             onLoginSuccess()
         }
     }

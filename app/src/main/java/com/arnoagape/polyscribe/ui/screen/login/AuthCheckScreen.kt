@@ -25,7 +25,7 @@ fun AuthCheckScreen(
     val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
 
     LaunchedEffect(isSignedIn) {
-        if (isSignedIn) {
+        if (isSignedIn == null) {
             navController.navigate(Home) {
                 popUpTo(AuthCheck) { inclusive = true }
             }

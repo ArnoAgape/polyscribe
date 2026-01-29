@@ -31,7 +31,7 @@ class LoginViewModel @Inject constructor(
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                false
+                null
             )
 
     /**
