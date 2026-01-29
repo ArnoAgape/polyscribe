@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.domain.model.File
-import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.components.FilePreviewList
@@ -233,18 +232,6 @@ fun HomeFile(
 
                     Spacer(Modifier.height(8.dp))
 
-                    /** ---------- NAME ---------- **/
-                    Text(
-                        text = stringResource(
-                            R.string.by,
-                            file.author?.displayName.toString()
-                        ),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
                     /** ---------- FILE PREVIEW ---------- **/
                     FilePreviewList(
                         fileUrls = file.fileUrl,
@@ -262,15 +249,9 @@ fun HomeFile(
 private fun HomeContentPreview() {
     PolyscribeTheme {
         val fakeFiles = listOf(
-            File(
-                dateTime = Instant.now(), author = User(displayName = "John Doe")
-            ),
-            File(
-                dateTime = Instant.now(), author = User(displayName = "John Doe")
-            ),
-            File(
-                dateTime = Instant.now(), author = User(displayName = "John Doe")
-            )
+            File(dateTime = Instant.now()),
+            File(dateTime = Instant.now()),
+            File(dateTime = Instant.now())
         )
 
         val previewState = HomeScreenState(

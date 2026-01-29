@@ -65,11 +65,11 @@
     <string name="confirm_password">Confirm password</string>
     <string name="hint_date">Date</string>
     <string name="hint_time">Time</string>
-    <string name="hint_color">Color:</string>
-    <string name="hint_double_sided">Double sided:</string>
-    <string name="hint_number_of_copies">Number of copies:</string>
-    <string name="hint_comments">Comments:</string>
-    <string name="hint_datetime">Collect date:</string>
+    <string name="hint_color">Color</string>
+    <string name="hint_double_sided">Double sided</string>
+    <string name="hint_number_of_copies">Number of copies</string>
+    <string name="hint_comments">Comments</string>
+    <string name="hint_datetime">Collect date</string>
 
     <string name="contentDescription_button_add">Click here to send a new document</string>
     <string name="contentDescription_go_back">Go back</string>
@@ -82,14 +82,14 @@
     <string name="contentDescription_add_picture">Click here to attach a picture</string>
     <string name="action_continue">Continue</string>
 
-    <string name="sent_at">Sent on %1$s at %2$s</string>
+    <string name="sent_at">File sent on %1$s at %2$s</string>
     <string name="by">By %1$s</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="detail_collect_date">Collect date: on %1$s at %2$s</string>
-    <string name="detail_color">Color: %1$s</string>
-    <string name="detail_double_sided">Double sided: %1$s</string>
-    <string name="detail_number_of_copies">Number of copies: %1$s</string>
-    <string name="detail_comments">Comments: %1$s</string>
+    <string name="collect_date_title">Collect date:</string>
+    <string name="detail_collect_date">%1$s at %2$s</string>
+    <string name="print_options">Print options:</string>
+    <string name="detail_number_of_copies">Number of copies</string>
+    <string name="detail_comments">Comments:</string>
     <string name="feature_coming_soon">Feature coming soon</string>
 </resources>

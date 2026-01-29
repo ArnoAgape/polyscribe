@@ -82,14 +82,14 @@
     <string name="contentDescription_add_picture">Cliquer ici pour joindre une image</string>
     <string name="action_continue">Continuer</string>
 
-    <string name="sent_at">Envoyé le %1$s à %2$s</string>
+    <string name="sent_at">Document envoyé le %1$s à %2$s</string>
     <string name="by">Par %1$s</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
-    <string name="detail_collect_date">Date de collecte : le %1$s à %2$s</string>
-    <string name="detail_color">Couleur : %1$s</string>
-    <string name="detail_double_sided">Recto-verso : %1$s</string>
+    <string name="collect_date_title">Date de collecte</string>
+    <string name="detail_collect_date">%1$s à %2$s</string>
+    <string name="print_options">Options d\'impression :</string>
     <string name="detail_number_of_copies">Nombre de copies : %1$s</string>
-    <string name="detail_comments">Commentaires : %1$s</string>
+    <string name="detail_comments">Commentaires :</string>
     <string name="feature_coming_soon">Fonctionnalité à venir</string>
 </resources>

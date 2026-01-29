@@ -4,10 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -21,7 +19,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -168,77 +165,37 @@ fun DetailItem(
     modifier: Modifier = Modifier,
     file: File
 ) {
-    Surface(
-        color = MaterialTheme.colorScheme.background
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
 
-            /** ---------- AUTHOR ---------- **/
-            file.author?.displayName?.let {
-                Text(
-                    text = stringResource(
-                        R.string.by,
-                        file.author.displayName
-                    ),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+        val (date, time) = Format.getLocalizedDateParts(file.dateTime)
+        val doubleSidedText =
+            if (file.doubleSided) stringResource(R.string.yes) else stringResource(R.string.no)
+        val coloredText =
+            if (file.colored) stringResource(R.string.yes) else stringResource(R.string.no)
 
-            Spacer(modifier.height(12.dp))
-
-            /** ---------- COLLECT DATE/TIME ---------- **/
-            val (date, time) = Format.getLocalizedDateParts(file.dateTime)
-
+        DetailCard(title = stringResource(R.string.collect_date_title)) {
             Text(stringResource(R.string.detail_collect_date, date, time))
+        }
 
-            /** ---------- COLOR DETAILS ---------- **/
-            val coloredText = if (file.colored) {
-                stringResource(R.string.yes)
-            } else {
-                stringResource(R.string.no)
+        DetailCard(title = stringResource(R.string.print_options)) {
+            DetailRow(stringResource(R.string.hint_color), coloredText)
+            DetailRow(stringResource(R.string.hint_double_sided), doubleSidedText)
+            DetailRow(
+                stringResource(R.string.hint_number_of_copies),
+                file.numberOfCopies.toString()
+            )
+        }
+
+        if (file.comment.isNotBlank()) {
+            DetailCard(title = stringResource(R.string.detail_comments)) {
+                Text(file.comment)
             }
-            Text(
-                text = stringResource(
-                    R.string.detail_color,
-                    coloredText
-                )
-            )
+        }
 
-            /** ---------- DOUBLE SIDED DETAILS ---------- **/
-            val doubleSidedText = if (file.doubleSided) {
-                stringResource(R.string.yes)
-            } else {
-                stringResource(R.string.no)
-            }
-            Text(
-                text = stringResource(
-                    R.string.detail_double_sided,
-                    doubleSidedText
-                )
-            )
-
-            /** ---------- NUMBER OF COPIES DETAILS ---------- **/
-            Text(
-                text = stringResource(
-                    R.string.detail_number_of_copies,
-                    file.numberOfCopies
-                )
-            )
-
-            /** ---------- COMMENT DETAILS ---------- **/
-            Text(
-                text = stringResource(
-                    R.string.detail_comments,
-                    file.comment
-                )
-            )
-
-            /** ---------- FILE PREVIEW ---------- **/
-            Text(text = stringResource(R.string.preview_file))
+        DetailCard(title = stringResource(R.string.preview_file)) {
             FilePreviewList(
                 fileUrls = file.fileUrl,
                 isDetailScreen = true
@@ -265,7 +222,7 @@ private fun DetailScreenPreview() {
                 colored = false,
                 doubleSided = false,
                 numberOfCopies = 9,
-                comment = ""
+                comment = "Format A4"
             )
 
         val previewState = DetailScreenState(
