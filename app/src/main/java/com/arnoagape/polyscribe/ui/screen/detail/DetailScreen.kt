@@ -2,6 +2,7 @@ package com.arnoagape.polyscribe.ui.screen.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +29,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -41,7 +44,6 @@ import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.components.FilePreviewList
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.Format
-import com.google.firebase.Timestamp
 import java.time.Instant
 
 /**
@@ -58,7 +60,6 @@ fun DetailScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val refreshState = rememberPullToRefreshState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     EventsEffect(viewModel.eventsFlow) { event ->
@@ -73,6 +74,26 @@ fun DetailScreen(
             else -> Unit
         }
     }
+
+    DetailContent(
+        state = state,
+        snackbarHostState = snackbarHostState,
+        onBackClick = onBackClick,
+        onRefresh = { viewModel.refreshData() }
+    )
+
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailContent(
+    state: DetailScreenState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onBackClick: () -> Unit,
+    onRefresh: () -> Unit
+) {
+    val refreshState = rememberPullToRefreshState()
 
     Scaffold(
         snackbarHost = {
@@ -103,19 +124,38 @@ fun DetailScreen(
                 .padding(contentPadding),
             state = refreshState,
             isRefreshing = state.uiState is DetailUiState.Loading,
-            onRefresh = { viewModel.refreshData() }
+            onRefresh = onRefresh
         ) {
-            if (state.uiState is DetailUiState.Success) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    item {
-                        DetailContent(
-                            file = (state.uiState as DetailUiState.Success).file,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        )
+            when (val ui = state.uiState) {
+
+                is DetailUiState.Success -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        item {
+                            DetailItem(
+                                file = ui.file,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+
+                is DetailUiState.Loading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is DetailUiState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(stringResource(R.string.error_generic))
                     }
                 }
             }
@@ -124,7 +164,7 @@ fun DetailScreen(
 }
 
 @Composable
-fun DetailContent(
+fun DetailItem(
     modifier: Modifier = Modifier,
     file: File
 ) {
@@ -212,11 +252,8 @@ fun DetailContent(
 @Composable
 private fun DetailScreenPreview() {
     PolyscribeTheme {
-        DetailContent(
-            file = File(
-                id = "1",
-                fileUrl = emptyList(),
-                createdAt = Timestamp(1233356000, 212120),
+        val fakeFile =
+            File(
                 dateTime = Instant.now(),
                 author = User(
                     id = "1",
@@ -227,9 +264,18 @@ private fun DetailScreenPreview() {
                 ),
                 colored = false,
                 doubleSided = false,
-                numberOfCopies = 1,
+                numberOfCopies = 9,
                 comment = ""
             )
+
+        val previewState = DetailScreenState(
+            uiState = DetailUiState.Success(fakeFile)
+        )
+
+        DetailContent(
+            state = previewState,
+            onBackClick = {},
+            onRefresh = {}
         )
     }
 }

@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -46,7 +47,7 @@ class DetailViewModel @Inject constructor(
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
-    private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Idle)
+    private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
 
     val isUserSignedIn =
@@ -112,6 +113,6 @@ class DetailViewModel @Inject constructor(
  * merging file loading state and authentication status.
  */
 data class DetailScreenState(
-    val uiState: DetailUiState = DetailUiState.Idle,
+    val uiState: DetailUiState = DetailUiState.Loading,
     val isSignedIn: Boolean = false
 )

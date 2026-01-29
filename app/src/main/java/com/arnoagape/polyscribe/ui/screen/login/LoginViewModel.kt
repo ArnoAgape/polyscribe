@@ -30,7 +30,7 @@ class LoginViewModel @Inject constructor(
         userRepository.isUserSignedIn()
             .stateIn(
                 viewModelScope,
-                SharingStarted.Eagerly,
+                SharingStarted.WhileSubscribed(5000),
                 false
             )
 

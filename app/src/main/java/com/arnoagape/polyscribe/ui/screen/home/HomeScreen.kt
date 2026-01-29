@@ -49,17 +49,14 @@ import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.components.FilePreviewList
-import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 import com.arnoagape.polyscribe.ui.utils.Format
-import com.google.firebase.Timestamp
 import java.time.Instant
 
 /**
  * Displays the home screen showing the list of uploaded files.
  *
  * @param viewModel ViewModel providing file data and UI state.
- * @param loginViewModel ViewModel providing authentication state.
  * @param onFileClick Callback invoked when a file is selected.
  * @param onFABClick Callback invoked when the FAB is pressed.
  */
@@ -67,15 +64,13 @@ import java.time.Instant
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    loginViewModel: LoginViewModel,
     onFileClick: (File) -> Unit,
     onFABClick: () -> Unit
 ) {
 
-    val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val refreshState = rememberPullToRefreshState()
-    val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
+    val isSignedIn by viewModel.isSignedIn.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
     EventsEffect(viewModel.eventsFlow) { event ->
@@ -100,6 +95,29 @@ fun HomeScreen(
         }
     }
 
+    HomeContent(
+        state = state,
+        isSignedIn = isSignedIn,
+        snackbarHostState = snackbarHostState,
+        onRefresh = { viewModel.refreshFiles() },
+        onFABClick = onFABClick,
+        onFileClick = onFileClick
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeContent(
+    state: HomeScreenState,
+    isSignedIn: Boolean,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onRefresh: () -> Unit,
+    onFABClick: () -> Unit,
+    onFileClick: (File) -> Unit
+) {
+    val refreshState = rememberPullToRefreshState()
+    val context = LocalContext.current
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -120,14 +138,12 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (isSignedIn) {
-                        onFABClick()
-                    } else {
-                        Toast.makeText(
-                            context, context.getString(R.string.error_no_account_file),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    if (isSignedIn) onFABClick()
+                    else Toast.makeText(
+                        context,
+                        context.getString(R.string.error_no_account_file),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -145,12 +161,12 @@ fun HomeScreen(
                 .padding(contentPadding),
             state = refreshState,
             isRefreshing = state.isRefreshing,
-            onRefresh = { viewModel.refreshFiles() }
+            onRefresh = onRefresh
         ) {
-            when (state.uiState) {
-                is HomeUiState.Idle, is HomeUiState.Success ->
-                    HomeContent(
-                        files = (state.uiState as HomeUiState.Success).files,
+            when (val ui = state.uiState) {
+                is HomeUiState.Success ->
+                    HomeFile(
+                        files = ui.files,
                         onFileClick = onFileClick
                     )
 
@@ -192,7 +208,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeContent(
+fun HomeFile(
     modifier: Modifier = Modifier,
     files: List<File>,
     onFileClick: (File) -> Unit
@@ -245,61 +261,28 @@ fun HomeContent(
 @Composable
 private fun HomeContentPreview() {
     PolyscribeTheme {
-        HomeContent(
-            files = listOf(
-                File(
-                    id = "1",
-                    fileUrl = emptyList(),
-                    createdAt = Timestamp(1233356000, 212120),
-                    dateTime = Instant.now(),
-                    author = User(
-                        id = "1",
-                        displayName = "John Doe",
-                        phoneNumber = "06 01 02 03 04",
-                        email = "jdoe@mail.com",
-                        professional = true
-                    ),
-                    colored = false,
-                    doubleSided = false,
-                    numberOfCopies = 1,
-                    comment = ""
-                ),
-                File(
-                    id = "2",
-                    fileUrl = emptyList(),
-                    createdAt = Timestamp(1233396000, 0),
-                    dateTime = Instant.now(),
-                    author = User(
-                        id = "2",
-                        displayName = "Harry Ter",
-                        phoneNumber = "06 12 23 34 45",
-                        email = "hter@mail.com",
-                        professional = true
-                    ),
-                    colored = false,
-                    doubleSided = false,
-                    numberOfCopies = 1,
-                    comment = "null"
-                ),
-                File(
-                    id = "3",
-                    fileUrl = emptyList(),
-                    createdAt = Timestamp(1363356000, 0),
-                    dateTime = Instant.now(),
-                    author = User(
-                        id = "3",
-                        displayName = "Emma Watt",
-                        phoneNumber = "06 02 03 04 05",
-                        email = "ewatt@mail.com",
-                        professional = false
-                    ),
-                    colored = false,
-                    doubleSided = false,
-                    numberOfCopies = 1,
-                    comment = "null"
-                )
+        val fakeFiles = listOf(
+            File(
+                dateTime = Instant.now(), author = User(displayName = "John Doe")
             ),
-            onFileClick = {}
+            File(
+                dateTime = Instant.now(), author = User(displayName = "John Doe")
+            ),
+            File(
+                dateTime = Instant.now(), author = User(displayName = "John Doe")
+            )
+        )
+
+        val previewState = HomeScreenState(
+            uiState = HomeUiState.Success(fakeFiles),
+            isRefreshing = false
+        )
+        HomeContent(
+            state = previewState,
+            onFileClick = {},
+            isSignedIn = true,
+            onRefresh = {},
+            onFABClick = {}
         )
     }
 }

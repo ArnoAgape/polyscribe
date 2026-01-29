@@ -155,10 +155,9 @@ fun SendScreen(
                     if (state.uiState is SendUiState.Success) (state.uiState as SendUiState.Success).file
                     else state.file
 
-                CreateFile(
+                SendContent(
                     contentPadding = contentPadding,
                     localUris = state.localUris,
-                    onAddFile = { viewModel.onAction(FormEvent.AddFile(it)) },
                     onAddFileClick = {
                         fileLauncher.launch(
                             arrayOf(
@@ -226,10 +225,9 @@ fun SendScreen(
 }
 
 @Composable
-fun CreateFile(
+fun SendContent(
     contentPadding: PaddingValues = PaddingValues(),
     localUris: List<Uri>,
-    onAddFile: (Uri) -> Unit,
     onAddFileClick: () -> Unit,
     onAddPictureClick: () -> Unit,
     onRemoveFile: (Uri) -> Unit,
@@ -420,11 +418,10 @@ fun CreateFile(
 
 @PreviewLightDark
 @Composable
-private fun CreateFilePreview() {
+private fun SendContentPreview() {
     PolyscribeTheme {
-        CreateFile(
+        SendContent(
             localUris = listOf("content://com.example.provider/document/resume.pdf").map { it.toUri() },
-            onAddFile = {},
             onAddFileClick = {},
             onAddPictureClick = {},
             onRemoveFile = {},

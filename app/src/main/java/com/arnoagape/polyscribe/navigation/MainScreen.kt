@@ -8,9 +8,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
@@ -29,6 +32,16 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     val loginViewModel: LoginViewModel = hiltViewModel()
+    val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
+
+    LaunchedEffect(isSignedIn) {
+        if (!isSignedIn) {
+            navController.navigate(Login) {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
 
     // Determines when the bottom bar should be displayed
     val isBottomBarDestination =

@@ -1,6 +1,5 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -26,19 +24,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.polyscribe.R
-import com.arnoagape.polyscribe.ui.common.Event
-import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
 /**
@@ -51,26 +51,21 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
  * @param onGuestSignInClick Logs in as a guest user.
  * @param onEmailSignInClick Launches the email sign-in flow.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
     onSaveClicked: () -> Unit,
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
-    onEmailSignInClick: () -> Unit
+    onEmailSignInClick: () -> Unit,
+    onLoginSuccess: () -> Unit
 ) {
+    val viewModel: LoginViewModel = hiltViewModel()
+    val isSignedIn by viewModel.isSignedIn.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
-
-    EventsEffect(viewModel.eventsFlow) { event ->
-        when (event) {
-            is Event.ShowMessage -> {
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                onSaveClicked()
-            }
-
-            else -> Unit
+    // Navigation after login success
+    LaunchedEffect(isSignedIn) {
+        if (isSignedIn) {
+            onLoginSuccess()
         }
     }
 

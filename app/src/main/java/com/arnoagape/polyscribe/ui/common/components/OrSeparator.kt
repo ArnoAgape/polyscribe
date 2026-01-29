@@ -1,4 +1,4 @@
-package com.arnoagape.polyscribe.ui.screen.login
+package com.arnoagape.polyscribe.ui.common.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -43,6 +43,14 @@ class HomeViewModel @Inject constructor(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
+    val isSignedIn =
+        userRepository.isUserSignedIn()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                false
+            )
+
     val uiState: StateFlow<HomeUiState> =
         userRepository.observeUser()
             .filterNotNull()
@@ -101,6 +109,6 @@ class HomeViewModel @Inject constructor(
  * including loading state and refresh status.
  */
 data class HomeScreenState(
-    val uiState: HomeUiState = HomeUiState.Idle,
+    val uiState: HomeUiState = HomeUiState.Loading,
     val isRefreshing: Boolean = false
 )

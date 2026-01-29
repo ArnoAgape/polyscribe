@@ -31,7 +31,7 @@ class SendScreenTest {
 
         composeTestRule.setContent {
 
-            CreateFile(
+            SendContent(
                 localUris = emptyList(),
                 onAddFile = { },
                 onAddFileClick = { addFileClicked = true },

@@ -29,11 +29,10 @@ import com.arnoagape.polyscribe.ui.screen.settings.SettingsViewModel
 fun AppNavGraph(
     navController: NavHostController
 ) {
-    val loginViewModel: LoginViewModel = hiltViewModel()
 
     // Sign-in launchers
-    val emailSignUpLauncher = rememberEmailSignUpLauncher(loginViewModel)
-    val googleSignUpLauncher = rememberGoogleSignUpLauncher(loginViewModel)
+    val emailSignUpLauncher = rememberEmailSignUpLauncher(hiltViewModel<LoginViewModel>())
+    val googleSignUpLauncher = rememberGoogleSignUpLauncher(hiltViewModel<LoginViewModel>())
 
     NavHost(
         navController = navController,
@@ -54,7 +53,6 @@ fun AppNavGraph(
         composable<Home> {
             HomeScreen(
                 viewModel = hiltViewModel<HomeViewModel>(),
-                loginViewModel = hiltViewModel<LoginViewModel>(),
                 onFABClick = { navController.navigate(Send) },
                 onFileClick = { file -> navController.navigate(Detail(file.id)) }
             )
@@ -62,18 +60,21 @@ fun AppNavGraph(
 
         composable<Login> {
             LoginScreen(
-                viewModel = loginViewModel,
                 onSaveClicked = { navController.navigate(Home) },
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onEmailSignInClick = { emailSignUpLauncher() },
-                onGuestSignInClick = { navController.navigate(Home) }
+                onGuestSignInClick = { navController.navigate(Home) },
+                onLoginSuccess = {
+                    navController.navigate(Home) {
+                        popUpTo(Login) { inclusive = true }
+                    }
+                }
             )
         }
 
         composable<Profile> {
             ProfileScreen(
-                viewModel = hiltViewModel<ProfileViewModel>(),
-                onLoginScreen = { navController.navigate(Login) }
+                viewModel = hiltViewModel<ProfileViewModel>()
             )
         }
 
