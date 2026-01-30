@@ -1,7 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.settings
 
 import android.os.Build
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -62,8 +61,6 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background),
         topBar = {
             TopAppBar(
                 title = {

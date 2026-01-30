@@ -95,8 +95,7 @@ fun LoginContent(
     val scrollState = rememberScrollState()
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        modifier = Modifier.fillMaxSize()
     ) {
         Box(
             modifier = Modifier

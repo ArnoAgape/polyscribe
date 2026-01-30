@@ -70,7 +70,6 @@ fun HomeScreen(
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val isSignedIn by viewModel.isSignedIn.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val resources = LocalResources.current
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -127,8 +126,7 @@ fun HomeContent(
             )
         },
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {

@@ -2,7 +2,6 @@ package com.arnoagape.polyscribe.ui.screen.profile
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -97,8 +96,7 @@ fun ProfileScreen(
             )
         },
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
