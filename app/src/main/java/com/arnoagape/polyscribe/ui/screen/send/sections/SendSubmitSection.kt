@@ -1,10 +1,12 @@
 package com.arnoagape.polyscribe.ui.screen.send.sections
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,21 +21,26 @@ fun SendSubmitSection(
     onSaveClicked: () -> Unit,
     isFileValid: Boolean
 ) {
-    Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .testTag(stringResource(R.string.action_send)),
-        onClick = onSaveClicked,
-        enabled = isFileValid && !isLoading
+    Surface(
+        tonalElevation = 4.dp
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(18.dp),
-                strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        } else {
-            Text(text = stringResource(id = R.string.action_send))
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .testTag(stringResource(R.string.action_send)),
+            onClick = onSaveClicked,
+            enabled = isFileValid && !isLoading
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text(text = stringResource(id = R.string.action_send))
+            }
         }
     }
 }

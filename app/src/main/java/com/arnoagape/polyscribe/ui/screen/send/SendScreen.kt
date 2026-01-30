@@ -8,12 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -133,78 +131,86 @@ fun SendScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            SendSubmitSection(
+                isFileValid = state.isValid,
+                isLoading = false,
+                onSaveClicked = { viewModel.sendFile() }
+            )
         }
     ) { contentPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+        ) {
+            when (state.uiState) {
+                is SendUiState.Idle, is SendUiState.Success -> {
+                    val fileToDisplay =
+                        if (state.uiState is SendUiState.Success) (state.uiState as SendUiState.Success).file
+                        else state.file
 
-        when (state.uiState) {
-            is SendUiState.Idle, is SendUiState.Success -> {
-                val fileToDisplay =
-                    if (state.uiState is SendUiState.Success) (state.uiState as SendUiState.Success).file
-                    else state.file
-
-                SendContent(
-                    contentPadding = contentPadding,
-                    localUris = state.localUris,
-                    onAddFileClick = {
-                        fileLauncher.launch(
-                            arrayOf(
-                                "application/pdf",
-                                "application/msword",
-                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                "application/vnd.oasis.opendocument.text",
-                                "text/plain"
+                    SendContent(
+                        localUris = state.localUris,
+                        onAddFileClick = {
+                            fileLauncher.launch(
+                                arrayOf(
+                                    "application/pdf",
+                                    "application/msword",
+                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                    "application/vnd.oasis.opendocument.text",
+                                    "text/plain"
+                                )
                             )
-                        )
-                    },
-                    onAddPictureClick = { pictureLauncher.launch("image/*") },
-                    onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
-                    dateTime = fileToDisplay.dateTime,
-                    onDateTimeChange = { viewModel.onAction(FormEvent.DateTimeChanged(it)) },
-                    colored = fileToDisplay.colored,
-                    onColorationChange = { viewModel.onAction(FormEvent.ColorChanged(it)) },
-                    doubleSided = fileToDisplay.doubleSided,
-                    onDoubleSidedChange = { viewModel.onAction(FormEvent.DoubleSidedChanged(it)) },
-                    numberOfCopies = fileToDisplay.numberOfCopies,
-                    onNumberOfCopiesChange = { newValue ->
-                        viewModel.onAction(FormEvent.NumberOfCopiesSet(newValue))
-                    },
-                    comments = fileToDisplay.comment,
-                    onCommentsChanged = { viewModel.onAction(FormEvent.CommentChanged(it)) },
-                    onSaveClicked = { viewModel.sendFile() },
-                    isFileValid = state.isValid,
-                    isLoading = false
-                )
-            }
+                        },
+                        onAddPictureClick = { pictureLauncher.launch("image/*") },
+                        onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
+                        dateTime = fileToDisplay.dateTime,
+                        onDateTimeChange = { viewModel.onAction(FormEvent.DateTimeChanged(it)) },
+                        colored = fileToDisplay.colored,
+                        onColorationChange = { viewModel.onAction(FormEvent.ColorChanged(it)) },
+                        doubleSided = fileToDisplay.doubleSided,
+                        onDoubleSidedChange = { viewModel.onAction(FormEvent.DoubleSidedChanged(it)) },
+                        numberOfCopies = fileToDisplay.numberOfCopies,
+                        onNumberOfCopiesChange = { newValue ->
+                            viewModel.onAction(FormEvent.NumberOfCopiesSet(newValue))
+                        },
+                        comments = fileToDisplay.comment,
+                        onCommentsChanged = { viewModel.onAction(FormEvent.CommentChanged(it)) }
+                    )
+                }
 
-            is SendUiState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator()
-                        Spacer(Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.sending),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                is SendUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                            Spacer(Modifier.height(16.dp))
+                            Text(
+                                text = stringResource(R.string.sending),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
-            }
 
-            is SendUiState.Error -> {
-                val errorState = state.uiState as SendUiState.Error
-                val message = when (errorState) {
-                    is SendUiState.Error.NoAccount -> (state.uiState as SendUiState.Error.NoAccount).message
-                    is SendUiState.Error.Generic -> (state.uiState as SendUiState.Error.Generic).message
-                }
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = message, color = MaterialTheme.colorScheme.error)
+                is SendUiState.Error -> {
+                    val errorState = state.uiState as SendUiState.Error
+                    val message = when (errorState) {
+                        is SendUiState.Error.NoAccount -> (state.uiState as SendUiState.Error.NoAccount).message
+                        is SendUiState.Error.Generic -> (state.uiState as SendUiState.Error.Generic).message
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = message, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }
@@ -213,15 +219,12 @@ fun SendScreen(
 
 @Composable
 fun SendContent(
-    contentPadding: PaddingValues = PaddingValues(),
     localUris: List<Uri>,
     dateTime: Instant,
     colored: Boolean,
     doubleSided: Boolean,
     numberOfCopies: Int,
     comments: String,
-    isFileValid: Boolean,
-    isLoading: Boolean,
     onDateTimeChange: (Instant) -> Unit,
     onColorationChange: (Boolean) -> Unit,
     onDoubleSidedChange: (Boolean) -> Unit,
@@ -229,8 +232,7 @@ fun SendContent(
     onCommentsChanged: (String) -> Unit,
     onAddFileClick: () -> Unit,
     onAddPictureClick: () -> Unit,
-    onRemoveFile: (Uri) -> Unit,
-    onSaveClicked: () -> Unit
+    onRemoveFile: (Uri) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
@@ -238,9 +240,8 @@ fun SendContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .navigationBarsPadding()
             .imePadding()
-            .padding(contentPadding)
+            .padding(bottom = SendDimens.BottomCtaHeight)
             .padding(SendDimens.ScreenPadding),
         verticalArrangement = Arrangement.spacedBy(SendDimens.SectionSpacing)
     ) {
@@ -270,15 +271,8 @@ fun SendContent(
             uris = localUris,
             onRemoveFile = onRemoveFile
         )
-
-        SendSubmitSection(
-            isFileValid = isFileValid,
-            isLoading = isLoading,
-            onSaveClicked = onSaveClicked
-        )
     }
 }
-
 
 @PreviewLightDark
 @Composable
@@ -298,10 +292,7 @@ private fun SendContentPreview() {
             numberOfCopies = 1,
             onNumberOfCopiesChange = {},
             comments = "I love Polyscribe!",
-            onCommentsChanged = {},
-            onSaveClicked = {},
-            isFileValid = true,
-            isLoading = false
+            onCommentsChanged = {}
         )
     }
 }
