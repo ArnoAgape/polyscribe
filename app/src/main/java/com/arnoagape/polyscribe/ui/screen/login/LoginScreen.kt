@@ -39,6 +39,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.ui.common.components.OrSeparator
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
 /**
@@ -165,7 +166,7 @@ fun LoginContent(
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(stringResource(R.string.sign_in_google))
                 }
-                /*
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 /** ---------- ADD BUTTONS FILE ---------- **/
@@ -182,7 +183,7 @@ fun LoginContent(
                     border = ButtonDefaults.outlinedButtonBorder(enabled = true)
                 ) {
                     Text(stringResource(R.string.sign_in_guest))
-                } */
+                }
             }
         }
     }
