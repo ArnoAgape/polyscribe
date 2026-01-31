@@ -1,8 +1,13 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -25,14 +30,27 @@ fun AuthCheckScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(state.isSignedIn) {
-        if (state.isSignedIn == null) {
-            navController.navigate(Home) {
-                popUpTo(AuthCheck) { inclusive = true }
+        when (state.isSignedIn) {
+            true -> {
+                navController.navigate(Home) {
+                    popUpTo(AuthCheck) { inclusive = true }
+                }
             }
-        } else {
-            navController.navigate(Login) {
-                popUpTo(AuthCheck) { inclusive = true }
+            false -> {
+                navController.navigate(Login) {
+                    popUpTo(AuthCheck) { inclusive = true }
+                }
             }
+            null -> Unit
+        }
+    }
+
+    if (state.isSignedIn == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }
