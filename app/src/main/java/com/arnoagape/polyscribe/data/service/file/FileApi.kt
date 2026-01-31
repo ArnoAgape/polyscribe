@@ -10,10 +10,14 @@ import kotlinx.coroutines.flow.Flow
  */
 interface FileApi {
 
-    fun getFilesOrderByUser(userId: String): Flow<List<File>>
-    suspend fun sendFile(localUris: List<Uri>, file: File): List<String>
-    suspend fun sendFileAsGuest(localUris: List<Uri>, file: File): List<String>
-    fun getFileById(fileId: String, userId: String): Flow<File?>
-    suspend fun uploadDocumentToFirebase(uri: Uri): String?
-    suspend fun uploadDocumentAsGuest(uri: Uri): String?
+    fun getFilesForUser(userId: String?, isAnonymous: Boolean): Flow<List<File>>
+
+    fun observeFileById(fileId: String, userId: String?, isAnonymous: Boolean): Flow<File?>
+
+    suspend fun sendFile(
+        localUris: List<Uri>,
+        file: File,
+        userId: String?,
+        isAnonymous: Boolean
+    ): List<String>
 }

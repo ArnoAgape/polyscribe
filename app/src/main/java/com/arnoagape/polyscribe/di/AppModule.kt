@@ -1,5 +1,7 @@
 package com.arnoagape.polyscribe.di
 
+import com.arnoagape.polyscribe.data.service.auth.AuthApi
+import com.arnoagape.polyscribe.data.service.auth.FirebaseAuthApi
 import com.arnoagape.polyscribe.data.service.file.FileApi
 import com.arnoagape.polyscribe.data.service.file.FirebaseFileApi
 import com.arnoagape.polyscribe.data.service.user.FirebaseUserApi
@@ -32,4 +34,11 @@ class AppModule {
     @Provides
     @Singleton
     fun provideUserApi(): UserApi = FirebaseUserApi()
+
+    /**
+     * Provides a singleton [AuthApi] implementation backed by Firebase.
+     */
+    @Provides
+    @Singleton
+    fun provideAuthApi(): AuthApi = FirebaseAuthApi()
 }

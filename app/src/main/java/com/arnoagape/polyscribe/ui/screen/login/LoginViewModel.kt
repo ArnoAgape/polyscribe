@@ -62,12 +62,9 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun loginAsGuest() {
+    fun loginAsGuest(): SessionType {
         _session.value = SessionType.Guest
-    }
-
-    fun onAuthenticated() {
-        _session.value = SessionType.Authenticated
+        return SessionType.Guest
     }
 
     fun sendEvent(event: Event) {

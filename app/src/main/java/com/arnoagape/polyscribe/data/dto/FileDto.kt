@@ -11,6 +11,8 @@ import java.io.Serializable
  */
 data class FileDto(
     val id: String = "",
+    val ownerId: String? = null,
+    val guestId: String? = null,
     val fileUrl: List<String> = emptyList(),
     val createdAt: Timestamp = Timestamp.now(),
     val dateTime: Timestamp = Timestamp.now(),

@@ -1,10 +1,13 @@
 package com.arnoagape.polyscribe.data.repository
 
 import android.net.Uri
+import android.util.Log
 import com.arnoagape.polyscribe.data.service.file.FileApi
-import com.arnoagape.polyscribe.data.service.user.UserApi
 import com.arnoagape.polyscribe.domain.model.File
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,22 +17,44 @@ import javax.inject.Singleton
  * a clean abstraction layer for ViewModels.
  */
 @Singleton
+@OptIn(ExperimentalCoroutinesApi::class)
 class FileRepository @Inject constructor(
     private val fileApi: FileApi,
-    private val userApi: UserApi
+    private val userRepository: UserRepository
 ) {
 
-    fun filesForUser(userId: String): Flow<List<File>> = fileApi.getFilesOrderByUser(userId)
+    fun observeFiles(): Flow<List<File>> =
+        userRepository.observeUserSession()
+            .onEach { session ->
+                Log.d(
+                    "DEBUG_SESSION",
+                    "session = userId=${session.userId}, isGuest=${session.isGuest}"
+                )
+            }
+            .flatMapLatest { session ->
+                fileApi.getFilesForUser(
+                    userId = session.userId,
+                    isAnonymous = session.isGuest
+                )
+            }
 
-    suspend fun sendFile(localUris: List<Uri>, file: File): Result<Unit> = runCatching {
+    fun observeFile(fileId: String): Flow<File?> =
+        userRepository.observeUserSession()
+            .flatMapLatest { session ->
+                fileApi.observeFileById(
+                    fileId,
+                    session.userId,
+                    session.isGuest
+                )
+            }
 
-        if (userApi.isGuest()) {
-            fileApi.sendFileAsGuest(localUris, file)
-        } else {
-            fileApi.sendFile(localUris, file)
-        }
+    suspend fun sendFile(localUris: List<Uri>, file: File): List<String> {
+        val session = userRepository.getCurrentSession()
+        return fileApi.sendFile(
+            localUris,
+            file,
+            session.userId,
+            session.isGuest
+        )
     }
-
-    fun getFileById(fileId: String, userId: String): Flow<File?> =
-        fileApi.getFileById(fileId, userId)
 }

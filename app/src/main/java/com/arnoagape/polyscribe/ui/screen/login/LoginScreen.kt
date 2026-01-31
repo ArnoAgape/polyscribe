@@ -24,8 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +34,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.domain.model.SessionType
@@ -59,19 +56,6 @@ fun LoginScreen(
     onLoginSuccess: (SessionType) -> Unit
 ) {
     val viewModel: LoginViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
-    LaunchedEffect(state.isSignedIn, state.session) {
-        when {
-            state.isSignedIn == true -> {
-                viewModel.onAuthenticated()
-                onLoginSuccess(SessionType.Authenticated)
-            }
-            state.session == SessionType.Guest -> {
-                onLoginSuccess(SessionType.Guest)
-            }
-        }
-    }
 
     Scaffold { contentPadding ->
         Column(
@@ -83,7 +67,9 @@ fun LoginScreen(
         ) {
             LoginContent(
                 onGoogleSignInClick = onGoogleSignInClick,
-                onGuestSignInClick = { viewModel.loginAsGuest() },
+                onGuestSignInClick = {
+                    onLoginSuccess(viewModel.loginAsGuest())
+                },
                 onEmailSignInClick = onEmailSignInClick
             )
         }

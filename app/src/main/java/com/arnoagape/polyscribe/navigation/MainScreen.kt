@@ -1,15 +1,19 @@
 package com.arnoagape.polyscribe.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -18,6 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
+import kotlinx.coroutines.flow.map
 
 /**
  * Root composable of the app.
@@ -27,65 +32,67 @@ import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 @Composable
 fun MainScreen() {
 
-    val navController = rememberNavController()
-    val navBackStackEntry = navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry.value?.destination?.route
-
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val state by loginViewModel.state.collectAsStateWithLifecycle()
+    val isSignedIn by loginViewModel.state
+        .map { it.isSignedIn }
+        .collectAsStateWithLifecycle(initialValue = null)
 
-    LaunchedEffect(state.isSignedIn) {
-        if (state.isSignedIn == false) {
-            navController.navigate(Login) {
-                popUpTo(0) { inclusive = true }
-                launchSingleTop = true
-            }
+    if (isSignedIn == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
+        return
     }
 
-    // Determines when the bottom bar should be displayed
-    val isBottomBarDestination =
-        currentRoute == Home::class.qualifiedName ||
-                currentRoute == Profile::class.qualifiedName ||
-                currentRoute == Settings::class.qualifiedName
+    val startDestination =
+        if (isSignedIn == true) Home else Login
 
-    if (isBottomBarDestination) {
-        NavigationSuiteScaffold(
-            navigationSuiteItems = {
-                AppDestinations.entries.forEach { destination ->
-                    item(
-                        icon = {
-                            Icon(destination.icon, contentDescription = destination.label())
-                        },
-                        label = { Text(destination.label()) },
-                        selected = currentRoute == destination.routeName,
-                        onClick = {
-                            if (currentRoute == destination.routeName) return@item
-                            if (destination == AppDestinations.PROFILE) {
-                                if (state.isSignedIn == true) {
-                                    navController.navigate(Profile)
-                                } else {
-                                    navController.navigate(AuthCheck)
-                                }
-                            } else {
+        val navController = rememberNavController()
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        val showBottomBar =
+            currentRoute == Home::class.qualifiedName ||
+                    currentRoute == Profile::class.qualifiedName ||
+                    currentRoute == Settings::class.qualifiedName
+
+        if (showBottomBar) {
+            NavigationSuiteScaffold(
+                navigationSuiteItems = {
+                    AppDestinations.entries.forEach { destination ->
+                        item(
+                            icon = {
+                                Icon(
+                                    destination.icon,
+                                    contentDescription = destination.label()
+                                )
+                            },
+                            label = { Text(destination.label()) },
+                            selected = currentRoute == destination.routeName,
+                            onClick = {
+                                if (currentRoute == destination.routeName) return@item
                                 navController.navigate(destination.screenObject) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
                                     launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
+            ) {
+                AppNavGraph(
+                    navController = navController,
+                    startDestination = startDestination
+                )
             }
-        ) {
-            AppNavGraph(navController = navController)
+        } else {
+            AppNavGraph(
+                navController = navController,
+                startDestination = startDestination
+            )
         }
-    } else {
-        AppNavGraph(navController = navController)
-    }
 }
 
 /**

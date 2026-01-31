@@ -1,24 +1,22 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.domain.model.File
+import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
-import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -40,100 +38,59 @@ class SendViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SendUiState>(SendUiState.Idle)
-    private val _user = MutableStateFlow<User?>(null)
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
     private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
 
-    val isGuest: Boolean
-        get() = _user.value == null
-
-    private val _file = MutableStateFlow(
-        File(
-            id = UUID.randomUUID().toString(),
-            fileUrl = emptyList(),
-            createdAt = Timestamp.now(),
-            dateTime = Instant.now(),
-            author = null,
+    private val _formState = MutableStateFlow(
+        SendFormState(
             colored = false,
             doubleSided = false,
             numberOfCopies = 1,
             comment = "",
+            dateTime = Instant.now()
         )
     )
-
-    /**
-     * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
-     */
-    private val _isFileValid = _localUris
-        .map { uris -> uris.isNotEmpty() }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
-        )
 
     val state: StateFlow<SendScreenState> =
         combine(
             _uiState,
-            _file,
-            _isFileValid,
+            _formState,
             _localUris
-        ) { ui, f, valid, local ->
+        ) { ui, f, uris ->
             SendScreenState(
                 uiState = ui,
-                file = f,
-                isValid = valid,
-                localUris = local
+                file = f.toFile(),
+                localUris = uris,
+                isValid = uris.isNotEmpty()
             )
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = SendScreenState()
         )
-
-    init {
-        viewModelScope.launch {
-            _user.value = userRepository.getCurrentUser()
-        }
-    }
 
     /**
      * Handles user actions modifying the file or selected URIs.
      */
-    fun onAction(formEvent: FormEvent) {
-        when (formEvent) {
-            is FormEvent.DateTimeChanged -> {
-                _file.update { it.copy(dateTime = formEvent.dateTime) }
-            }
+    fun onAction(event: FormEvent) {
+        _formState.update { form ->
+            when (event) {
+                is FormEvent.DateTimeChanged -> form.copy(dateTime = event.dateTime)
+                is FormEvent.ColorChanged -> form.copy(colored = event.colored)
+                is FormEvent.DoubleSidedChanged -> form.copy(doubleSided = event.doubleSided)
+                is FormEvent.NumberOfCopiesSet ->
+                    form.copy(numberOfCopies = event.value.coerceAtLeast(1))
 
-            is FormEvent.ColorChanged -> {
-                _file.update { it.copy(colored = formEvent.colored) }
+                is FormEvent.CommentChanged -> form.copy(comment = event.comment)
+                else -> form
             }
+        }
 
-            is FormEvent.DoubleSidedChanged -> {
-                _file.update { it.copy(doubleSided = formEvent.doubleSided) }
-            }
-
-            is FormEvent.NumberOfCopiesSet -> {
-                _file.update { file ->
-                    file.copy(numberOfCopies = formEvent.value.coerceAtLeast(1))
-                }
-            }
-
-            is FormEvent.AddFile -> {
-                _localUris.update { it + formEvent.uri }
-            }
-
-            is FormEvent.RemoveFile -> {
-                _localUris.update { it - formEvent.uri }
-            }
-
-            is FormEvent.CommentChanged -> {
-                _file.update { it.copy(comment = formEvent.comment) }
-            }
-
+        when (event) {
+            is FormEvent.AddFile -> _localUris.update { it + event.uri }
+            is FormEvent.RemoveFile -> _localUris.update { it - event.uri }
             else -> Unit
         }
     }
@@ -146,39 +103,56 @@ class SendViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = SendUiState.Loading
 
-            val currentUser = _user.value
-            val fileToSave = _file.value.copy(author = currentUser)
-
-            val result = fileRepository.sendFile(
-                localUris = _localUris.value,
-                file = fileToSave
+            val file = _formState.value.toFile(
+                id = UUID.randomUUID().toString()
             )
 
-            result
-                .onSuccess {
-                    _uiState.value = SendUiState.Success(fileToSave)
+            val sessionType =
+                if (userRepository.getCurrentUser() == null)
+                    SessionType.Guest
+                else
+                    SessionType.Authenticated
 
-                    _events.trySend(
-                        Event.ShowSuccessMessage(R.string.success_file)
-                    )
-                }
-                .onFailure { throwable ->
-                    Log.e("SendViewModel", "sendFile failed", throwable)
-                    _uiState.value = SendUiState.Error.Generic()
-                    _events.trySend(Event.ShowMessage(R.string.error_generic))
-                }
-
+            runCatching {
+                fileRepository.sendFile(
+                    localUris = _localUris.value,
+                    file = file
+                )
+            }.onSuccess {
+                _uiState.value = SendUiState.Success(file)
+                _events.trySend(Event.FileSentSuccessfully(sessionType))
+            }.onFailure {
+                _uiState.value = SendUiState.Error.Generic()
+                _events.trySend(Event.ShowMessage(R.string.error_generic))
+            }
         }
     }
 }
 
-/**
- * Combined UI state for the send screen,
- * containing the file, selection, and validation status.
- */
 data class SendScreenState(
     val uiState: SendUiState = SendUiState.Idle,
     val file: File = File(),
     val isValid: Boolean = false,
     val localUris: List<Uri> = emptyList()
 )
+
+data class SendFormState(
+    val colored: Boolean,
+    val doubleSided: Boolean,
+    val numberOfCopies: Int,
+    val comment: String,
+    val dateTime: Instant
+) {
+    fun toFile(
+        id: String = "",
+        author: User? = null
+    ) = File(
+        id = id,
+        colored = colored,
+        doubleSided = doubleSided,
+        numberOfCopies = numberOfCopies,
+        comment = comment,
+        dateTime = dateTime,
+        author = author
+    )
+}

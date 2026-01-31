@@ -27,9 +27,6 @@ data class User(
     }
 
     companion object {
-        /**
-         * Converts a [FileDto] from Firestore to a domain [File] model.
-         */
         fun fromDto(dto: UserDto): User {
             return User(
                 id = dto.id,

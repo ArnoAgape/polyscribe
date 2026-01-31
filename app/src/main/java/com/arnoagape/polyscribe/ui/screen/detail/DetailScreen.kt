@@ -19,8 +19,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -47,7 +45,6 @@ import java.time.Instant
  * @param viewModel The ViewModel providing file data and state.
  * @param onBackClick Callback invoked when the back button is pressed.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     viewModel: DetailViewModel,
@@ -73,10 +70,8 @@ fun DetailScreen(
     DetailContent(
         state = state,
         snackbarHostState = snackbarHostState,
-        onBackClick = onBackClick,
-        onRefresh = { viewModel.refreshData() }
+        onBackClick = onBackClick
     )
-
 
 }
 
@@ -85,10 +80,8 @@ fun DetailScreen(
 fun DetailContent(
     state: DetailScreenState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    onBackClick: () -> Unit,
-    onRefresh: () -> Unit
+    onBackClick: () -> Unit
 ) {
-    val refreshState = rememberPullToRefreshState()
 
     Scaffold(
         snackbarHost = {
@@ -112,13 +105,10 @@ fun DetailContent(
             )
         }
     ) { contentPadding ->
-        PullToRefreshBox(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding),
-            state = refreshState,
-            isRefreshing = state.isRefreshing,
-            onRefresh = onRefresh
+                .padding(contentPadding)
         ) {
             when (val ui = state.uiState) {
 
@@ -228,8 +218,7 @@ private fun DetailScreenPreview() {
 
         DetailContent(
             state = previewState,
-            onBackClick = {},
-            onRefresh = {}
+            onBackClick = {}
         )
     }
 }

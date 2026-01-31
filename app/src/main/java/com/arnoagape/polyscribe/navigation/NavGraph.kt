@@ -1,7 +1,10 @@
 package com.arnoagape.polyscribe.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,7 +13,6 @@ import com.arnoagape.polyscribe.ui.screen.detail.DetailScreen
 import com.arnoagape.polyscribe.ui.screen.detail.DetailViewModel
 import com.arnoagape.polyscribe.ui.screen.home.HomeScreen
 import com.arnoagape.polyscribe.ui.screen.home.HomeViewModel
-import com.arnoagape.polyscribe.ui.screen.login.AuthCheckScreen
 import com.arnoagape.polyscribe.ui.screen.login.LoginScreen
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.arnoagape.polyscribe.ui.screen.login.launchers.rememberEmailSignUpLauncher
@@ -28,7 +30,8 @@ import com.arnoagape.polyscribe.ui.screen.settings.SettingsViewModel
  */
 @Composable
 fun AppNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    startDestination: Any
 ) {
 
     // Sign-in launchers
@@ -37,12 +40,8 @@ fun AppNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = AuthCheck
+        startDestination = startDestination
     ) {
-
-        composable<AuthCheck> {
-            AuthCheckScreen(navController)
-        }
 
         composable<Detail> {
             DetailScreen(
@@ -54,7 +53,12 @@ fun AppNavGraph(
         composable<Home> {
             HomeScreen(
                 viewModel = hiltViewModel<HomeViewModel>(),
-                onFABClick = { navController.navigate(Send) },
+                onFABClick = {
+                    navController.currentBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("sessionType", SessionType.Authenticated)
+                    navController.navigate(Send)
+                },
                 onFileClick = { file -> navController.navigate(Detail(file.id)) }
             )
         }
@@ -65,10 +69,13 @@ fun AppNavGraph(
                 onEmailSignInClick = { emailSignUpLauncher() },
                 onLoginSuccess = { session ->
                     when (session) {
-                        SessionType.Guest ->
-                            navController.navigate(Send) {
-                                popUpTo(Login) { inclusive = true }
-                            }
+                        SessionType.Guest -> {
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("sessionType", SessionType.Guest)
+
+                            navController.navigate(Send)
+                        }
 
                         SessionType.Authenticated ->
                             navController.navigate(Home) {
@@ -80,24 +87,46 @@ fun AppNavGraph(
         }
 
         composable<Profile> {
-            ProfileScreen(
-                viewModel = hiltViewModel<ProfileViewModel>()
-            )
+            val viewModel = hiltViewModel<ProfileViewModel>()
+            val session by viewModel.session.collectAsStateWithLifecycle()
+
+            LaunchedEffect(session.isGuest) {
+                if (session.isGuest) {
+                    navController.navigate(Login) {
+                        popUpTo(Profile) { inclusive = true }
+                    }
+                }
+            }
+
+            if (!session.isGuest) {
+                ProfileScreen(viewModel = viewModel)
+            }
         }
 
         composable<Send> {
+            val sessionType =
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<SessionType>("sessionType")
+                    ?: SessionType.Authenticated
+
             SendScreen(
                 viewModel = hiltViewModel<SendViewModel>(),
-                onBackClick = { session ->
+                sessionType = sessionType,
+                onBackClick = { navController.popBackStack() },
+                onSaveClick = { session ->
                     when (session) {
-                        SessionType.Authenticated ->
-                            navController.navigateUp()
-
                         SessionType.Guest ->
-                            navController.navigate(AuthCheck)
+                            navController.navigate(Login) {
+                                popUpTo(Send) { inclusive = true }
+                            }
+
+                        SessionType.Authenticated ->
+                            navController.navigate(Home) {
+                                popUpTo(Send) { inclusive = true }
+                            }
                     }
-                },
-                onSaveClick = { navController.navigateUp() }
+                }
             )
         }
 

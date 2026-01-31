@@ -66,8 +66,9 @@ import java.time.Instant
 @Composable
 fun SendScreen(
     viewModel: SendViewModel,
-    onBackClick: (SessionType) -> Unit,
-    onSaveClick: () -> Unit
+    sessionType: SessionType,
+    onBackClick: () -> Unit,
+    onSaveClick: (SessionType) -> Unit
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -105,14 +106,16 @@ fun SendScreen(
                 }
             }
 
-            is Event.ShowSuccessMessage -> {
-                Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
-                onSaveClick()
-
-                if (viewModel.isGuest) {
-                    onBackClick(SessionType.Guest)
-                }
+            is Event.FileSentSuccessfully -> {
+                Toast.makeText(
+                    context,
+                    R.string.success_file,
+                    Toast.LENGTH_SHORT
+                ).show()
+                onSaveClick(sessionType)
             }
+
+            else -> {}
         }
     }
 
@@ -128,11 +131,15 @@ fun SendScreen(
                     Text(stringResource(R.string.send_fragment_label))
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onBackClick(SessionType.Authenticated) }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.contentDescription_go_back)
-                        )
+                    if (sessionType == SessionType.Authenticated) {
+                        IconButton(onClick = onBackClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(
+                                    id = R.string.contentDescription_go_back
+                                )
+                            )
+                        }
                     }
                 }
             )

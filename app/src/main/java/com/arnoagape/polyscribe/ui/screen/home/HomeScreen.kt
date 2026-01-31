@@ -92,12 +92,13 @@ fun HomeScreen(
                     message = resources.getString(event.message)
                 )
             }
+            else -> {}
         }
     }
 
     HomeContent(
         state = state,
-        isSignedIn = isSignedIn,
+        isSignedIn = isSignedIn == true,
         snackbarHostState = snackbarHostState,
         onRefresh = { viewModel.refreshFiles() },
         onFABClick = onFABClick,

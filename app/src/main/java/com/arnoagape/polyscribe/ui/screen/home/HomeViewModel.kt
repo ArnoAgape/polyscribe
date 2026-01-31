@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -48,25 +48,30 @@ class HomeViewModel @Inject constructor(
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                false
+                null
             )
 
     val uiState: StateFlow<HomeUiState> =
-        userRepository.observeUser()
-            .filterNotNull()
-            .flatMapLatest { user ->
-                fileRepository.filesForUser(user.id)
-            }
-            .map { files ->
-                if (files.isEmpty()) HomeUiState.Error.Empty()
-                else HomeUiState.Success(files)
+        userRepository.isUserSignedIn()
+            .flatMapLatest { signedIn ->
+                when (signedIn) {
+                    null -> flowOf(HomeUiState.Loading)
+
+                    false -> flowOf(HomeUiState.Error.Empty())
+
+                    true -> fileRepository.observeFiles()
+                        .map { files ->
+                            if (files.isEmpty()) HomeUiState.Error.Empty()
+                            else HomeUiState.Success(files)
+                        }
+                }
             }
             .catch { e ->
                 emit(HomeUiState.Error.Generic(e.message ?: "Unknown error"))
             }
             .stateIn(
                 viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
+                SharingStarted.WhileSubscribed(5_000),
                 HomeUiState.Loading
             )
 
