@@ -8,6 +8,7 @@ import android.webkit.MimeTypeMap
 import com.arnoagape.polyscribe.data.dto.FileDto
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
@@ -32,8 +33,10 @@ class FirebaseFileApi @Inject constructor(
     private val networkUtils: NetworkUtils
 ) : FileApi {
 
+    private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
     private val filesCollection = firestore.collection("files")
+    private val guestCollection = firestore.collection("guest")
 
     /**
      * Retrieves all files ordered by creation date (descending) from a specific user
@@ -71,6 +74,28 @@ class FirebaseFileApi @Inject constructor(
             Log.e("FirebaseFileApi", "Error while adding document", e)
             throw e
         }
+    }
+
+    override suspend fun sendFileAsGuest(localUris: List<Uri>, file: File): List<String> {
+
+        if (auth.currentUser == null) {
+            auth.signInAnonymously().await()
+        }
+
+        if (!networkUtils.isNetworkAvailable()) {
+            throw IOException("No internet connection")
+        }
+
+        val uploadedFiles = localUris.map { uri ->
+            uploadDocumentAsGuest(uri)
+        }
+
+        val updated = file.copy(fileUrl = uploadedFiles)
+        guestCollection.document(updated.id)
+            .set(updated.guestToDto())
+            .await()
+
+        return uploadedFiles
     }
 
     /**
@@ -123,6 +148,47 @@ class FirebaseFileApi @Inject constructor(
             } catch (e: Exception) {
                 Log.e("FirebaseUpload", "Error while uploading", e)
                 null
+            } finally {
+                pfd?.close()
+            }
+        }
+    }
+
+    override suspend fun uploadDocumentAsGuest(uri: Uri): String {
+        return withContext(Dispatchers.IO) {
+            var pfd: ParcelFileDescriptor? = null
+
+            try {
+                val mimeType = context.contentResolver.getType(uri)
+                pfd = context.contentResolver.openFileDescriptor(uri, "r")
+
+                val allowedMimeTypes = listOf(
+                    "image/jpeg", "image/png", "application/pdf",
+                    "application/msword",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "application/vnd.oasis.opendocument.text",
+                    "text/plain"
+                )
+
+                if (mimeType !in allowedMimeTypes) {
+                    throw IllegalArgumentException("Unsupported file type: $mimeType")
+                }
+
+                val extension =
+                    MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
+
+                val fileName = "${System.currentTimeMillis()}.$extension"
+
+                val storageRef = FirebaseStorage.getInstance()
+                    .reference
+                    .child("guest/$fileName")
+
+                storageRef.putFile(uri).await()
+                return@withContext storageRef.downloadUrl.await().toString()
+
+            } catch (e: Exception) {
+                Log.e("FirebaseGuestUpload", "Error while uploading", e)
+                throw e
             } finally {
                 pfd?.close()
             }

@@ -50,6 +50,7 @@ android {
         jvmToolchain(17)
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -106,6 +107,8 @@ dependencies {
     implementation(libs.firebase.ui.storage)
     implementation(libs.play.services.auth)
     implementation(libs.datastore.preferences)
+    implementation(libs.firebase.appcheck.playintegrity)
+    debugImplementation(libs.firebase.appcheck.debug)
 
     //DI
     implementation(libs.hilt)

@@ -30,10 +30,8 @@ class FirebaseUserApi : UserApi {
         professional = false
     )
 
-    /** Returns the currently authenticated user. */
     override suspend fun getCurrentUser(): User? = auth.currentUser?.toDomain()
 
-    /** Observes authentication changes and emits the current user. */
     override fun observeUser(): Flow<User?> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { auth ->
             trySend(auth.currentUser?.toDomain())
@@ -42,10 +40,6 @@ class FirebaseUserApi : UserApi {
         awaitClose { auth.removeAuthStateListener(listener) }
     }
 
-    /**
-     * Updates the user's FirebaseAuth profile, email verification,
-     * and persists additional fields in Firestore.
-     */
     override suspend fun updateUser(user: User): Result<Unit> {
         return try {
             val currentUser = auth.currentUser
@@ -72,9 +66,6 @@ class FirebaseUserApi : UserApi {
         }
     }
 
-    /**
-     * Ensures the authenticated user has a Firestore document.
-     */
     override suspend fun ensureUserInFirestore(): Result<Unit> {
         val firebaseUser = auth.currentUser
             ?: return Result.failure(Exception("User not signed in"))
@@ -93,7 +84,6 @@ class FirebaseUserApi : UserApi {
         }
     }
 
-    /** Signs out the current user. */
     override fun signOut(): Result<Unit> = try {
         auth.signOut()
         Result.success(Unit)
@@ -101,7 +91,6 @@ class FirebaseUserApi : UserApi {
         Result.failure(e)
     }
 
-    /** Emits authentication status updates in real time. */
     override fun isUserSignedIn(): Flow<Boolean> = callbackFlow {
         trySend(auth.currentUser != null)
 
@@ -113,7 +102,6 @@ class FirebaseUserApi : UserApi {
         awaitClose { auth.removeAuthStateListener(listener) }
     }
 
-    /** Deletes the current FirebaseAuth user and their Firestore record. */
     override suspend fun deleteUser(): Result<Unit> = try {
         val currentUser = auth.currentUser ?: return Result.failure(Exception("No user signed in"))
         usersCollection.document(currentUser.uid).delete().await()
@@ -122,4 +110,7 @@ class FirebaseUserApi : UserApi {
     } catch (e: Exception) {
         Result.failure(e)
     }
+
+    override fun isGuest(): Boolean =
+        auth.currentUser == null
 }

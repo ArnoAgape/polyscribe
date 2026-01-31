@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.FormEvent
@@ -65,7 +66,7 @@ import java.time.Instant
 @Composable
 fun SendScreen(
     viewModel: SendViewModel,
-    onBackClick: () -> Unit,
+    onBackClick: (SessionType) -> Unit,
     onSaveClick: () -> Unit
 ) {
 
@@ -107,6 +108,10 @@ fun SendScreen(
             is Event.ShowSuccessMessage -> {
                 Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
                 onSaveClick()
+
+                if (viewModel.isGuest) {
+                    onBackClick(SessionType.Guest)
+                }
             }
         }
     }
@@ -123,7 +128,7 @@ fun SendScreen(
                     Text(stringResource(R.string.send_fragment_label))
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onBackClick() }) {
+                    IconButton(onClick = { onBackClick(SessionType.Authenticated) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.contentDescription_go_back)

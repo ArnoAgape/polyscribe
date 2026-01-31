@@ -39,6 +39,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.common.components.OrSeparator
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
@@ -47,26 +48,28 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
  * email, Google, and guest access.
  *
  * @param viewModel ViewModel providing authentication state and events.
- * @param onSaveClicked Callback executed after successful sign-in.
+ * @param onLoginSuccess Callback executed after successful sign-in.
  * @param onGoogleSignInClick Launches the Google sign-in flow.
- * @param onGuestSignInClick Logs in as a guest user.
  * @param onEmailSignInClick Launches the email sign-in flow.
  */
 @Composable
 fun LoginScreen(
-    onSaveClicked: () -> Unit,
     onGoogleSignInClick: () -> Unit,
-    onGuestSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: (SessionType) -> Unit
 ) {
     val viewModel: LoginViewModel = hiltViewModel()
-    val isSignedIn by viewModel.isSignedIn.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Navigation after login success
-    LaunchedEffect(isSignedIn) {
-        if (isSignedIn == true) {
-            onLoginSuccess()
+    LaunchedEffect(state.isSignedIn, state.session) {
+        when {
+            state.isSignedIn == true -> {
+                viewModel.onAuthenticated()
+                onLoginSuccess(SessionType.Authenticated)
+            }
+            state.session == SessionType.Guest -> {
+                onLoginSuccess(SessionType.Guest)
+            }
         }
     }
 
@@ -80,7 +83,7 @@ fun LoginScreen(
         ) {
             LoginContent(
                 onGoogleSignInClick = onGoogleSignInClick,
-                onGuestSignInClick = onGuestSignInClick,
+                onGuestSignInClick = { viewModel.loginAsGuest() },
                 onEmailSignInClick = onEmailSignInClick
             )
         }

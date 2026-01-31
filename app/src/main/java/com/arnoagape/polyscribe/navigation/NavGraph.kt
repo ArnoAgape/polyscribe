@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.screen.detail.DetailScreen
 import com.arnoagape.polyscribe.ui.screen.detail.DetailViewModel
 import com.arnoagape.polyscribe.ui.screen.home.HomeScreen
@@ -60,13 +61,19 @@ fun AppNavGraph(
 
         composable<Login> {
             LoginScreen(
-                onSaveClicked = { navController.navigate(Home) },
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onEmailSignInClick = { emailSignUpLauncher() },
-                onGuestSignInClick = { navController.navigate(Home) },
-                onLoginSuccess = {
-                    navController.navigate(Home) {
-                        popUpTo(Login) { inclusive = true }
+                onLoginSuccess = { session ->
+                    when (session) {
+                        SessionType.Guest ->
+                            navController.navigate(Send) {
+                                popUpTo(Login) { inclusive = true }
+                            }
+
+                        SessionType.Authenticated ->
+                            navController.navigate(Home) {
+                                popUpTo(Login) { inclusive = true }
+                            }
                     }
                 }
             )
@@ -81,7 +88,15 @@ fun AppNavGraph(
         composable<Send> {
             SendScreen(
                 viewModel = hiltViewModel<SendViewModel>(),
-                onBackClick = { navController.navigateUp() },
+                onBackClick = { session ->
+                    when (session) {
+                        SessionType.Authenticated ->
+                            navController.navigateUp()
+
+                        SessionType.Guest ->
+                            navController.navigate(AuthCheck)
+                    }
+                },
                 onSaveClick = { navController.navigateUp() }
             )
         }

@@ -1,6 +1,7 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
@@ -10,21 +11,18 @@ import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
-import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.IOException
 import java.time.Instant
 import java.util.UUID
 import javax.inject.Inject
@@ -38,20 +36,18 @@ import javax.inject.Inject
 @HiltViewModel
 class SendViewModel @Inject constructor(
     private val fileRepository: FileRepository,
-    private val userRepository: UserRepository,
-    private val networkUtils: NetworkUtils
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SendUiState>(SendUiState.Idle)
-    val uiState: StateFlow<SendUiState> = _uiState.asStateFlow()
     private val _user = MutableStateFlow<User?>(null)
-    val user: StateFlow<User?> = _user.asStateFlow()
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
     private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
-    val localUris = _localUris.asStateFlow()
 
+    val isGuest: Boolean
+        get() = _user.value == null
 
     private val _file = MutableStateFlow(
         File(
@@ -68,15 +64,9 @@ class SendViewModel @Inject constructor(
     )
 
     /**
-     * Public state flow representing the current post being edited.
-     * This is immutable for consumers.
-     */
-    val file: StateFlow<File> = _file.asStateFlow()
-
-    /**
      * StateFlow derived from the post that emits a FormError if the title is empty, null otherwise.
      */
-    val isFileValid = localUris
+    private val _isFileValid = _localUris
         .map { uris -> uris.isNotEmpty() }
         .stateIn(
             scope = viewModelScope,
@@ -86,10 +76,10 @@ class SendViewModel @Inject constructor(
 
     val state: StateFlow<SendScreenState> =
         combine(
-            uiState,
-            file,
-            isFileValid,
-            localUris
+            _uiState,
+            _file,
+            _isFileValid,
+            _localUris
         ) { ui, f, valid, local ->
             SendScreenState(
                 uiState = ui,
@@ -154,49 +144,30 @@ class SendViewModel @Inject constructor(
      */
     fun sendFile() {
         viewModelScope.launch {
-
-            // 1. Network checking
-            if (!networkUtils.isNetworkAvailable()) {
-                _events.trySend(Event.ShowMessage(R.string.no_network))
-                return@launch
-            }
-
-            // 2. If user logged in checking
-            val currentUser = _user.value
-            if (currentUser == null) {
-                _uiState.value = SendUiState.Error.NoAccount()
-                _events.trySend(Event.ShowMessage(R.string.error_no_account_file))
-                return@launch
-            }
-
             _uiState.value = SendUiState.Loading
 
-            try {
-                // 3. Creation of file with user
-                val fileToSave = _file.value.copy(author = currentUser)
+            val currentUser = _user.value
+            val fileToSave = _file.value.copy(author = currentUser)
 
-                // 4. Upload Storage + Firestore
-                val uploadedFiles = fileRepository.sendFile(_localUris.value, fileToSave)
+            val result = fileRepository.sendFile(
+                localUris = _localUris.value,
+                file = fileToSave
+            )
 
-                _file.update {
-                    it.copy(fileUrl = uploadedFiles)
+            result
+                .onSuccess {
+                    _uiState.value = SendUiState.Success(fileToSave)
+
+                    _events.trySend(
+                        Event.ShowSuccessMessage(R.string.success_file)
+                    )
+                }
+                .onFailure { throwable ->
+                    Log.e("SendViewModel", "sendFile failed", throwable)
+                    _uiState.value = SendUiState.Error.Generic()
+                    _events.trySend(Event.ShowMessage(R.string.error_generic))
                 }
 
-                // 5. Success UI
-                _uiState.value = SendUiState.Success(fileToSave)
-                _events.trySend(Event.ShowSuccessMessage(R.string.success_file))
-
-            } catch (e: IOException) {
-                // 6. Network error (impossible upload)
-                _uiState.value = SendUiState.Error.Generic("Network error: ${e.message}")
-                _events.trySend(Event.ShowMessage(R.string.no_network))
-                return@launch
-
-            } catch (_: Exception) {
-                // 7. Generic error (Firebase Storage, Firestore, etc.)
-                _uiState.value = SendUiState.Error.Generic()
-                _events.trySend(Event.ShowMessage(R.string.error_generic))
-            }
         }
     }
 }

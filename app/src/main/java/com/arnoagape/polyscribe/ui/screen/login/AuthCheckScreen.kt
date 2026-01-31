@@ -15,17 +15,17 @@ import com.arnoagape.polyscribe.navigation.Login
  * Redirects signed-in users to [Home] and others to [Login].
  *
  * @param navController Navigation controller used for redirection.
- * @param loginViewModel Injected ViewModel providing sign-in state.
+ * @param viewModel Injected ViewModel providing sign-in state.
  */
 @Composable
 fun AuthCheckScreen(
     navController: NavHostController,
-    loginViewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(isSignedIn) {
-        if (isSignedIn == null) {
+    LaunchedEffect(state.isSignedIn) {
+        if (state.isSignedIn == null) {
             navController.navigate(Home) {
                 popUpTo(AuthCheck) { inclusive = true }
             }

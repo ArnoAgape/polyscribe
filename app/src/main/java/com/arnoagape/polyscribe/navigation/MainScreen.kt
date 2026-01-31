@@ -32,10 +32,10 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val isSignedIn by loginViewModel.isSignedIn.collectAsStateWithLifecycle()
+    val state by loginViewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(isSignedIn) {
-        if (isSignedIn == false) {
+    LaunchedEffect(state.isSignedIn) {
+        if (state.isSignedIn == false) {
             navController.navigate(Login) {
                 popUpTo(0) { inclusive = true }
                 launchSingleTop = true
@@ -62,7 +62,7 @@ fun MainScreen() {
                         onClick = {
                             if (currentRoute == destination.routeName) return@item
                             if (destination == AppDestinations.PROFILE) {
-                                if (loginViewModel.isSignedIn.value == true) {
+                                if (state.isSignedIn == true) {
                                     navController.navigate(Profile)
                                 } else {
                                     navController.navigate(AuthCheck)

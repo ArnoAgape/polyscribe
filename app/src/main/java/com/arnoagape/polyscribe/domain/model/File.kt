@@ -1,6 +1,7 @@
 package com.arnoagape.polyscribe.domain.model
 
 import com.arnoagape.polyscribe.data.dto.FileDto
+import com.arnoagape.polyscribe.data.dto.GuestFileDto
 import com.google.firebase.Timestamp
 import java.time.Instant
 
@@ -31,6 +32,19 @@ data class File(
             createdAt = createdAt,
             dateTime = Timestamp(dateTime.epochSecond, dateTime.nano),
             author = author,
+            colored = colored,
+            doubleSided = doubleSided,
+            numberOfCopies = numberOfCopies,
+            comment = comment
+        )
+    }
+
+    fun guestToDto(): GuestFileDto {
+        return GuestFileDto(
+            id = id,
+            fileUrl = fileUrl,
+            createdAt = createdAt,
+            dateTime = Timestamp(dateTime.epochSecond, dateTime.nano),
             colored = colored,
             doubleSided = doubleSided,
             numberOfCopies = numberOfCopies,

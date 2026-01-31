@@ -15,24 +15,11 @@ class UserRepository @Inject constructor(
     private val userApi: UserApi
 ) {
 
-    /** Returns the currently signed-in user. */
     suspend fun getCurrentUser() = userApi.getCurrentUser()
-
-    /** Observes the authenticated user's data. */
     fun observeUser(): Flow<User?> = userApi.observeUser()
-
-    /** Updates the user data. */
     suspend fun updateUser(user: User) = userApi.updateUser(user)
-
-    /** Ensures the user exists in Firestore. */
     suspend fun ensureUserInFirestore() = userApi.ensureUserInFirestore()
-
-    /** Signs the user out. */
     fun signOut() = userApi.signOut()
-
-    /** Emits whether a user is currently signed in. */
     fun isUserSignedIn(): Flow<Boolean> = userApi.isUserSignedIn()
-
-    /** Permanently deletes the user's account. */
     suspend fun deleteUser() = userApi.deleteUser()
 }
