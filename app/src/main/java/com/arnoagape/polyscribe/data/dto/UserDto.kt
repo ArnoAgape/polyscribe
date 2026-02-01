@@ -12,3 +12,9 @@ data class UserDto(
     val email: String? = "",
     val professional: Boolean = false
 ) : Serializable
+
+data class AuthorSnapshot(
+    val displayName: String? = null,
+    val email: String? = null,
+    val phoneNumber: String? = null
+)

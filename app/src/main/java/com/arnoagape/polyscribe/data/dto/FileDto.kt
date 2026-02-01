@@ -1,6 +1,5 @@
 package com.arnoagape.polyscribe.data.dto
 
-import com.arnoagape.polyscribe.domain.model.User
 import com.google.firebase.Timestamp
 import java.io.Serializable
 
@@ -11,14 +10,14 @@ import java.io.Serializable
  */
 data class FileDto(
     val id: String = "",
-    val ownerId: String? = null,
-    val guestId: String? = null,
     val fileUrl: List<String> = emptyList(),
     val createdAt: Timestamp = Timestamp.now(),
-    val dateTime: Timestamp = Timestamp.now(),
-    val author: User? = null,
+    val collectDate: Timestamp = Timestamp.now(),
+    val author: AuthorSnapshot? = null,
     val colored: Boolean = false,
     val doubleSided: Boolean = false,
-    val numberOfCopies: Int = 1,
-    val comment: String = ""
+    val copies: Int = 1,
+    val comment: String = "",
+    val ownerId: String? = null,
+    val guestId: String? = null,
 ) : Serializable

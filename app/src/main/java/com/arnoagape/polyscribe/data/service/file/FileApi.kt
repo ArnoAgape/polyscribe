@@ -16,8 +16,6 @@ interface FileApi {
 
     suspend fun sendFile(
         localUris: List<Uri>,
-        file: File,
-        userId: String?,
-        isAnonymous: Boolean
+        file: File
     ): List<String>
 }

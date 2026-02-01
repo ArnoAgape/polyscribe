@@ -4,11 +4,11 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.data.dto.AuthorSnapshot
 import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.SessionType
-import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -145,14 +145,14 @@ data class SendFormState(
 ) {
     fun toFile(
         id: String = "",
-        author: User? = null
+        author: AuthorSnapshot? = null
     ) = File(
         id = id,
         colored = colored,
         doubleSided = doubleSided,
         numberOfCopies = numberOfCopies,
         comment = comment,
-        dateTime = dateTime,
+        collectDate = dateTime,
         author = author
     )
 }

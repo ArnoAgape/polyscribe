@@ -49,12 +49,6 @@ class FileRepository @Inject constructor(
             }
 
     suspend fun sendFile(localUris: List<Uri>, file: File): List<String> {
-        val session = userRepository.getCurrentSession()
-        return fileApi.sendFile(
-            localUris,
-            file,
-            session.userId,
-            session.isGuest
-        )
+        return fileApi.sendFile(localUris, file)
     }
 }

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.webkit.MimeTypeMap
+import com.arnoagape.polyscribe.data.dto.AuthorSnapshot
 import com.arnoagape.polyscribe.data.dto.FileDto
 import com.arnoagape.polyscribe.data.service.user.UserApi
 import com.arnoagape.polyscribe.domain.model.File
@@ -105,29 +106,41 @@ class FirebaseFileApi @Inject constructor(
      */
     override suspend fun sendFile(
         localUris: List<Uri>,
-        file: File,
-        userId: String?,
-        isAnonymous: Boolean
+        file: File
     ): List<String> {
         if (!networkUtils.isNetworkAvailable()) {
             throw IOException("No internet connection")
         }
 
-        val user: FirebaseUser = auth.currentUser
-            ?: auth.signInAnonymously().await().user
-            ?: throw IllegalStateException("Unable to get Firebase user")
+        val firebaseUser =
+            auth.currentUser
+                ?: auth.signInAnonymously().await().user
+                ?: throw IllegalStateException("Unable to get Firebase user")
 
         val uploadedFiles = localUris.mapNotNull { uri ->
             uploadDocumentToFirebase(uri)
         }
 
+        val authorSnapshot =
+            if (!firebaseUser.isAnonymous) {
+                AuthorSnapshot(
+                    displayName = firebaseUser.displayName,
+                    email = firebaseUser.email,
+                    phoneNumber = firebaseUser.phoneNumber
+                )
+            } else null
+
         val updated = file.copy(
             fileUrl = uploadedFiles,
-            ownerId = if (!user.isAnonymous) user.uid else null,
-            guestId = if (user.isAnonymous) user.uid else null
+            ownerId = if (!firebaseUser.isAnonymous) firebaseUser.uid else null,
+            guestId = if (firebaseUser.isAnonymous) firebaseUser.uid else null,
+            author = authorSnapshot
         )
 
-        filesCollection.document(updated.id).set(updated.toDto()).await()
+        filesCollection
+            .document(updated.id)
+            .set(updated.toDto())
+            .await()
 
         return uploadedFiles
     }

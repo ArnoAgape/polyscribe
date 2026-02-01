@@ -178,7 +178,7 @@ fun SendScreen(
                         },
                         onAddPictureClick = { pictureLauncher.launch("image/*") },
                         onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },
-                        dateTime = fileToDisplay.dateTime,
+                        dateTime = fileToDisplay.collectDate,
                         onDateTimeChange = { viewModel.onAction(FormEvent.DateTimeChanged(it)) },
                         colored = fileToDisplay.colored,
                         onColorationChange = { viewModel.onAction(FormEvent.ColorChanged(it)) },

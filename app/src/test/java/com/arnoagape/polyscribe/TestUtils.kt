@@ -21,7 +21,7 @@ object TestUtils {
             id = id,
             fileUrl = listOf("file://local/path/to/file.pdf"),
             createdAt = Timestamp(1233356000, 212120),
-            dateTime = Instant.now(),
+            collectDate = Instant.now(),
             author = User(
                 id = "1",
                 displayName = "John Doe",

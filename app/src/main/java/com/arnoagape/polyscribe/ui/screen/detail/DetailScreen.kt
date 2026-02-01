@@ -30,8 +30,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoagape.polyscribe.R
+import com.arnoagape.polyscribe.data.dto.AuthorSnapshot
 import com.arnoagape.polyscribe.domain.model.File
-import com.arnoagape.polyscribe.domain.model.User
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.components.FilePreviewList
@@ -157,7 +157,7 @@ fun DetailItem(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        val (date, time) = Format.getLocalizedDateParts(file.dateTime)
+        val (date, time) = Format.getLocalizedDateParts(file.collectDate)
         val doubleSidedText =
             if (file.doubleSided) stringResource(R.string.yes) else stringResource(R.string.no)
         val coloredText =
@@ -198,13 +198,11 @@ private fun DetailScreenPreview() {
     PolyscribeTheme {
         val fakeFile =
             File(
-                dateTime = Instant.now(),
-                author = User(
-                    id = "1",
+                collectDate = Instant.now(),
+                author = AuthorSnapshot(
                     displayName = "John Doe",
                     phoneNumber = "06 01 02 03 04",
-                    email = "jdoe@mail.com",
-                    professional = true
+                    email = "jdoe@mail.com"
                 ),
                 colored = false,
                 doubleSided = false,

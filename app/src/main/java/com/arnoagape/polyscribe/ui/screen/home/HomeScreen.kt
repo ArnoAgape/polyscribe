@@ -251,9 +251,9 @@ fun HomeFile(
 private fun HomeContentPreview() {
     PolyscribeTheme {
         val fakeFiles = listOf(
-            File(dateTime = Instant.now()),
-            File(dateTime = Instant.now()),
-            File(dateTime = Instant.now())
+            File(collectDate = Instant.now()),
+            File(collectDate = Instant.now()),
+            File(collectDate = Instant.now())
         )
 
         val previewState = HomeScreenState(
