@@ -147,7 +147,7 @@ fun SendScreen(
         bottomBar = {
             SendSubmitSection(
                 isFileValid = state.isValid,
-                isLoading = false,
+                isLoading = state.uiState is SendUiState.Loading,
                 onSaveClicked = { viewModel.sendFile() }
             )
         }

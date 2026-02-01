@@ -14,8 +14,5 @@ interface FileApi {
 
     fun observeFileById(fileId: String, userId: String?, isAnonymous: Boolean): Flow<File?>
 
-    suspend fun sendFile(
-        localUris: List<Uri>,
-        file: File
-    ): List<String>
+    suspend fun sendFile(localUris: List<Uri>, file: File): List<String>
 }

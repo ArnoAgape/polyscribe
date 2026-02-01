@@ -2,6 +2,7 @@ package com.arnoagape.polyscribe.ui.screen.send.sections
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -27,6 +28,7 @@ fun SendSubmitSection(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(8.dp)
                 .navigationBarsPadding()
                 .testTag(stringResource(R.string.action_send)),
             onClick = onSaveClicked,

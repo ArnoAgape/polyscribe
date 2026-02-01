@@ -7,7 +7,6 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import com.arnoagape.polyscribe.data.dto.AuthorSnapshot
 import com.arnoagape.polyscribe.data.dto.FileDto
-import com.arnoagape.polyscribe.data.service.user.UserApi
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import com.google.firebase.auth.FirebaseAuth
@@ -23,7 +22,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -37,8 +35,7 @@ import java.io.IOException
 @OptIn(ExperimentalCoroutinesApi::class)
 class FirebaseFileApi @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val networkUtils: NetworkUtils,
-    private val userApi: UserApi
+    private val networkUtils: NetworkUtils
 ) : FileApi {
 
     private val auth = FirebaseAuth.getInstance()
@@ -50,17 +47,14 @@ class FirebaseFileApi @Inject constructor(
      * and maps Firestore DTOs to domain models.
      */
 
-    override fun getFilesForUser(
-        userId: String?,
-        isAnonymous: Boolean
-    ): Flow<List<File>> {
+    override fun getFilesForUser(userId: String?, isAnonymous: Boolean): Flow<List<File>> {
 
         Log.d(
             "DEBUG_FILES",
             "getFilesForUser uid=$userId anon=$isAnonymous"
         )
 
-        if (userId == null) return emptyFlow()
+        if (userId == null) return flowOf(emptyList())
 
         val query =
             if (isAnonymous) {
@@ -104,10 +98,7 @@ class FirebaseFileApi @Inject constructor(
      *
      * @throws IOException when the device is offline
      */
-    override suspend fun sendFile(
-        localUris: List<Uri>,
-        file: File
-    ): List<String> {
+    override suspend fun sendFile(localUris: List<Uri>, file: File): List<String> {
         if (!networkUtils.isNetworkAvailable()) {
             throw IOException("No internet connection")
         }
@@ -118,7 +109,7 @@ class FirebaseFileApi @Inject constructor(
                 ?: throw IllegalStateException("Unable to get Firebase user")
 
         val uploadedFiles = localUris.mapNotNull { uri ->
-            uploadDocumentToFirebase(uri)
+            uploadDocumentToFirebase(uri, firebaseUser)
         }
 
         val authorSnapshot =
@@ -149,9 +140,16 @@ class FirebaseFileApi @Inject constructor(
      * Uploads a document to Firebase Storage.
      * Validates MIME type and returns the public download URL.
      */
-    private suspend fun uploadDocumentToFirebase(uri: Uri): String? {
+    private suspend fun uploadDocumentToFirebase(uri: Uri, firebaseUser: FirebaseUser): String? {
         return withContext(Dispatchers.IO + SupervisorJob()) {
             var pfd: ParcelFileDescriptor? = null
+
+            val rawName =
+                firebaseUser.displayName
+                    ?: firebaseUser.email
+                    ?: "invite"
+            val safeUserName = rawName.safeFileName()
+            val timestamp = System.currentTimeMillis()
 
             try {
                 val mimeType = context.contentResolver.getType(uri)
@@ -171,7 +169,7 @@ class FirebaseFileApi @Inject constructor(
 
                 val extension =
                     MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
-                val fileName = "${System.currentTimeMillis()}.$extension"
+                val fileName = "${safeUserName}_${timestamp}.$extension"
 
                 val storageRef = FirebaseStorage.getInstance()
                     .reference
@@ -229,4 +227,9 @@ class FirebaseFileApi @Inject constructor(
             }
         }
     }
+
+    private fun String.safeFileName(): String =
+        lowercase()
+            .replace("\\s+".toRegex(), "_")
+            .replace("[^a-z0-9_-]".toRegex(), "")
 }
