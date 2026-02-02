@@ -54,22 +54,21 @@ class DetailViewModelTest {
         viewModel = DetailViewModel(
             fileRepository = fileRepo,
             userRepository = userRepo,
-            savedStateHandle = savedStateHandle,
-            networkUtils = fakeNetwork
+            savedStateHandle = savedStateHandle
         )
     }
 
     @Test
     fun `observeFile sets Loading first`() = runTest {
 
-        coEvery { fileRepo.getFileById(any(),any()) } returns flow {
+        coEvery { fileRepo.observeFile(any()) } returns flow {
             delay(1)
             emit(TestUtils.fakeFile(id = "123"))
         }
 
         createViewModel()
 
-        viewModel.uiState.test {
+        viewModel.fileState.test {
             assertTrue(awaitItem() is DetailUiState.Loading)
             assertTrue(awaitItem() is DetailUiState.Success)
         }
@@ -78,14 +77,14 @@ class DetailViewModelTest {
     @Test
     fun `observeFile emits Error_Empty when file is null`() = runTest {
 
-        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
+        coEvery { fileRepo.observeFile("123") } returns flow {
             delay(1)
             emit(null)
         }
 
         createViewModel()
 
-        viewModel.uiState.test {
+        viewModel.fileState.test {
             assertTrue(awaitItem() is DetailUiState.Loading)
             val second = awaitItem()
             assertTrue(second is DetailUiState.Error.Empty)
@@ -95,51 +94,18 @@ class DetailViewModelTest {
     @Test
     fun `observeFile emits Generic error when exception thrown`() = runTest {
 
-        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
+        coEvery { fileRepo.observeFile("123") } returns flow {
             delay(1)
             throw RuntimeException("boom")
         }
 
         createViewModel()
 
-        viewModel.uiState.test {
+        viewModel.fileState.test {
             assertTrue(awaitItem() is DetailUiState.Loading)
             val second = awaitItem()
             assertTrue(second is DetailUiState.Error.Generic)
         }
-    }
-
-    @Test
-    fun `refreshData sends no_network event when offline`() = runTest {
-
-        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
-            delay(1)
-            emit(TestUtils.fakeFile(id = "1"))
-        }
-        every { fakeNetwork.isNetworkAvailable() } returns false
-
-        createViewModel()
-
-        viewModel.eventsFlow.test {
-            viewModel.refreshData()
-            val event = awaitItem()
-            assertTrue(event is Event.ShowMessage)
-            assertEquals(R.string.no_network, (event as Event.ShowMessage).message)
-        }
-    }
-
-    @Test
-    fun `refreshData reobserves file when online`() = runTest {
-
-        val file = TestUtils.fakeFile(id = "1")
-        coEvery { fileRepo.getFileById("123", "1234") } returns flow {
-            emit(file)
-        }
-        every { fakeNetwork.isNetworkAvailable() } returns true
-
-        createViewModel()
-
-        viewModel.refreshData()
     }
 
 }

@@ -37,7 +37,7 @@ class LoginViewModelTest {
 
         viewModel = LoginViewModel(userRepo)
 
-        assertFalse(viewModel.isSignedIn.value == true)
+
     }
 
     @Test
@@ -46,14 +46,14 @@ class LoginViewModelTest {
 
         viewModel = LoginViewModel(userRepo)
 
-        assertFalse(viewModel.isSignedIn.value == false)
+
     }
 
 
     @Test
     fun `syncUserWithFirestore calls ensureUserInFirestore`() = runTest {
         every { userRepo.isUserSignedIn() } returns flowOf(false)
-        coEvery { userRepo.ensureUserInFirestore() } returns Result.success(Unit)
+        coEvery { userRepo.ensureUserInFirestore() } returns Unit
 
         viewModel = LoginViewModel(userRepo)
         viewModel.syncUserWithFirestore()

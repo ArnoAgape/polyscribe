@@ -48,7 +48,7 @@ class HomeViewModelTest {
     @Test
     fun `uiState is Success when repository returns files`() = runTest {
         val fakeFiles = listOf(TestUtils.fakeFile("1"))
-        every { fileRepo.observeFiles("1234") } returns flowOf(fakeFiles)
+        every { fileRepo.observeFiles() } returns flowOf(fakeFiles)
 
         viewModel = HomeViewModel(fileRepo, userRepo,fakeNetwork)
 
@@ -62,7 +62,7 @@ class HomeViewModelTest {
     @Test
     fun `uiState is Error_Empty when repository returns empty list`() = runTest {
         fileRepo = mockkClass(FileRepository::class)
-        every { fileRepo.observeFiles("1234") } returns flowOf(emptyList())
+        every { fileRepo.observeFiles() } returns flowOf(emptyList())
 
         viewModel = HomeViewModel(fileRepo, userRepo,fakeNetwork)
 
@@ -78,7 +78,7 @@ class HomeViewModelTest {
         val errorFlow = flow<List<File>> { throw Exception("Database failed") }
 
         fileRepo = mockk(relaxed = true)
-        every { fileRepo.observeFiles("1234") } returns errorFlow
+        every { fileRepo.observeFiles() } returns errorFlow
         every { userRepo.isUserSignedIn() } returns flowOf(true)
         every { fakeNetwork.isNetworkAvailable() } returns true
 
@@ -104,7 +104,7 @@ class HomeViewModelTest {
             events.trySend(Event.ShowMessage(R.string.no_network))
         }
 
-        every { fileRepo.observeFiles("1234") } returns flowOf(emptyList())
+        every { fileRepo.observeFiles() } returns flowOf(emptyList())
 
         viewModel = HomeViewModel(fileRepo, userRepo,fakeNetwork)
 

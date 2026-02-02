@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe
 
+import com.arnoagape.polyscribe.data.dto.AuthorSnapshot
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
 import com.google.firebase.Timestamp
@@ -22,12 +23,10 @@ object TestUtils {
             fileUrl = listOf("file://local/path/to/file.pdf"),
             createdAt = Timestamp(1233356000, 212120),
             collectDate = Instant.now(),
-            author = User(
-                id = "1",
+            author = AuthorSnapshot(
                 displayName = "John Doe",
                 phoneNumber = "06 01 02 03 04",
-                email = "jdoe@mail.com",
-                professional = true
+                email = "jdoe@mail.com"
             ),
             colored = false,
             doubleSided = false,

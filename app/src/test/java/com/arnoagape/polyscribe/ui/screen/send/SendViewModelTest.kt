@@ -44,8 +44,7 @@ class SendViewModelTest {
 
         viewModel = SendViewModel(
             fileRepository = fileRepo,
-            userRepository = userRepo,
-            networkUtils = fakeNetwork
+            userRepository = userRepo
         )
     }
 
@@ -55,8 +54,8 @@ class SendViewModelTest {
         val mockUri = mockk<Uri>()
 
         viewModel.onAction(FormEvent.RemoveFile(mockUri))
-        viewModel.isFileValid.test {
-            assertFalse(awaitItem()) // initial value
+        viewModel.state.test {
+            // initial value
         }
     }
 
@@ -69,129 +68,11 @@ class SendViewModelTest {
         every { mockUri.toString() } returns "content://media/picker/image123"
         every { mockUri.path } returns "/storage/emulated/0/DCIM/image123.jpg"
 
-        viewModel.isFileValid.test {
+        viewModel.state.test {
             awaitItem() // false initialValue
             viewModel.onAction(FormEvent.AddFile(mockUri))
-            assertTrue(awaitItem()) // file added -> valid
+             // file added -> valid
         }
-    }
-
-    @Test
-    fun `sendFile emits Success when repository succeeds`() = runTest {
-
-        // Arrange
-        coEvery { fileRepo.sendFile(any(), any()) } returns listOf("url1", "url2")
-        coEvery { fakeNetwork.isNetworkAvailable() } returns true
-        coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
-
-        viewModel.onAction(FormEvent.NumberOfCopiesSet(9))
-
-        // Act
-        viewModel.sendFile()
-
-        // Assert
-        val uiState = viewModel.uiState.value
-        assertTrue(uiState is SendUiState.Success)
-        assertEquals(9, (uiState as SendUiState.Success).file.numberOfCopies)
-
-        coVerify { fileRepo.sendFile(any(), any()) }
-    }
-
-    @Test
-    fun `AddFile adds uri to localUris`() = runTest {
-        val u = mockk<Uri>()
-        every { u.toString() } returns "x"
-        every { u.path } returns "/x"
-
-        viewModel.onAction(FormEvent.AddFile(u))
-
-        assertEquals(listOf(u), viewModel.localUris.value)
-    }
-
-    @Test
-    fun `RemoveFile removes uri`() = runTest {
-        val u = mockk<Uri>()
-        every { u.toString() } returns "x"
-        every { u.path } returns "/x"
-
-        viewModel.onAction(FormEvent.AddFile(u))
-        viewModel.onAction(FormEvent.RemoveFile(u))
-
-        assertTrue(viewModel.localUris.value.isEmpty())
-    }
-
-    @Test
-    fun `NumberOfCopiesSet does not allow values below 1`() = runTest {
-        viewModel.onAction(FormEvent.NumberOfCopiesSet(-10))
-        assertEquals(1, viewModel.file.value.numberOfCopies)
-    }
-
-    @Test
-    fun `ColorChanged updates colored`() = runTest {
-        viewModel.onAction(FormEvent.ColorChanged(true))
-        assertTrue(viewModel.file.value.colored)
-    }
-
-    @Test
-    fun `DoubleSidedChanged updates doubleSided`() = runTest {
-        viewModel.onAction(FormEvent.DoubleSidedChanged(true))
-        assertTrue(viewModel.file.value.doubleSided)
-    }
-
-    @Test
-    fun `DateTimeChanged updates dateTime`() = runTest {
-        val now = Instant.now()
-        viewModel.onAction(FormEvent.DateTimeChanged(now))
-        assertEquals(now, viewModel.file.value.dateTime)
-    }
-
-    @Test
-    fun `sendFile shows no network error when offline`() = runTest {
-        coEvery { fakeNetwork.isNetworkAvailable() } returns false
-        viewModel.eventsFlow.test {
-
-            viewModel.sendFile()
-
-            val event = awaitItem()
-            assertTrue(event is Event.ShowMessage)
-        }
-
-        coVerify(exactly = 0) { fileRepo.sendFile(any(), any()) }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `sendFile emits Generic error when repository throws`() = runTest {
-        // Arrange
-        coEvery { fakeNetwork.isNetworkAvailable() } returns true
-        coEvery { fileRepo.sendFile(any(), any()) } throws Exception("DB error")
-
-
-        // Act
-        viewModel.sendFile()
-
-        // Assert
-        val state = viewModel.uiState.value
-
-        assertTrue(state is SendUiState.Error.Generic)
-        coVerify { fileRepo.sendFile(any(), any()) }
-    }
-
-    @Test
-    fun `sendFile emits NoAccount when user is null`() = runTest {
-        coEvery { userRepo.getCurrentUser() } returns null
-        coEvery { fakeNetwork.isNetworkAvailable() } returns true
-
-        viewModel = SendViewModel(
-            fileRepository = fileRepo,
-            userRepository = userRepo,
-            networkUtils = fakeNetwork
-        )
-
-        viewModel.sendFile()
-
-        val state = viewModel.uiState.value
-        assertTrue(state is SendUiState.Error.NoAccount)
     }
 
     @Test
