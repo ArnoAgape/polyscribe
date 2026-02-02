@@ -29,9 +29,9 @@ object TestUtils {
                 email = "jdoe@mail.com"
             ),
             colored = false,
-            doubleSided = false,
+            doubleSided = true,
             numberOfCopies = 9,
-            comment = ""
+            comment = "I love Polyscribe!"
         )
     }
 

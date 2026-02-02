@@ -2,18 +2,17 @@ package com.arnoagape.polyscribe.ui.screen.detail
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import com.arnoagape.polyscribe.MainDispatcherRule
-import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.TestUtils
 import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
-import com.arnoagape.polyscribe.ui.common.Event
-import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -26,51 +25,46 @@ class DetailViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var fileRepo: FileRepository
-    private lateinit var userRepo: UserRepository
-
-    private lateinit var fakeNetwork: NetworkUtils
-    private lateinit var viewModel: DetailViewModel
+    private val fileRepo: FileRepository = mockk()
+    private val userRepo: UserRepository = mockk()
     private lateinit var savedStateHandle: SavedStateHandle
 
     @Before
     fun setup() {
-        fileRepo = mockk()
-        userRepo = mockk(relaxed = true)
-        fakeNetwork = mockk()
-
-        coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1234")
-        every { fakeNetwork.checkNetwork(any(), any()) } returns Unit
-        every { userRepo.observeUser() } returns flowOf(TestUtils.fakeUser(id = "1234"))
-
         savedStateHandle = SavedStateHandle().apply {
             set("fileId", "123")
         }
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
-
     }
 
-    fun createViewModel() {
-        viewModel = DetailViewModel(
+    private fun createViewModel(): DetailViewModel {
+        every { userRepo.isUserSignedIn() } returns flowOf(true)
+
+        return DetailViewModel(
             fileRepository = fileRepo,
             userRepository = userRepo,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
         )
     }
 
     @Test
-    fun `observeFile sets Loading first`() = runTest {
+    fun `file success contains correct data`() = runTest {
+        every { fileRepo.observeFile(any()) } returns flowOf(TestUtils.fakeFile("1"))
 
-        coEvery { fileRepo.observeFile(any()) } returns flow {
-            delay(1)
-            emit(TestUtils.fakeFile(id = "123"))
-        }
+        val viewModel = createViewModel()
 
-        createViewModel()
+        viewModel.state.test {
+            val success = awaitItem()
 
-        viewModel.fileState.test {
-            assertTrue(awaitItem() is DetailUiState.Loading)
-            assertTrue(awaitItem() is DetailUiState.Success)
+            val file = (success.uiState as DetailUiState.Success).file
+
+            assertThat(file.colored).isFalse()
+            assertThat(file.doubleSided).isTrue()
+            assertThat(file.numberOfCopies).isEqualTo(9)
+            assertThat(file.comment).isEqualTo("I love Polyscribe!")
+            assertThat(file.author?.displayName).isEqualTo("John Doe")
+            assertThat(file.fileUrl).isEqualTo(listOf("file://local/path/to/file.pdf"))
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -82,12 +76,15 @@ class DetailViewModelTest {
             emit(null)
         }
 
-        createViewModel()
+        val viewModel = createViewModel()
 
-        viewModel.fileState.test {
-            assertTrue(awaitItem() is DetailUiState.Loading)
-            val second = awaitItem()
-            assertTrue(second is DetailUiState.Error.Empty)
+        viewModel.state.test {
+            val loading = awaitItem()
+            assertThat(loading.uiState).isEqualTo(DetailUiState.Loading)
+
+            val empty = awaitItem()
+            assertThat(empty.uiState)
+                .isEqualTo(DetailUiState.Error.Empty("Impossible to find the file"))
         }
     }
 
@@ -99,12 +96,15 @@ class DetailViewModelTest {
             throw RuntimeException("boom")
         }
 
-        createViewModel()
+        val viewModel = createViewModel()
 
-        viewModel.fileState.test {
-            assertTrue(awaitItem() is DetailUiState.Loading)
-            val second = awaitItem()
-            assertTrue(second is DetailUiState.Error.Generic)
+        viewModel.state.test {
+            val loading = awaitItem()
+            assertThat(loading.uiState).isEqualTo(DetailUiState.Loading)
+
+            val error = awaitItem()
+            assertThat(error.uiState)
+                .isEqualTo(DetailUiState.Error.Generic("boom"))
         }
     }
 

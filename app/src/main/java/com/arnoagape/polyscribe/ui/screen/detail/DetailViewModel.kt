@@ -29,8 +29,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    val fileRepository: FileRepository,
-    val userRepository: UserRepository,
+    private val fileRepository: FileRepository,
+    private val userRepository: UserRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -39,7 +39,7 @@ class DetailViewModel @Inject constructor(
     private val _events = Channel<Event>()
     val eventsFlow = _events.receiveAsFlow()
 
-    val isUserSignedIn =
+    private val isUserSignedIn =
         userRepository.isUserSignedIn()
             .stateIn(
                 viewModelScope,
@@ -47,7 +47,7 @@ class DetailViewModel @Inject constructor(
                 null
             )
 
-    val fileState: StateFlow<DetailUiState> =
+    private val fileState: StateFlow<DetailUiState> =
         fileRepository.observeFile(fileId)
             .map { file ->
                 when (file) {

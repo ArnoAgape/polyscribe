@@ -156,12 +156,12 @@ fun LoginContent(
                     Text(stringResource(R.string.sign_in_google))
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
-                /** ---------- ADD BUTTONS FILE ---------- **/
+                /** ---------- SEPARATOR ---------- **/
                 OrSeparator()
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 /** ---------- GUEST BUTTON ---------- **/
                 OutlinedButton(

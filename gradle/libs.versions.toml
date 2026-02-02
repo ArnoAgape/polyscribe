@@ -1,5 +1,6 @@
 [versions]
 agp = "9.0.0"
+assertk = "0.28.1"
 desugar_jdk_libs = "2.1.5"
 kotlin = "2.2.21"
 ksp = "2.3.2"
@@ -28,6 +29,7 @@ dependencyAnalysis = "3.5.1"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assertk" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 firebase-appcheck-debug = { module = "com.google.firebase:firebase-appcheck-debug" }
 firebase-appcheck-playintegrity = { module = "com.google.firebase:firebase-appcheck-playintegrity" }
