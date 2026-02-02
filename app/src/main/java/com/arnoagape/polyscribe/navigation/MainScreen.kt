@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
+import com.arnoagape.polyscribe.ui.utils.SharedFilesHolder
 import kotlinx.coroutines.flow.map
 
 /**
@@ -37,6 +39,7 @@ fun MainScreen() {
         .map { it.isSignedIn }
         .collectAsStateWithLifecycle(initialValue = null)
 
+    // 🔄 Waiting for Firebase
     if (isSignedIn == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -47,52 +50,64 @@ fun MainScreen() {
         return
     }
 
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // 🚀 Goes to Send if file or picture is shared from outside the app
+    LaunchedEffect(SharedFilesHolder.uris.size) {
+        if (
+            SharedFilesHolder.hasFiles() &&
+            navController.currentDestination?.route != Send::class.qualifiedName
+        ) {
+            navController.navigate(Send) {
+                launchSingleTop = true
+            }
+        }
+    }
+
+    val showBottomBar =
+        currentRoute == Home::class.qualifiedName ||
+                currentRoute == Profile::class.qualifiedName ||
+                currentRoute == Settings::class.qualifiedName
+
     val startDestination =
         if (isSignedIn == true) Home else Login
 
-        val navController = rememberNavController()
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
-        val showBottomBar =
-            currentRoute == Home::class.qualifiedName ||
-                    currentRoute == Profile::class.qualifiedName ||
-                    currentRoute == Settings::class.qualifiedName
-
-        if (showBottomBar) {
-            NavigationSuiteScaffold(
-                navigationSuiteItems = {
-                    AppDestinations.entries.forEach { destination ->
-                        item(
-                            icon = {
-                                Icon(
-                                    destination.icon,
-                                    contentDescription = destination.label()
-                                )
-                            },
-                            label = { Text(destination.label()) },
-                            selected = currentRoute == destination.routeName,
-                            onClick = {
-                                if (currentRoute == destination.routeName) return@item
-                                navController.navigate(destination.screenObject) {
-                                    launchSingleTop = true
-                                }
+    if (showBottomBar) {
+        NavigationSuiteScaffold(
+            navigationSuiteItems = {
+                AppDestinations.entries.forEach { destination ->
+                    item(
+                        icon = {
+                            Icon(
+                                destination.icon,
+                                contentDescription = destination.label()
+                            )
+                        },
+                        label = { Text(destination.label()) },
+                        selected = currentRoute == destination.routeName,
+                        onClick = {
+                            if (currentRoute == destination.routeName) return@item
+                            navController.navigate(destination.screenObject) {
+                                launchSingleTop = true
                             }
-                        )
-                    }
+                        }
+                    )
                 }
-            ) {
-                AppNavGraph(
-                    navController = navController,
-                    startDestination = startDestination
-                )
             }
-        } else {
+        ) {
             AppNavGraph(
                 navController = navController,
                 startDestination = startDestination
             )
         }
+    } else {
+        AppNavGraph(
+            navController = navController,
+            startDestination = startDestination
+        )
+    }
 }
 
 /**

@@ -146,7 +146,8 @@ class FirebaseFileApi @Inject constructor(
 
             val rawName =
                 firebaseUser.displayName
-                    ?: firebaseUser.email
+                    ?.takeIf { it.isNotBlank() }
+                    ?: firebaseUser.email?.takeIf { it.isNotBlank() }
                     ?: "invite"
             val safeUserName = rawName.safeFileName()
             val timestamp = System.currentTimeMillis()

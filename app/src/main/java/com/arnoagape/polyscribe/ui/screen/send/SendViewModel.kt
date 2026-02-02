@@ -43,6 +43,14 @@ class SendViewModel @Inject constructor(
 
     private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
 
+    private val _isSignedIn =
+        userRepository.isUserSignedIn()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                null
+            )
+
     private val _formState = MutableStateFlow(
         SendFormState(
             colored = false,
@@ -57,13 +65,15 @@ class SendViewModel @Inject constructor(
         combine(
             _uiState,
             _formState,
-            _localUris
-        ) { ui, f, uris ->
+            _localUris,
+            _isSignedIn
+        ) { ui, f, uris, s ->
             SendScreenState(
                 uiState = ui,
                 file = f.toFile(),
                 localUris = uris,
-                isValid = uris.isNotEmpty()
+                isValid = uris.isNotEmpty(),
+                isSignedIn = s
             )
         }.stateIn(
             scope = viewModelScope,
@@ -133,7 +143,8 @@ data class SendScreenState(
     val uiState: SendUiState = SendUiState.Idle,
     val file: File = File(),
     val isValid: Boolean = false,
-    val localUris: List<Uri> = emptyList()
+    val localUris: List<Uri> = emptyList(),
+    val isSignedIn: Boolean? = null
 )
 
 data class SendFormState(

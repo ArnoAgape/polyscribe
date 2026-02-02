@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +47,7 @@ import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.FormEvent
+import com.arnoagape.polyscribe.ui.utils.SharedFilesHolder
 import com.arnoagape.polyscribe.ui.screen.send.sections.SendActionsSection
 import com.arnoagape.polyscribe.ui.screen.send.sections.SendCommentsSection
 import com.arnoagape.polyscribe.ui.screen.send.sections.SendDateTimeSection
@@ -66,7 +68,6 @@ import java.time.Instant
 @Composable
 fun SendScreen(
     viewModel: SendViewModel,
-    sessionType: SessionType,
     onBackClick: () -> Unit,
     onSaveClick: (SessionType) -> Unit
 ) {
@@ -92,6 +93,13 @@ fun SendScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        val sharedUris = SharedFilesHolder.consume()
+        sharedUris.forEach { uri ->
+            viewModel.onAction(FormEvent.AddFile(uri))
+        }
+    }
+
     EventsEffect(viewModel.eventsFlow) { event ->
         when (event) {
             is Event.ShowMessage -> {
@@ -112,7 +120,7 @@ fun SendScreen(
                     R.string.success_file,
                     Toast.LENGTH_SHORT
                 ).show()
-                onSaveClick(sessionType)
+                onSaveClick(event.sessionType)
             }
 
             else -> {}
@@ -131,7 +139,7 @@ fun SendScreen(
                     Text(stringResource(R.string.send_fragment_label))
                 },
                 navigationIcon = {
-                    if (sessionType == SessionType.Authenticated) {
+                    if (state.isSignedIn == true) {
                         IconButton(onClick = onBackClick) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,

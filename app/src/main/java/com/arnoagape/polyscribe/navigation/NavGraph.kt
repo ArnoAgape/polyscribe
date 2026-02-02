@@ -112,13 +112,12 @@ fun AppNavGraph(
 
             SendScreen(
                 viewModel = hiltViewModel<SendViewModel>(),
-                sessionType = sessionType,
                 onBackClick = { navController.popBackStack() },
                 onSaveClick = { session ->
                     when (session) {
                         SessionType.Guest ->
                             navController.navigate(Login) {
-                                popUpTo(Send) { inclusive = true }
+                                popUpTo(0) { inclusive = true }
                             }
 
                         SessionType.Authenticated ->
