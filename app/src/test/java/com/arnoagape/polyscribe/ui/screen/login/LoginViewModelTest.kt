@@ -6,6 +6,8 @@ import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.TestUtils
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.ui.common.Event
+import com.arnoagape.polyscribe.ui.screen.home.HomeViewModel
+import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -22,20 +24,30 @@ class LoginViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var userRepo: UserRepository
-    private lateinit var viewModel: LoginViewModel
+    private val userRepo: UserRepository = mockk()
+    private val viewModel: LoginViewModel = mockk()
+    private val networkUtils: NetworkUtils = mockk()
 
     @Before
     fun setup() {
-        userRepo = mockk(relaxed = true)
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
+    }
+
+    private fun createViewModel(): LoginViewModel {
+        every { networkUtils.isNetworkAvailable() } returns true
+        every { userRepo.isUserSignedIn() } returns flowOf(true)
+
+        return LoginViewModel(
+            userRepository = userRepo,
+            networkUtils = networkUtils
+        )
     }
 
     @Test
     fun `isSignedIn emits true when repository returns true`() = runTest {
         every { userRepo.isUserSignedIn() } returns flowOf(true)
 
-        viewModel = LoginViewModel(userRepo)
+        createViewModel()
 
 
     }
@@ -44,7 +56,7 @@ class LoginViewModelTest {
     fun `isSignedIn emits false when repository returns false`() = runTest {
         every { userRepo.isUserSignedIn() } returns flowOf(false)
 
-        viewModel = LoginViewModel(userRepo)
+        createViewModel()
 
 
     }
@@ -55,7 +67,7 @@ class LoginViewModelTest {
         every { userRepo.isUserSignedIn() } returns flowOf(false)
         coEvery { userRepo.ensureUserInFirestore() } returns Unit
 
-        viewModel = LoginViewModel(userRepo)
+        createViewModel()
         viewModel.syncUserWithFirestore()
 
         coVerify { userRepo.ensureUserInFirestore() }
@@ -65,7 +77,7 @@ class LoginViewModelTest {
     @Test
     fun `sendEvent emits multiple events in correct order`() = runTest {
         every { userRepo.isUserSignedIn() } returns flowOf(false)
-        viewModel = LoginViewModel(userRepo)
+        createViewModel()
 
         val eventNoNetwork = Event.ShowMessage(R.string.no_network)
         val eventSuccess = Event.ShowSuccessMessage(R.string.success_user_updated)

@@ -2,6 +2,7 @@ package com.arnoagape.polyscribe.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.ui.common.Event
@@ -9,6 +10,7 @@ import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,8 +34,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    fileRepository: FileRepository,
-    userRepository: UserRepository,
+    private val fileRepository: FileRepository,
+    private val userRepository: UserRepository,
     private val networkUtils: NetworkUtils
 ) : ViewModel() {
 
@@ -93,17 +95,15 @@ class HomeViewModel @Inject constructor(
             )
         )
 
-    init {
-        networkUtils.checkNetwork(networkUtils, _events)
-    }
-
     fun refreshFiles() {
+        if (!networkUtils.isNetworkAvailable()) {
+            _events.trySend(Event.ShowMessage(R.string.no_network))
+            return
+        }
+
         viewModelScope.launch {
-            networkUtils.checkNetwork(networkUtils, _events)
             _isRefreshing.value = true
-
-            kotlinx.coroutines.delay(700)
-
+            delay(700)
             _isRefreshing.value = false
         }
     }

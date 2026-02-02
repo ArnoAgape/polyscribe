@@ -10,18 +10,13 @@ import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.time.Instant
 
 class SendViewModelTest {
 
@@ -30,17 +25,17 @@ class SendViewModelTest {
     private lateinit var fileRepo: FileRepository
     private lateinit var userRepo: UserRepository
 
-    private lateinit var fakeNetwork: NetworkUtils
+    private lateinit var networkUtils: NetworkUtils
     private lateinit var viewModel: SendViewModel
 
     @Before
     fun setup() {
         fileRepo = mockk()
         userRepo = mockk()
-        fakeNetwork = mockk()
+        networkUtils = mockk()
 
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
-        every { fakeNetwork.checkNetwork(any(), any()) } returns Unit
+        every { networkUtils.isNetworkAvailable() } returns true
 
         viewModel = SendViewModel(
             fileRepository = fileRepo,
@@ -77,7 +72,7 @@ class SendViewModelTest {
 
     @Test
     fun `sendFile emits success event`() = runTest {
-        coEvery { fakeNetwork.isNetworkAvailable() } returns true
+        coEvery { networkUtils.isNetworkAvailable() } returns true
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser("1")
         coEvery { fileRepo.sendFile(any(), any()) } returns listOf("url1")
 

@@ -32,7 +32,7 @@
     <string name="error_sign_up">Inscription annulée ou échouée</string>
     <string name="error_no_account_file">Un compte est nécessaire pour ajouter un fichier</string>
     <string name="error_no_account_profile">Un compte est nécessaire pour modifier vos informations</string>
-    <string name="no_network">Aucun réseau disponible</string>
+    <string name="no_network">Connectez-vous à un réseau pour continuer</string>
     <string name="try_again">Réessayer</string>
     <string name="no_files">Pour envoyer un nouveau document, appuyez sur le bouton "+"</string>
     <string name="error_number_of_copies">Le nombre de copies ne doit pas être égale à 0</string>

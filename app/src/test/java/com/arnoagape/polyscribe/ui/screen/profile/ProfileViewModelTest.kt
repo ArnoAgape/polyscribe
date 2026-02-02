@@ -29,7 +29,7 @@ class ProfileViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var userRepo: UserRepository
-    private lateinit var network: NetworkUtils
+    private lateinit var networkUtils: NetworkUtils
     private lateinit var emailValidator: AndroidEmailValidator
     private lateinit var viewModel: ProfileViewModel
 
@@ -38,12 +38,12 @@ class ProfileViewModelTest {
     @Before
     fun setup() {
         userRepo = mockk(relaxed = true)
-        network = mockk(relaxed = true)
+        networkUtils = mockk(relaxed = true)
         emailValidator = mockk()
     }
 
     private fun createViewModel() {
-        viewModel = ProfileViewModel(userRepo, network, emailValidator)
+        viewModel = ProfileViewModel(userRepo, networkUtils, emailValidator)
     }
 
     @Test
@@ -103,7 +103,7 @@ class ProfileViewModelTest {
     @Test
     fun `saveUser sends NoAccount when user null`() = runTest {
         every { userRepo.observeUser() } returns flowOf(null)
-        every { network.checkNetwork(any(), any()) } returns Unit
+        every { networkUtils.isNetworkAvailable() } returns true
 
         createViewModel()
 
@@ -121,7 +121,7 @@ class ProfileViewModelTest {
     fun `saveUser success updates UI and sends success event`() = runTest {
         every { userRepo.observeUser() } returns flowOf(fakeUser)
         every { emailValidator.validate(any()) } returns true
-        every { network.checkNetwork(any(), any()) } returns Unit
+        every { networkUtils.isNetworkAvailable() } returns true
         coEvery { userRepo.updateUser(any()) } returns Result.success(Unit)
 
         createViewModel()
@@ -141,7 +141,7 @@ class ProfileViewModelTest {
     fun `saveUser handles IOException as network error`() = runTest {
         every { userRepo.observeUser() } returns flowOf(fakeUser)
         every { emailValidator.validate(any()) } returns true
-        every { network.checkNetwork(any(), any()) } returns Unit
+        every { networkUtils.isNetworkAvailable() } returns true
         coEvery { userRepo.updateUser(any()) } throws IOException("fail")
 
         createViewModel()
@@ -160,7 +160,7 @@ class ProfileViewModelTest {
     fun `saveUser handles generic exception`() = runTest {
         every { userRepo.observeUser() } returns flowOf(fakeUser)
         every { emailValidator.validate(any()) } returns true
-        every { network.checkNetwork(any(), any()) } returns Unit
+        every { networkUtils.isNetworkAvailable() } returns true
         coEvery { userRepo.updateUser(any()) } throws RuntimeException()
 
         createViewModel()

@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,6 +40,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.domain.model.SessionType
+import com.arnoagape.polyscribe.ui.common.Event
+import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.components.OrSeparator
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
@@ -57,6 +62,23 @@ fun LoginScreen(
 ) {
     val viewModel: LoginViewModel = hiltViewModel()
 
+    val context = LocalContext.current
+    val resources = LocalResources.current
+
+    EventsEffect(viewModel.eventsFlow) { event ->
+        when (event) {
+            is Event.ShowMessage -> {
+                Toast.makeText(
+                    context,
+                    resources.getString(event.message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            else -> Unit
+        }
+    }
+
     Scaffold { contentPadding ->
         Column(
             modifier = Modifier
@@ -66,11 +88,13 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             LoginContent(
-                onGoogleSignInClick = onGoogleSignInClick,
+                onGoogleSignInClick = { viewModel.onSignInRequested { onGoogleSignInClick() } },
                 onGuestSignInClick = {
-                    onLoginSuccess(viewModel.loginAsGuest())
+                    viewModel.onSignInRequested {
+                        onLoginSuccess(viewModel.loginAsGuest())
+                    }
                 },
-                onEmailSignInClick = onEmailSignInClick
+                onEmailSignInClick = { viewModel.onSignInRequested { onEmailSignInClick() } }
             )
         }
     }
@@ -156,12 +180,12 @@ fun LoginContent(
                     Text(stringResource(R.string.sign_in_google))
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 /** ---------- SEPARATOR ---------- **/
                 OrSeparator()
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 /** ---------- GUEST BUTTON ---------- **/
                 OutlinedButton(

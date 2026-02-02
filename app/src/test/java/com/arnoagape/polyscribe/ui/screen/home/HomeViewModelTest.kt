@@ -14,7 +14,6 @@ import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -31,7 +30,7 @@ class HomeViewModelTest {
     private val networkUtils: NetworkUtils = mockk()
 
     private fun createViewModel(): HomeViewModel {
-        every { networkUtils.checkNetwork(networkUtils, any()) } returns Unit
+        every { networkUtils.isNetworkAvailable() } returns true
         every { userRepo.isUserSignedIn() } returns flowOf(true)
 
         return HomeViewModel(
@@ -91,10 +90,7 @@ class HomeViewModelTest {
     fun `refreshFiles emits no network message when offline`() = runTest {
         val viewModel = createViewModel()
 
-        every { networkUtils.checkNetwork(any(), any()) } answers {
-            val events = secondArg<Channel<Event>>()
-            events.trySend(Event.ShowMessage(R.string.no_network))
-        }
+        every { networkUtils.isNetworkAvailable() } returns false
 
         viewModel.eventsFlow.test {
             viewModel.refreshFiles()
