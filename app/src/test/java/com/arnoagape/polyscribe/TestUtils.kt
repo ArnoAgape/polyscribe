@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe
 
+import com.arnoagape.polyscribe.data.UserSession
 import com.arnoagape.polyscribe.data.dto.AuthorSnapshot
 import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.User
@@ -42,11 +43,19 @@ object TestUtils {
      * @return A fake [User].
      */
     fun fakeUser(id: String): User {
-        return User(id,
+        return User(
+            id = id,
             displayName = "Gerry Ariella",
             phoneNumber = "0606060606",
             email = "gariella@mail.com",
             professional = false)
+    }
+
+    fun fakeUserSession(id: String) : UserSession {
+        return UserSession(
+            userId = "",
+            isGuest = false
+        )
     }
 
 }

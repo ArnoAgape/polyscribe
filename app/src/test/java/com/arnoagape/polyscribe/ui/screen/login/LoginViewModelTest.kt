@@ -1,22 +1,19 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
 import app.cash.turbine.test
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import com.arnoagape.polyscribe.MainDispatcherRule
 import com.arnoagape.polyscribe.R
-import com.arnoagape.polyscribe.TestUtils
 import com.arnoagape.polyscribe.data.repository.UserRepository
+import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.common.Event
-import com.arnoagape.polyscribe.ui.screen.home.HomeViewModel
 import com.arnoagape.polyscribe.ui.utils.NetworkUtils
-import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -25,17 +22,12 @@ class LoginViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private val userRepo: UserRepository = mockk()
-    private val viewModel: LoginViewModel = mockk()
     private val networkUtils: NetworkUtils = mockk()
-
-    @Before
-    fun setup() {
-        coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
-    }
+    private val onAllowed = mockk<() -> Unit>()
+    private val signedInFlow = MutableStateFlow<Boolean?>(null)
 
     private fun createViewModel(): LoginViewModel {
-        every { networkUtils.isNetworkAvailable() } returns true
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
+        every { userRepo.isUserSignedIn() } returns signedInFlow
 
         return LoginViewModel(
             userRepository = userRepo,
@@ -44,50 +36,58 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `isSignedIn emits true when repository returns true`() = runTest {
-        every { userRepo.isUserSignedIn() } returns flowOf(true)
+    fun `onSignInRequested emits no network message when offline`() = runTest {
+        val viewModel = createViewModel()
 
-        createViewModel()
-
-
-    }
-
-    @Test
-    fun `isSignedIn emits false when repository returns false`() = runTest {
-        every { userRepo.isUserSignedIn() } returns flowOf(false)
-
-        createViewModel()
-
-
-    }
-
-
-    @Test
-    fun `syncUserWithFirestore calls ensureUserInFirestore`() = runTest {
-        every { userRepo.isUserSignedIn() } returns flowOf(false)
-        coEvery { userRepo.ensureUserInFirestore() } returns Unit
-
-        createViewModel()
-        viewModel.syncUserWithFirestore()
-
-        coVerify { userRepo.ensureUserInFirestore() }
-    }
-
-
-    @Test
-    fun `sendEvent emits multiple events in correct order`() = runTest {
-        every { userRepo.isUserSignedIn() } returns flowOf(false)
-        createViewModel()
-
-        val eventNoNetwork = Event.ShowMessage(R.string.no_network)
-        val eventSuccess = Event.ShowSuccessMessage(R.string.success_user_updated)
+        every { networkUtils.isNetworkAvailable() } returns false
 
         viewModel.eventsFlow.test {
-            viewModel.sendEvent(eventNoNetwork)
-            viewModel.sendEvent(eventSuccess)
+            viewModel.onSignInRequested(onAllowed = onAllowed)
 
-            assertEquals(eventNoNetwork, awaitItem())
-            assertEquals(eventSuccess, awaitItem())
+            val event = awaitItem()
+            assertThat(event).isInstanceOf(Event.ShowMessage::class.java)
+
+            val offlineEvent = event as Event.ShowMessage
+            assertThat(offlineEvent.message).isEqualTo(R.string.no_network)
+        }
+    }
+
+    @Test
+    fun `Authenticated overrides Guest session`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitItem()
+
+            viewModel.loginAsGuest()
+            val guest = awaitItem()
+            assertThat(guest.session).isEqualTo(SessionType.Guest)
+
+            signedInFlow.value = true
+            val authenticated = awaitItem()
+
+            assertThat(authenticated.session).isEqualTo(SessionType.Authenticated)
+            assertThat(authenticated.isSignedIn).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `state switches from Guest to Authenticated when user signs in`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.state.test {
+            awaitItem()
+
+            viewModel.loginAsGuest()
+            val guest = awaitItem()
+            assertThat(guest.session).isEqualTo(SessionType.Guest)
+            assertThat(guest.isSignedIn).isEqualTo(null)
+
+            signedInFlow.value = true
+
+            val authenticated = awaitItem()
+            assertThat(authenticated.session).isEqualTo(SessionType.Authenticated)
+            assertThat(authenticated.isSignedIn).isEqualTo(true)
         }
     }
 }
