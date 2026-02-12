@@ -104,12 +104,6 @@ fun AppNavGraph(
         }
 
         composable<Send> {
-            val sessionType =
-                navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.get<SessionType>("sessionType")
-                    ?: SessionType.Authenticated
-
             SendScreen(
                 viewModel = hiltViewModel<SendViewModel>(),
                 onBackClick = { navController.popBackStack() },

@@ -42,6 +42,7 @@ class LoginViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 null
             )
+    val isSignedIn: StateFlow<Boolean?> = _isSignedIn
 
     val state: StateFlow<LoginScreenState> =
         combine(_session, _isSignedIn) { session, isSignedIn ->
@@ -50,8 +51,7 @@ class LoginViewModel @Inject constructor(
                     isSignedIn == true -> SessionType.Authenticated
                     session == SessionType.Guest -> SessionType.Guest
                     else -> null
-                },
-                isSignedIn = isSignedIn
+                }
             )
         }.stateIn(
             viewModelScope,
@@ -88,6 +88,5 @@ class LoginViewModel @Inject constructor(
 }
 
 data class LoginScreenState(
-    val session: SessionType? = null,
-    val isSignedIn: Boolean? = null
+    val session: SessionType? = null
 )

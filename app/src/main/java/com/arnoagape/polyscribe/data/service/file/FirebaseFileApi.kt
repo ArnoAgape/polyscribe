@@ -19,7 +19,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
@@ -141,7 +140,7 @@ class FirebaseFileApi @Inject constructor(
      * Validates MIME type and returns the public download URL.
      */
     private suspend fun uploadDocumentToFirebase(uri: Uri, firebaseUser: FirebaseUser): String? {
-        return withContext(Dispatchers.IO + SupervisorJob()) {
+        return withContext(Dispatchers.IO) {
             var pfd: ParcelFileDescriptor? = null
 
             val rawName =

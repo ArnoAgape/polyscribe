@@ -67,7 +67,6 @@ class LoginViewModelTest {
             val authenticated = awaitItem()
 
             assertThat(authenticated.session).isEqualTo(SessionType.Authenticated)
-            assertThat(authenticated.isSignedIn).isEqualTo(true)
         }
     }
 
@@ -81,13 +80,11 @@ class LoginViewModelTest {
             viewModel.loginAsGuest()
             val guest = awaitItem()
             assertThat(guest.session).isEqualTo(SessionType.Guest)
-            assertThat(guest.isSignedIn).isEqualTo(null)
 
             signedInFlow.value = true
 
             val authenticated = awaitItem()
             assertThat(authenticated.session).isEqualTo(SessionType.Authenticated)
-            assertThat(authenticated.isSignedIn).isEqualTo(true)
         }
     }
 }

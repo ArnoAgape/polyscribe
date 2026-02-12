@@ -24,7 +24,6 @@ import androidx.navigation.compose.rememberNavController
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.ui.screen.login.LoginViewModel
 import com.arnoagape.polyscribe.ui.utils.SharedFilesHolder
-import kotlinx.coroutines.flow.map
 
 /**
  * Root composable of the app.
@@ -35,9 +34,8 @@ import kotlinx.coroutines.flow.map
 fun MainScreen() {
 
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val isSignedIn by loginViewModel.state
-        .map { it.isSignedIn }
-        .collectAsStateWithLifecycle(initialValue = null)
+    val isSignedIn by loginViewModel.isSignedIn
+        .collectAsStateWithLifecycle()
 
     // 🔄 Waiting for Firebase
     if (isSignedIn == null) {
