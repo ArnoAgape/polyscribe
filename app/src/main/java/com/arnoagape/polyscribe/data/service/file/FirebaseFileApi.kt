@@ -48,21 +48,23 @@ class FirebaseFileApi @Inject constructor(
 
     override fun getFilesForUser(userId: String?, isAnonymous: Boolean): Flow<List<File>> {
 
-        Log.d(
-            "DEBUG_FILES",
-            "getFilesForUser uid=$userId anon=$isAnonymous"
-        )
-
         if (userId == null) return flowOf(emptyList())
 
-        val query =
-            if (isAnonymous) {
-                filesCollection.whereEqualTo("guestId", userId)
-            } else {
-                filesCollection.whereEqualTo("ownerId", userId)
-            }
+        val rawName = if (isAnonymous) {
+            "guest"
+        } else {
+            auth.currentUser?.displayName
+                ?: auth.currentUser?.email
+                ?: "user"
+        }
 
-        return query
+        val safeUserName = rawName.safeFileName()
+        val userFolder = "${safeUserName}_${userId}"
+
+        return firestore
+            .collection("files")
+            .document(userFolder)
+            .collection("files")
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .dataObjects<FileDto>()
             .map { it.map(File::fromDto) }
@@ -107,8 +109,22 @@ class FirebaseFileApi @Inject constructor(
                 ?: auth.signInAnonymously().await().user
                 ?: throw IllegalStateException("Unable to get Firebase user")
 
+        val isGuest = firebaseUser.isAnonymous
+
+        val rawName =
+            if (isGuest)
+                file.guestName.ifBlank { "guest" }
+            else
+                firebaseUser.displayName
+                    ?: firebaseUser.email
+                    ?: "user"
+
+        val safeUserName = rawName.safeFileName()
+
+        val userFolder = "${safeUserName}_${firebaseUser.uid}"
+
         val uploadedFiles = localUris.mapNotNull { uri ->
-            uploadDocumentToFirebase(uri, firebaseUser)
+            uploadDocumentToFirebase(uri, firebaseUser, userFolder)
         }
 
         val authorSnapshot =
@@ -126,8 +142,15 @@ class FirebaseFileApi @Inject constructor(
             guestId = if (firebaseUser.isAnonymous) firebaseUser.uid else null,
             author = authorSnapshot
         )
+        Log.d("DEBUG_STORAGE", "path = files/$userFolder/$safeUserName")
+        Log.d("DEBUG_STORAGE", "userFolder = $userFolder")
+        Log.d("DEBUG_STORAGE", "uid = ${firebaseUser.uid}")
 
-        filesCollection
+
+        firestore
+            .collection("files")
+            .document(userFolder)
+            .collection("files")
             .document(updated.id)
             .set(updated.toDto())
             .await()
@@ -139,7 +162,11 @@ class FirebaseFileApi @Inject constructor(
      * Uploads a document to Firebase Storage.
      * Validates MIME type and returns the public download URL.
      */
-    private suspend fun uploadDocumentToFirebase(uri: Uri, firebaseUser: FirebaseUser): String? {
+    private suspend fun uploadDocumentToFirebase(
+        uri: Uri,
+        firebaseUser: FirebaseUser,
+        userFolder: String
+    ): String? {
         return withContext(Dispatchers.IO) {
             var pfd: ParcelFileDescriptor? = null
 
@@ -173,7 +200,10 @@ class FirebaseFileApi @Inject constructor(
 
                 val storageRef = FirebaseStorage.getInstance()
                     .reference
-                    .child("files/$fileName")
+                    .child("files/$userFolder/$fileName")
+
+                Log.d("DEBUG_STORAGE", "current auth uid = ${auth.currentUser?.uid}")
+                Log.d("DEBUG_STORAGE", "folder uid = ${userFolder.substringAfterLast("_")}")
 
                 storageRef.putFile(uri).await()
                 return@withContext storageRef.downloadUrl.await().toString()
