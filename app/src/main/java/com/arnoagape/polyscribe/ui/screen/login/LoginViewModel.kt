@@ -45,7 +45,10 @@ class LoginViewModel @Inject constructor(
     val isSignedIn: StateFlow<Boolean?> = _isSignedIn
 
     val state: StateFlow<LoginScreenState> =
-        combine(_session, _isSignedIn) { session, isSignedIn ->
+        combine(
+            _session,
+            _isSignedIn
+        ) { session, isSignedIn ->
             LoginScreenState(
                 session = when {
                     isSignedIn == true -> SessionType.Authenticated

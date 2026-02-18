@@ -1,6 +1,7 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
@@ -57,7 +58,8 @@ class SendViewModel @Inject constructor(
             doubleSided = false,
             numberOfCopies = 1,
             comment = "",
-            dateTime = Instant.now()
+            dateTime = Instant.now(),
+            guestName = ""
         )
     )
 
@@ -94,6 +96,7 @@ class SendViewModel @Inject constructor(
                     form.copy(numberOfCopies = event.value.coerceAtLeast(1))
 
                 is FormEvent.CommentChanged -> form.copy(comment = event.comment)
+                is FormEvent.GuestNameChanged -> form.copy(guestName = event.guestName) // LoginScreen field
                 else -> form
             }
         }
@@ -122,6 +125,8 @@ class SendViewModel @Inject constructor(
                     SessionType.Guest
                 else
                     SessionType.Authenticated
+
+            Log.d("SEND_DEBUG", "GuestName sent: ${_formState.value.guestName}")
 
             runCatching {
                 fileRepository.sendFile(
@@ -152,7 +157,8 @@ data class SendFormState(
     val doubleSided: Boolean,
     val numberOfCopies: Int,
     val comment: String,
-    val dateTime: Instant
+    val dateTime: Instant,
+    val guestName: String // LoginScreen field
 ) {
     fun toFile(
         id: String = "",
@@ -164,6 +170,7 @@ data class SendFormState(
         numberOfCopies = numberOfCopies,
         comment = comment,
         collectDate = dateTime,
-        author = author
+        author = author,
+        guestName = guestName // LoginScreen field
     )
 }

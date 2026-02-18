@@ -20,4 +20,5 @@ data class FileDto(
     val comment: String = "",
     val ownerId: String? = null,
     val guestId: String? = null,
+    val guestName: String = ""
 ) : Serializable

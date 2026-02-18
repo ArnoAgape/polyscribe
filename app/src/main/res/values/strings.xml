@@ -56,8 +56,8 @@
 
     <string name="sign_in_google">Sign in with Google</string>
     <string name="sign_in_email">Sign in with email</string>
-    <string name="sign_in_title">Sign up with your e-mail address or with Google to use Polyscribe</string>
-    <string name="sign_in_guest">Continue as guest</string>
+    <string name="sign_in_title">Enter your name in order to use Polyscribe.</string>
+    <string name="sign_in_guest">Continue</string>
     <string name="sign_up">Sign up</string>
     <string name="email">Email</string>
     <string name="copies">Copies</string>
@@ -69,6 +69,7 @@
     <string name="hint_double_sided">Double sided</string>
     <string name="hint_number_of_copies">Number of copies</string>
     <string name="hint_comments">Comments</string>
+    <string name="hint_first_last_name">First and last name</string>
     <string name="hint_datetime">Collect date</string>
 
     <string name="contentDescription_button_add">Click here to send a new document</string>

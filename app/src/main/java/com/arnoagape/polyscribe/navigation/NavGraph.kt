@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.arnoagape.polyscribe.domain.model.SessionType
+import com.arnoagape.polyscribe.ui.common.FormEvent
 import com.arnoagape.polyscribe.ui.screen.detail.DetailScreen
 import com.arnoagape.polyscribe.ui.screen.detail.DetailViewModel
 import com.arnoagape.polyscribe.ui.screen.home.HomeScreen
@@ -64,6 +65,7 @@ fun AppNavGraph(
         }
 
         composable<Login> {
+            val sendViewModel: SendViewModel = hiltViewModel()
             LoginScreen(
                 onGoogleSignInClick = { googleSignUpLauncher() },
                 onEmailSignInClick = { emailSignUpLauncher() },
@@ -73,6 +75,10 @@ fun AppNavGraph(
                             navController.currentBackStackEntry
                                 ?.savedStateHandle
                                 ?.set("sessionType", SessionType.Guest)
+
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("guestName", sendViewModel.state.value.file.guestName)
 
                             navController.navigate(Send)
                         }
@@ -104,8 +110,23 @@ fun AppNavGraph(
         }
 
         composable<Send> {
+
+            val viewModel = hiltViewModel<SendViewModel>()
+
+            val guestName =
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.get<String>("guestName") ?: ""
+
+            LaunchedEffect(guestName) {
+                if (guestName.isNotBlank()) {
+                    viewModel.onAction(
+                        FormEvent.GuestNameChanged(guestName)
+                    )
+                }
+            }
             SendScreen(
-                viewModel = hiltViewModel<SendViewModel>(),
+                viewModel = viewModel,
                 onBackClick = { navController.popBackStack() },
                 onSaveClick = { session ->
                     when (session) {

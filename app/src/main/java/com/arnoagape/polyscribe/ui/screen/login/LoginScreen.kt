@@ -11,38 +11,39 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.arnoagape.polyscribe.R
 import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.EventsEffect
-import com.arnoagape.polyscribe.ui.common.components.OrSeparator
+import com.arnoagape.polyscribe.ui.common.FormEvent
+import com.arnoagape.polyscribe.ui.screen.send.SendViewModel
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
 
 /**
@@ -61,6 +62,9 @@ fun LoginScreen(
     onLoginSuccess: (SessionType) -> Unit
 ) {
     val viewModel: LoginViewModel = hiltViewModel()
+    val sendViewModel: SendViewModel = hiltViewModel()
+
+    val state by sendViewModel.state.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -88,6 +92,9 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             LoginContent(
+                guestName = state.file.guestName,
+                onGuestNameChanged = { sendViewModel.onAction(FormEvent.GuestNameChanged(it))},
+                isGuestNameValid = state.file.guestName.isNotBlank(),
                 onGoogleSignInClick = { viewModel.onSignInRequested { onGoogleSignInClick() } },
                 onGuestSignInClick = {
                     viewModel.onSignInRequested {
@@ -102,6 +109,9 @@ fun LoginScreen(
 
 @Composable
 fun LoginContent(
+    guestName: String,
+    onGuestNameChanged: (String) -> Unit,
+    isGuestNameValid: Boolean,
     onGoogleSignInClick: () -> Unit,
     onGuestSignInClick: () -> Unit,
     onEmailSignInClick: () -> Unit
@@ -142,7 +152,7 @@ fun LoginContent(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 /** ---------- EMAIL BUTTON ---------- **/
-                Button(
+                /*Button(
                     onClick = { onEmailSignInClick() },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -185,15 +195,34 @@ fun LoginContent(
                 /** ---------- SEPARATOR ---------- **/
                 OrSeparator()
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(14.dp))*/
+
+                /** ---------- NAME FIELD ---------- **/
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = guestName,
+                    onValueChange = onGuestNameChanged,
+                    label = { Text(stringResource(R.string.hint_first_last_name)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Words
+                    ),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 /** ---------- GUEST BUTTON ---------- **/
-                OutlinedButton(
+                Button(
                     onClick = onGuestSignInClick,
+                    enabled = isGuestNameValid,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    border = ButtonDefaults.outlinedButtonBorder(enabled = true)
                 ) {
                     Text(stringResource(R.string.sign_in_guest))
                 }
@@ -207,6 +236,9 @@ fun LoginContent(
 private fun LoginScreenPreview() {
     PolyscribeTheme {
         LoginContent(
+            guestName = "John Doe",
+            onGuestNameChanged = {},
+            isGuestNameValid = false,
             onEmailSignInClick = { },
             onGoogleSignInClick = { },
             onGuestSignInClick = { }

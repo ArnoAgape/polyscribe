@@ -21,7 +21,8 @@ data class File(
     val colored: Boolean = false,
     val doubleSided: Boolean = false,
     val numberOfCopies: Int = 1,
-    val comment: String = ""
+    val comment: String = "",
+    val guestName: String = ""
 ) {
 
     /**
@@ -39,7 +40,8 @@ data class File(
             copies = numberOfCopies,
             comment = comment,
             ownerId = ownerId,
-            guestId = guestId
+            guestId = guestId,
+            guestName = guestName
         )
     }
 
@@ -57,7 +59,8 @@ data class File(
                 colored = dto.colored,
                 doubleSided = dto.doubleSided,
                 numberOfCopies = dto.copies,
-                comment = dto.comment
+                comment = dto.comment,
+                guestName = dto.guestName
             )
         }
     }

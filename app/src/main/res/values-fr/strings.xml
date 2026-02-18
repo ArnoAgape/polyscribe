@@ -56,8 +56,8 @@
 
     <string name="sign_in_google">Continuer avec Google</string>
     <string name="sign_in_email">Continuer avec un email</string>
-    <string name="sign_in_title">Inscrivez-vous avec une adresse e-mail ou un compte Google pour utiliser Polyscribe</string>
-    <string name="sign_in_guest">Continuer en tant qu\'invité</string>
+    <string name="sign_in_title">Entrez votre nom pour utiliser Polyscribe.</string>
+    <string name="sign_in_guest">Continuer</string>
     <string name="sign_up">S\'inscrire</string>
     <string name="email">E-mail</string>
     <string name="copies">Copies</string>
@@ -69,6 +69,7 @@
     <string name="hint_double_sided">Recto-verso :</string>
     <string name="hint_number_of_copies">Exemplaires :</string>
     <string name="hint_comments">Commentaires :</string>
+    <string name="hint_first_last_name">Prénom et nom</string>
     <string name="hint_datetime">Date de collecte :</string>
 
     <string name="contentDescription_button_add">Cliquer ici pour envoyer un nouveau document</string>

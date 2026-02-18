@@ -18,4 +18,6 @@ sealed class FormEvent {
     data class DisplayNameChanged(val displayName: String) : FormEvent()
     data class EmailChanged(val email: String) : FormEvent()
 
+    data class GuestNameChanged(val guestName: String) : FormEvent()
+
 }
