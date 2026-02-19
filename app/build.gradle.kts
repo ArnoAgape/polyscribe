@@ -121,7 +121,7 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.datastore.preferences)
     implementation(libs.firebase.appcheck.playintegrity)
-    debugImplementation(libs.firebase.appcheck.debug)
+    implementation(libs.firebase.appcheck.debug)
 
     //DI
     implementation(libs.hilt)
