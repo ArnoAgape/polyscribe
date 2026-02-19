@@ -29,21 +29,30 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Build APK release
-      - name: Build Release APK
+      # Build CI Release APK
+      - name: Build CI Release APK
         run: |
-          ./gradlew assembleRelease \
-            -PstorePassword=${{ secrets.KEYSTORE_PASSWORD }} \
-            -PkeyPassword=${{ secrets.KEY_PASSWORD }} \
-            -PkeyAlias=${{ secrets.KEY_ALIAS }} \
-            -PstoreFile=upload-keystore.jks
+          ./gradlew assembleCiRelease \
+          -PstorePassword=${{ secrets.KEYSTORE_PASSWORD }} \
+          -PkeyPassword=${{ secrets.KEY_PASSWORD }} \
+          -PkeyAlias=${{ secrets.KEY_ALIAS }} \
+          -PstoreFile=upload-keystore.jks
 
-      # Upload vers Firebase App Distribution
+        # Upload vers Firebase App Distribution
       - name: Upload to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          file: app/build/outputs/apk/release/app-release.apk
+          file: app/build/outputs/apk/ciRelease/app-ciRelease.apk
           releaseNotes: "Automated release from GitHub tag ${{ github.ref_name }}"
-          testers: "arno.bouiron@gmail.com"
+          testers: "arno.bouiron@gmail.com, a.hazoume.fd@gmail.com"
+
+        # Build Play Store AAB
+      - name: Build Release AAB
+        run: |
+          ./gradlew bundleRelease \
+          -PstorePassword=${{ secrets.KEYSTORE_PASSWORD }} \
+          -PkeyPassword=${{ secrets.KEY_PASSWORD }} \
+          -PkeyAlias=${{ secrets.KEY_ALIAS }} \
+          -PstoreFile=upload-keystore.jks

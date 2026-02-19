@@ -30,14 +30,27 @@ android {
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
+
         debug {
             enableAndroidTestCoverage = true
             enableUnitTestCoverage = true
+            buildConfigField("Boolean", "IS_CI_BUILD", "false")
+        }
+
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            buildConfigField("Boolean", "IS_CI_BUILD", "false")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        create("ciRelease") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            buildConfigField("Boolean", "IS_CI_BUILD", "true")
         }
     }
 

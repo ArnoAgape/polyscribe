@@ -1,10 +1,8 @@
 package com.arnoagape.polyscribe
 
 import android.app.Application
-import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import dagger.hilt.android.HiltAndroidApp
 
@@ -24,15 +22,26 @@ class PolyscribeApplication : Application() {
 
         val appCheck = FirebaseAppCheck.getInstance()
 
-        if (BuildConfig.DEBUG) {
-            FirebaseAppCheck.getInstance()
-                .installAppCheckProviderFactory(
-                    DebugAppCheckProviderFactory.getInstance()
+        when {
+            BuildConfig.DEBUG -> {
+                installDebugAppCheck(appCheck)
+            }
+
+            BuildConfig.IS_CI_BUILD -> {
+                installDebugAppCheck(appCheck)
+            }
+
+            else -> {
+                appCheck.installAppCheckProviderFactory(
+                    PlayIntegrityAppCheckProviderFactory.getInstance()
                 )
-        } else {
-            appCheck.installAppCheckProviderFactory(
-                PlayIntegrityAppCheckProviderFactory.getInstance()
-            )
+            }
         }
+    }
+
+    private fun installDebugAppCheck(appCheck: FirebaseAppCheck) {
+        appCheck.installAppCheckProviderFactory(
+            com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory.getInstance()
+        )
     }
 }
