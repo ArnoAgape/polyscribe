@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.arnoagape.polyscribe.MainActivity
 import com.arnoagape.polyscribe.R
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -55,8 +56,10 @@ class NotificationService : FirebaseMessagingService() {
         )
 
         val builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_notification) // monochrome
-            .setLargeIcon(largeIcon)                  // couleur ici
+            .setSmallIcon(R.drawable.ic_notification) // blanc transparent
+            .setLargeIcon(largeIcon)
+            .setColor(ContextCompat.getColor(this, R.color.ic_launcher_background))
+            .setColorized(true)
             .setContentTitle(title ?: "New notification")
             .setContentText(body ?: "")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

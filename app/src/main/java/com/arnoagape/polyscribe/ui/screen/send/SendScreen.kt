@@ -181,15 +181,7 @@ fun SendScreen(
                     SendContent(
                         localUris = state.localUris,
                         onAddFileClick = {
-                            fileLauncher.launch(
-                                arrayOf(
-                                    "application/pdf",
-                                    "application/msword",
-                                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                    "application/vnd.oasis.opendocument.text",
-                                    "text/plain"
-                                )
-                            )
+                            fileLauncher.launch(arrayOf("*/*"))
                         },
                         onAddPictureClick = { pictureLauncher.launch("image/*") },
                         onRemoveFile = { viewModel.onAction(FormEvent.RemoveFile(it)) },

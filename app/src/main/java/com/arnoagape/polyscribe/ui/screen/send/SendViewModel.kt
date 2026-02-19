@@ -2,7 +2,6 @@ package com.arnoagape.polyscribe.ui.screen.send
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoagape.polyscribe.R
@@ -47,7 +46,7 @@ class SendViewModel @Inject constructor(
     }
 
     private val _uiState = MutableStateFlow<SendUiState>(SendUiState.Idle)
-    private val _events = Channel<Event>()
+    private val _events = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = _events.receiveAsFlow()
 
     private val _localUris = MutableStateFlow<List<Uri>>(emptyList())
@@ -176,7 +175,7 @@ class SendViewModel @Inject constructor(
                 else
                     SessionType.Authenticated
 
-            Log.d("SEND_DEBUG", "GuestName sent: ${_formState.value.guestName}")
+            //Log.d("SEND_DEBUG", "GuestName sent: ${_formState.value.guestName}")
 
             runCatching {
                 fileRepository.sendFile(

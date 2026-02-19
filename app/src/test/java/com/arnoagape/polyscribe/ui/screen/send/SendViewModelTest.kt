@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
+import android.content.Context
 import android.net.Uri
 import app.cash.turbine.test
 import com.arnoagape.polyscribe.MainDispatcherRule
@@ -8,11 +9,11 @@ import com.arnoagape.polyscribe.data.repository.FileRepository
 import com.arnoagape.polyscribe.data.repository.UserRepository
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
-import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -24,22 +25,22 @@ class SendViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var fileRepo: FileRepository
     private lateinit var userRepo: UserRepository
-
-    private lateinit var networkUtils: NetworkUtils
     private lateinit var viewModel: SendViewModel
+    private lateinit var context: Context
 
     @Before
     fun setup() {
         fileRepo = mockk()
         userRepo = mockk()
-        networkUtils = mockk()
+        context = mockk()
 
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser(id = "1")
-        every { networkUtils.isNetworkAvailable() } returns true
+        coEvery { userRepo.isUserSignedIn() } returns flowOf(true)
 
         viewModel = SendViewModel(
             fileRepository = fileRepo,
-            userRepository = userRepo
+            userRepository = userRepo,
+            context = context
         )
     }
 
@@ -50,7 +51,7 @@ class SendViewModelTest {
 
         viewModel.onAction(FormEvent.RemoveFile(mockUri))
         viewModel.state.test {
-            // initial value
+            awaitItem()
         }
     }
 
@@ -64,24 +65,30 @@ class SendViewModelTest {
         every { mockUri.path } returns "/storage/emulated/0/DCIM/image123.jpg"
 
         viewModel.state.test {
-            awaitItem() // false initialValue
+            awaitItem() // valeur initiale
+
             viewModel.onAction(FormEvent.AddFile(mockUri))
-             // file added -> valid
+
+            val updated = awaitItem()
+
+            assertTrue(updated.isValid)
         }
     }
 
     @Test
     fun `sendFile emits success event`() = runTest {
-        coEvery { networkUtils.isNetworkAvailable() } returns true
+
         coEvery { userRepo.getCurrentUser() } returns TestUtils.fakeUser("1")
         coEvery { fileRepo.sendFile(any(), any()) } returns listOf("url1")
 
         viewModel.eventsFlow.test {
+
             viewModel.sendFile()
 
             val event = awaitItem()
-            assertTrue(event is Event.ShowSuccessMessage)
-        }
-    }
 
+            assertTrue(event is Event.FileSentSuccessfully)
+        }
+
+    }
 }

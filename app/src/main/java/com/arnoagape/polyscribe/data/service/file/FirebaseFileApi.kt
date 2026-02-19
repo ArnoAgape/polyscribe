@@ -168,44 +168,87 @@ class FirebaseFileApi @Inject constructor(
         userFolder: String
     ): String? {
         return withContext(Dispatchers.IO) {
+
             var pfd: ParcelFileDescriptor? = null
 
-            val rawName =
-                firebaseUser.displayName
-                    ?.takeIf { it.isNotBlank() }
-                    ?: firebaseUser.email?.takeIf { it.isNotBlank() }
-                    ?: "invite"
-            val safeUserName = rawName.safeFileName()
-            val timestamp = System.currentTimeMillis()
-
             try {
+
                 val mimeType = context.contentResolver.getType(uri)
+                Log.d("DEBUG_MIME", "mimeType = $mimeType")
+
                 pfd = context.contentResolver.openFileDescriptor(uri, "r")
 
+                // 🔹 Récupérer nom fichier réel
+                val cursor = context.contentResolver.query(uri, null, null, null, null)
+                val nameIndex =
+                    cursor?.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                cursor?.moveToFirst()
+                val originalFileName =
+                    nameIndex?.let { cursor.getString(it) } ?: "file"
+                cursor?.close()
+
+                val extension =
+                    originalFileName.substringAfterLast(".", "").lowercase()
+
+                // 🔹 MIME autorisés
                 val allowedMimeTypes = listOf(
-                    "image/jpeg", "image/png", "application/pdf",
+                    "application/pdf",
                     "application/msword",
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "application/vnd.ms-excel",
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "application/vnd.ms-excel.sheet.macroEnabled.12",
+                    "application/vnd.ms-powerpoint",
+                    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    "application/vnd.ms-powerpoint.presentation.macroEnabled.12",
                     "application/vnd.oasis.opendocument.text",
+                    "application/vnd.oasis.opendocument.spreadsheet",
+                    "application/vnd.oasis.opendocument.presentation",
+                    "application/rtf",
+                    "text/rtf",
                     "text/plain"
                 )
 
-                if (mimeType !in allowedMimeTypes) {
+                // 🔹 Extensions autorisées (fallback)
+                val allowedExtensions = listOf(
+                    "pdf",
+                    "doc", "docx",
+                    "xls", "xlsx", "xlsm",
+                    "ppt", "pptx", "pptm",
+                    "odt", "ods", "odp",
+                    "rtf", "txt",
+                    "jpg", "jpeg", "png", "tif", "tiff", "heic", "heif"
+                )
+
+                val isMimeAllowed =
+                    mimeType?.startsWith("image/") == true ||
+                            mimeType in allowedMimeTypes
+
+                val isExtensionAllowed =
+                    extension in allowedExtensions
+
+                if (!isMimeAllowed && !isExtensionAllowed) {
                     throw IllegalArgumentException("Unsupported file type.")
                 }
 
-                val extension =
-                    MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: "bin"
-                val fileName = "${safeUserName}_${timestamp}.$extension"
+                // 🔹 Nettoyage nom utilisateur
+                val rawName =
+                    firebaseUser.displayName
+                        ?.takeIf { it.isNotBlank() }
+                        ?: firebaseUser.email?.takeIf { it.isNotBlank() }
+                        ?: "invite"
+
+                val safeUserName = rawName.safeFileName()
+                val timestamp = System.currentTimeMillis()
+
+                val finalFileName = "${safeUserName}_${timestamp}.$extension"
 
                 val storageRef = FirebaseStorage.getInstance()
                     .reference
-                    .child("files/$userFolder/$fileName")
-
-                Log.d("DEBUG_STORAGE", "current auth uid = ${auth.currentUser?.uid}")
-                Log.d("DEBUG_STORAGE", "folder uid = ${userFolder.substringAfterLast("_")}")
+                    .child("files/$userFolder/$finalFileName")
 
                 storageRef.putFile(uri).await()
+
                 return@withContext storageRef.downloadUrl.await().toString()
 
             } catch (e: Exception) {
