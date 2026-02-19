@@ -56,3 +56,10 @@ jobs:
           -PkeyPassword=${{ secrets.KEY_PASSWORD }} \
           -PkeyAlias=${{ secrets.KEY_ALIAS }} \
           -PstoreFile=upload-keystore.jks
+
+        # Upload release on GitHub
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: polyscribe-aab
+          path: app/build/outputs/bundle/release/app-release.aab
