@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
@@ -48,8 +49,14 @@ class NotificationService : FirebaseMessagingService() {
             this, 0, intent, PendingIntent.FLAG_IMMUTABLE
         )
 
+        val largeIcon = BitmapFactory.decodeResource(
+            resources,
+            R.drawable.ic_polyscribe_logo
+        )
+
         val builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_polyscribe_logo)
+            .setSmallIcon(R.drawable.ic_notification) // monochrome
+            .setLargeIcon(largeIcon)                  // couleur ici
             .setContentTitle(title ?: "New notification")
             .setContentText(body ?: "")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

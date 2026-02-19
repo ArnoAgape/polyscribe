@@ -16,6 +16,11 @@ sealed interface Event {
     data class ShowMessage(val message: Int) : Event
 
     /**
+     * Shows a message to the user using a string resource.
+     */
+    data class ErrorUploadFiles(val message: Int) : Event
+
+    /**
      * Shows a success message to the user using a string resource.
      */
     data class ShowSuccessMessage(val message: Int) : Event

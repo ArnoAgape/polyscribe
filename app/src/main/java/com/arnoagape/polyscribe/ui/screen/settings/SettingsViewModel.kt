@@ -19,7 +19,13 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val notificationsEnabled = settingsRepository.notificationsEnabled
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+        .stateIn(
+            viewModelScope,
+            started = SharingStarted.WhileSubscribed(
+                stopTimeoutMillis = 5000
+            ),
+            initialValue = false
+        )
 
     fun toggleNotifications(enabled: Boolean) {
         viewModelScope.launch {

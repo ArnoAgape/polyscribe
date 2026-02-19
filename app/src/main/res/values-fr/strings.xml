@@ -32,6 +32,8 @@
     <string name="error_sign_up">Inscription annulée ou échouée</string>
     <string name="error_no_account_file">Un compte est nécessaire pour ajouter un fichier</string>
     <string name="error_no_account_profile">Un compte est nécessaire pour modifier vos informations</string>
+    <string name="error_max_files">Vous avez atteint la limite maximale d\'envoi de fichiers.</string>
+    <string name="error_max_size">Taille maximale de 50 Mo atteinte.</string>
     <string name="no_network">Connectez-vous à un réseau pour continuer</string>
     <string name="try_again">Réessayer</string>
     <string name="no_files">Pour envoyer un nouveau document, appuyez sur le bouton "+"</string>

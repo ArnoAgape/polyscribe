@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.login
 
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -16,16 +18,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
@@ -45,6 +45,9 @@ import com.arnoagape.polyscribe.ui.common.EventsEffect
 import com.arnoagape.polyscribe.ui.common.FormEvent
 import com.arnoagape.polyscribe.ui.screen.send.SendViewModel
 import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 /**
  * Displays the login screen with multiple sign-in options:
@@ -55,6 +58,7 @@ import com.arnoagape.polyscribe.ui.theme.PolyscribeTheme
  * @param onGoogleSignInClick Launches the Google sign-in flow.
  * @param onEmailSignInClick Launches the email sign-in flow.
  */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LoginScreen(
     onGoogleSignInClick: () -> Unit,
@@ -83,6 +87,13 @@ fun LoginScreen(
         }
     }
 
+    val notificationsPermissionState =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            rememberPermissionState(
+                android.Manifest.permission.POST_NOTIFICATIONS
+            )
+        } else null
+
     Scaffold { contentPadding ->
         Column(
             modifier = Modifier
@@ -93,11 +104,18 @@ fun LoginScreen(
         ) {
             LoginContent(
                 guestName = state.file.guestName,
-                onGuestNameChanged = { sendViewModel.onAction(FormEvent.GuestNameChanged(it))},
+                onGuestNameChanged = { sendViewModel.onAction(FormEvent.GuestNameChanged(it)) },
                 isGuestNameValid = state.file.guestName.isNotBlank(),
                 onGoogleSignInClick = { viewModel.onSignInRequested { onGoogleSignInClick() } },
                 onGuestSignInClick = {
                     viewModel.onSignInRequested {
+
+                        if (notificationsPermissionState != null &&
+                            !notificationsPermissionState.status.isGranted
+                        ) {
+                            notificationsPermissionState.launchPermissionRequest()
+                        }
+
                         onLoginSuccess(viewModel.loginAsGuest())
                     }
                 },
@@ -145,11 +163,11 @@ fun LoginContent(
 
                 Text(
                     stringResource(R.string.sign_in_title),
-                    style = MaterialTheme.typography.labelLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 /** ---------- EMAIL BUTTON ---------- **/
                 /*Button(
@@ -198,7 +216,7 @@ fun LoginContent(
                 Spacer(modifier = Modifier.height(14.dp))*/
 
                 /** ---------- NAME FIELD ---------- **/
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = guestName,
                     onValueChange = onGuestNameChanged,
@@ -207,11 +225,7 @@ fun LoginContent(
                         keyboardType = KeyboardType.Text,
                         capitalization = KeyboardCapitalization.Words
                     ),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -222,6 +236,7 @@ fun LoginContent(
                     enabled = isGuestNameValid,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .height(50.dp),
                 ) {
                     Text(stringResource(R.string.sign_in_guest))

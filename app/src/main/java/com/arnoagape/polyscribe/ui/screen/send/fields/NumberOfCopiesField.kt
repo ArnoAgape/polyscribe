@@ -127,6 +127,7 @@ fun NumberOfCopiesField(
 
                     IconButton(
                         onClick = { onNumberOfCopiesChange(numberOfCopies + 1) },
+                        enabled = numberOfCopies < 999,
                         modifier = Modifier.semantics {
                             contentDescription =
                                 resources.getString(R.string.contentDescription_add_copy)
@@ -170,7 +171,10 @@ fun NumberPickerDialog(
             OutlinedTextField(
                 value = inputValue,
                 onValueChange = { value ->
-                    inputValue = value.filter { it.isDigit() }
+                    val digitsOnly = value.filter { it.isDigit() }
+                    if (digitsOnly.length <= 3) {
+                        inputValue = digitsOnly
+                    }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true
@@ -179,7 +183,8 @@ fun NumberPickerDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    val finalValue = inputValue.toIntOrNull()?.coerceAtLeast(1) ?: 1
+                    val finalValue = inputValue
+                        .toIntOrNull()?.coerceIn(1, 999) ?: 1
                     onConfirm(finalValue)
                 },
                 colors = ButtonDefaults.textButtonColors(

@@ -114,6 +114,13 @@ fun SendScreen(
                 }
             }
 
+            is Event.ErrorUploadFiles -> {
+                snackbarHostState.showSnackbar(
+                    message = resources.getString(event.message),
+                    duration = SnackbarDuration.Short
+                )
+            }
+
             is Event.FileSentSuccessfully -> {
                 Toast.makeText(
                     context,

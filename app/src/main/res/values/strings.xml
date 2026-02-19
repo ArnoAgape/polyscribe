@@ -32,6 +32,8 @@
     <string name="error_sign_up">Sign up canceled or failed</string>
     <string name="error_no_account_file">An account is mandatory in order to add a file</string>
     <string name="error_no_account_profile">An account is mandatory in order to update your profile</string>
+    <string name="error_max_files">You have reached the file upload limit.</string>
+    <string name="error_max_size">Size limit is 50MB</string>
     <string name="no_network">No network available</string>
     <string name="try_again">Try again</string>
     <string name="no_files">To send a new file, please press the button "+"</string>

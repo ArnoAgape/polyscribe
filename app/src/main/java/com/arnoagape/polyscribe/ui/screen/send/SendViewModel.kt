@@ -1,5 +1,6 @@
 package com.arnoagape.polyscribe.ui.screen.send
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,8 +37,14 @@ import javax.inject.Inject
 @HiltViewModel
 class SendViewModel @Inject constructor(
     private val fileRepository: FileRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
+
+    companion object {
+        private const val MAX_FILES = 10
+        private const val MAX_TOTAL_SIZE = 50 * 1024 * 1024L // 50 MB
+    }
 
     private val _uiState = MutableStateFlow<SendUiState>(SendUiState.Idle)
     private val _events = Channel<Event>()
@@ -93,7 +101,11 @@ class SendViewModel @Inject constructor(
                 is FormEvent.ColorChanged -> form.copy(colored = event.colored)
                 is FormEvent.DoubleSidedChanged -> form.copy(doubleSided = event.doubleSided)
                 is FormEvent.NumberOfCopiesSet ->
-                    form.copy(numberOfCopies = event.value.coerceAtLeast(1))
+                    form.copy(
+                        numberOfCopies = event.value
+                            .coerceAtLeast(1)
+                            .coerceAtMost(999)
+                    )
 
                 is FormEvent.CommentChanged -> form.copy(comment = event.comment)
                 is FormEvent.GuestNameChanged -> form.copy(guestName = event.guestName) // LoginScreen field
@@ -102,7 +114,31 @@ class SendViewModel @Inject constructor(
         }
 
         when (event) {
-            is FormEvent.AddFile -> _localUris.update { it + event.uri }
+            is FormEvent.AddFile -> {
+                _localUris.update { current ->
+
+                    val newList = current + event.uri
+
+                    val totalSize = newList.sumOf { uri ->
+                        getFileSize(uri)
+                    }
+
+                    if (newList.size > 10) {
+                        viewModelScope.launch {
+                            _events.send(Event.ErrorUploadFiles(R.string.error_max_files))
+                        }
+                        current
+                    } else if (totalSize > MAX_TOTAL_SIZE) {
+                        viewModelScope.launch {
+                            _events.send(Event.ErrorUploadFiles(R.string.error_max_size))
+                        }
+                        current
+                    } else {
+                        newList
+                    }
+                }
+            }
+
             is FormEvent.RemoveFile -> _localUris.update { it - event.uri }
             else -> Unit
         }
@@ -115,6 +151,20 @@ class SendViewModel @Inject constructor(
     fun sendFile() {
         viewModelScope.launch {
             _uiState.value = SendUiState.Loading
+
+            val totalSize = _localUris.value.sumOf { getFileSize(it) }
+
+            if (_localUris.value.size > MAX_FILES) {
+                _uiState.value = SendUiState.Error.Generic()
+                _events.trySend(Event.ErrorUploadFiles(R.string.error_max_files))
+                return@launch
+            }
+
+            if (totalSize > MAX_TOTAL_SIZE) {
+                _uiState.value = SendUiState.Error.Generic()
+                _events.trySend(Event.ErrorUploadFiles(R.string.error_max_size))
+                return@launch
+            }
 
             val file = _formState.value.toFile(
                 id = UUID.randomUUID().toString()
@@ -140,6 +190,17 @@ class SendViewModel @Inject constructor(
                 _uiState.value = SendUiState.Error.Generic()
                 _events.trySend(Event.ShowMessage(R.string.error_generic))
             }
+        }
+    }
+
+    private fun getFileSize(uri: Uri): Long {
+        return try {
+            context.contentResolver
+                .openFileDescriptor(uri, "r")
+                ?.use { it.statSize }
+                ?: 0L
+        } catch (e: Exception) {
+            0L
         }
     }
 }
