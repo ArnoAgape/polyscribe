@@ -29,6 +29,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(
+                project.findProperty("storeFile") as String? ?: "upload-keystore.jks"
+            )
+            storePassword = project.findProperty("storePassword") as String?
+            keyAlias = project.findProperty("keyAlias") as String?
+            keyPassword = project.findProperty("keyPassword") as String?
+        }
+    }
+
     buildTypes {
 
         debug {
@@ -38,6 +49,7 @@ android {
         }
 
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             buildConfigField("Boolean", "IS_CI_BUILD", "false")
