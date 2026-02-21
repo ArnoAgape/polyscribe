@@ -22,8 +22,8 @@ android {
         applicationId = "com.arnoagape.polyscribe"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -125,7 +125,6 @@ dependencies {
 
     // Firebase & Firestore
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
     implementation(libs.firebase.ui.auth)
     implementation (libs.firebase.firestore)
     implementation(libs.firebase.messaging)
