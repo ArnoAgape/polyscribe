@@ -110,7 +110,9 @@ fun SendScreen(
                     duration = SnackbarDuration.Short
                 )
                 if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.sendFile()
+                    viewModel.onSaveButton {
+                        viewModel.sendFile()
+                    }
                 }
             }
 
@@ -163,7 +165,11 @@ fun SendScreen(
             SendSubmitSection(
                 isFileValid = state.isValid,
                 isLoading = state.uiState is SendUiState.Loading,
-                onSaveClicked = { viewModel.sendFile() }
+                onSaveClicked = {
+                    viewModel.onSaveButton {
+                        viewModel.sendFile()
+                    }
+                }
             )
         }
     ) { contentPadding ->

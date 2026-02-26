@@ -34,7 +34,7 @@
     <string name="error_no_account_profile">Un compte est nécessaire pour modifier vos informations</string>
     <string name="error_max_files">Vous avez atteint la limite maximale d\'envoi de fichiers.</string>
     <string name="error_max_size">Taille maximale de 50 Mo atteinte.</string>
-    <string name="no_network">Connectez-vous à un réseau pour continuer</string>
+    <string name="no_network">Aucune connexion internet.</string>
     <string name="try_again">Réessayer</string>
     <string name="no_files">Pour envoyer un nouveau document, appuyez sur le bouton "+"</string>
     <string name="error_number_of_copies">Le nombre de copies ne doit pas être égale à 0</string>

@@ -12,6 +12,7 @@ import com.arnoagape.polyscribe.domain.model.File
 import com.arnoagape.polyscribe.domain.model.SessionType
 import com.arnoagape.polyscribe.ui.common.Event
 import com.arnoagape.polyscribe.ui.common.FormEvent
+import com.arnoagape.polyscribe.ui.utils.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
@@ -37,6 +38,7 @@ import javax.inject.Inject
 class SendViewModel @Inject constructor(
     private val fileRepository: FileRepository,
     private val userRepository: UserRepository,
+    private val networkUtils: NetworkUtils,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -198,10 +200,23 @@ class SendViewModel @Inject constructor(
                 .openFileDescriptor(uri, "r")
                 ?.use { it.statSize }
                 ?: 0L
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0L
         }
     }
+
+
+    fun onSaveButton(onAllowed: () -> Unit) {
+        viewModelScope.launch {
+            if (!networkUtils.isNetworkAvailable()) {
+                _events.trySend(Event.ShowMessage(R.string.no_network))
+                return@launch
+            }
+
+            onAllowed()
+        }
+    }
+
 }
 
 data class SendScreenState(
